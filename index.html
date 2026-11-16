@@ -66,7 +66,7 @@
                     <i data-lucide="gift" class="w-8 h-8"></i>
                 </div>
                 <h1 class="font-serif text-3xl font-bold text-stone-800">Amigo Secreto</h1>
-                <p class="text-sm text-stone-500 mt-1">Entre ou crie sua conta para gerenciar seus desejos e reservar presentes com segurança.</p>
+                <p class="text-sm text-stone-500 mt-1">Entre ou crie sua conta para gerenciar seus desejos e escolher presentes (até R$ 100,00).</p>
             </div>
 
             <!-- Abas Entrar / Criar Conta -->
@@ -105,7 +105,7 @@
                     <label class="block text-sm font-semibold text-stone-700 mb-1.5">Seu E-mail (Opcional)</label>
                     <input type="email" id="auth-email" placeholder="seuemail@exemplo.com" autocomplete="email"
                         class="w-full px-4 py-3 rounded-xl border border-stone-300 focus:border-holiday-pine focus:ring-2 focus:ring-holiday-pine/20 outline-none text-base sm:text-sm">
-                    <p class="text-xs text-stone-400 mt-1">Usado para enviar os detalhes do presente que você escolher.</p>
+                    <p class="text-xs text-stone-400 mt-1">Usado para enviar os detalhes dos presentes que você escolher.</p>
                 </div>
 
                 <div>
@@ -244,32 +244,38 @@
                 </div>
             </section>
             
-            <!-- Banner de Resumo da Minha Reserva -->
-            <div id="my-reservation-banner" class="hidden mb-6 bg-gradient-to-r from-holiday-pine to-holiday-pineLight text-white p-4 sm:p-5 rounded-3xl shadow-md border border-holiday-gold/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div class="flex items-start gap-3">
-                    <div class="p-2.5 bg-white/15 rounded-2xl shrink-0 mt-0.5">
-                        <i data-lucide="shopping-bag" class="w-6 h-6 text-holiday-goldLight"></i>
+            <!-- Banner de Resumo da Minha Reserva (Múltiplos itens até R$ 100,00) -->
+            <div id="my-reservation-banner" class="hidden mb-6 bg-gradient-to-r from-holiday-pine to-holiday-pineLight text-white p-4 sm:p-5 rounded-3xl shadow-md border border-holiday-gold/40">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div class="flex items-start gap-3 min-w-0 flex-1">
+                        <div class="p-2.5 bg-white/15 rounded-2xl shrink-0 mt-0.5">
+                            <i data-lucide="shopping-bag" class="w-6 h-6 text-holiday-goldLight"></i>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <span class="text-[11px] uppercase tracking-wider font-bold text-holiday-goldLight">Sua Escolha Secreta (Só você vê)</span>
+                                <span id="banner-budget-pill" class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-white/15 text-holiday-goldLight">
+                                    R$ 0,00 / R$ 100,00
+                                </span>
+                            </div>
+                            <h3 id="banner-gift-recipient" class="font-serif text-lg font-bold text-white leading-snug mt-0.5">Para: Participante</h3>
+                            <p id="banner-budget-remaining" class="text-xs text-emerald-100 mt-0.5">Você ainda pode adicionar mais opções dessa pessoa até completar R$ 100,00.</p>
+                        </div>
                     </div>
-                    <div>
-                        <span class="text-[11px] uppercase tracking-wider font-bold text-holiday-goldLight">Sua Escolha Secreta (Só você vê)</span>
-                        <h3 id="banner-gift-title" class="font-serif text-lg font-bold text-white leading-snug">Presente escolhido</h3>
-                        <p id="banner-gift-recipient" class="text-xs text-emerald-100 mt-0.5">Para: Participante</p>
+                    <div class="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 w-full sm:w-auto shrink-0">
+                        <button onclick="sendEmailBackup()" class="min-h-[42px] px-3.5 py-2 rounded-xl bg-white text-holiday-pine hover:bg-holiday-goldLight font-bold text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer">
+                            <i data-lucide="mail" class="w-3.5 h-3.5"></i>
+                            <span>Enviar Resumo</span>
+                        </button>
+                        <button id="banner-unreserve-all-btn" class="min-h-[42px] px-3.5 py-2 rounded-xl bg-red-500/85 hover:bg-red-600 text-white font-semibold text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer">
+                            <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                            <span>Desmarcar Tudo</span>
+                        </button>
                     </div>
                 </div>
-                <div class="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 w-full sm:w-auto">
-                    <a id="banner-gift-link" href="#" target="_blank" rel="noopener noreferrer" class="col-span-2 sm:col-span-1 min-h-[42px] px-4 py-2 rounded-xl bg-white text-holiday-pine font-bold text-xs flex items-center justify-center gap-1.5 hover:bg-holiday-goldLight transition-colors">
-                        <span>Abrir Loja</span>
-                        <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
-                    </a>
-                    <button onclick="sendEmailBackup()" class="min-h-[42px] px-3.5 py-2 rounded-xl bg-white/15 hover:bg-white/25 text-white font-semibold text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer">
-                        <i data-lucide="mail" class="w-3.5 h-3.5"></i>
-                        <span>E-mail</span>
-                    </button>
-                    <button id="banner-unreserve-btn" class="min-h-[42px] px-3.5 py-2 rounded-xl bg-red-500/85 hover:bg-red-600 text-white font-semibold text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer">
-                        <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
-                        <span>Desmarcar</span>
-                    </button>
-                </div>
+
+                <!-- Lista dos Itens Escolhidos -->
+                <div id="banner-selected-items-list" class="mt-4 pt-3.5 border-t border-white/15 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5"></div>
             </div>
 
             <!-- Barra de Filtros -->
@@ -318,7 +324,7 @@
         <!-- Footer Desktop -->
         <footer class="hidden md:block bg-white border-t border-holiday-sand py-6 mt-12">
             <div class="max-w-6xl mx-auto px-4 text-center text-xs sm:text-sm text-stone-500 flex items-center justify-between gap-2">
-                <p>Amigo Secreto • Cada participante escolhe 1 presente por lista 🎄✨</p>
+                <p>Amigo Secreto • Escolha um ou mais presentes da mesma lista até R$ 100,00 🎄✨</p>
                 <p id="footer-user-info" class="text-xs text-stone-400"></p>
             </div>
         </footer>
@@ -563,7 +569,7 @@
                 </div>
                 <div>
                     <h2 class="font-serif text-lg sm:text-2xl font-bold text-stone-800 leading-tight">Minhas Opções de Presente</h2>
-                    <p class="text-[11px] sm:text-xs text-stone-500">Adicione uma ou mais opções para o seu amigo secreto escolher</p>
+                    <p class="text-[11px] sm:text-xs text-stone-500">Cadastre opções (informe o preço para que possam combinar itens até R$ 100,00)</p>
                 </div>
             </div>
 
@@ -603,20 +609,26 @@
         </div>
     </div>
 
-    <!-- ==================== MODAL: CONFIRMAÇÃO DE RESERVA + E-MAIL ==================== -->
+    <!-- ==================== MODAL: CONFIRMAÇÃO DE RESERVA + E-MAIL (ATÉ R$ 100,00) ==================== -->
     <div id="reserve-modal" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs z-50 hidden items-start sm:items-center justify-center p-0 sm:p-4 overflow-y-auto">
         <div id="reserve-modal-sheet" class="bg-white rounded-b-3xl sm:rounded-3xl max-w-md w-full p-6 pb-safe shadow-2xl border-b sm:border border-holiday-sand my-0 sm:my-auto">
             <div class="w-14 h-14 rounded-2xl bg-holiday-goldLight text-holiday-berry flex items-center justify-center mx-auto mb-3">
                 <i data-lucide="shopping-bag" class="w-7 h-7"></i>
             </div>
-            <h3 class="font-serif text-xl font-bold text-stone-800 text-center mb-2">Confirmar escolha de presente?</h3>
-            <p id="reserve-modal-desc" class="text-sm text-stone-600 text-center mb-4"></p>
+            <h3 class="font-serif text-xl font-bold text-stone-800 text-center mb-2">Adicionar presente à sua escolha?</h3>
+            <p id="reserve-modal-desc" class="text-sm text-stone-600 text-center mb-3"></p>
+
+            <!-- Resumo do Orçamento de R$ 100,00 -->
+            <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-3 mb-4 text-xs text-emerald-900 flex items-center justify-between">
+                <span>Total acumulado com este item:</span>
+                <strong id="reserve-modal-budget-summary" class="text-sm text-holiday-pine">R$ 0,00 / R$ 100,00</strong>
+            </div>
 
             <div class="bg-holiday-cream p-3.5 rounded-2xl border border-holiday-sand mb-5">
                 <label class="block text-xs font-bold text-stone-700 mb-1.5">Receber detalhes e link por e-mail:</label>
                 <input type="email" id="reserve-email-input" placeholder="seuemail@exemplo.com"
                     class="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 bg-white text-base sm:text-sm focus:border-holiday-pine outline-none">
-                <p class="text-[11px] text-stone-500 mt-1.5">O cartão inteiro ficará bloqueado para outros participantes, mas só você verá qual opção escolheu. <strong>Dica:</strong> caso não ache na caixa de entrada, verifique o Spam.</p>
+                <p class="text-[11px] text-stone-500 mt-1.5">O cartão desta pessoa ficará reservado para você, e você poderá escolher mais itens dela até atingir <strong>R$ 100,00</strong>. Só você vê quais itens escolheu.</p>
             </div>
 
             <div class="flex items-center gap-3 pb-2">
@@ -683,8 +695,9 @@
             emailjs.init({ publicKey: EMAILJS_CONFIG.publicKey });
         }
 
-        // Identificador exclusivo do Administrador
+        // Identificador exclusivo do Administrador e Teto de Orçamento
         const ADMIN_USERNAME_KEY = 'yuri_brian';
+        const MAX_GIFT_BUDGET = 100.00;
 
         let db = null;
         let auth = null;
@@ -702,6 +715,48 @@
         let pendingProfileAvatar = '';
 
         lucide.createIcons();
+
+        // ==================== UTILITÁRIOS DE PREÇO E RESERVAS MÚLTIPLAS ====================
+        function parsePriceBRL(priceStr) {
+            if (priceStr === null || priceStr === undefined) return 0;
+            if (typeof priceStr === 'number') return isNaN(priceStr) ? 0 : priceStr;
+            const cleaned = String(priceStr).replace(/[^\d,.-]/g, '').trim();
+            if (!cleaned) return 0;
+
+            let normalized = cleaned;
+            if (cleaned.includes(',') && cleaned.includes('.')) {
+                normalized = cleaned.replace(/\./g, '').replace(',', '.');
+            } else if (cleaned.includes(',')) {
+                normalized = cleaned.replace(',', '.');
+            }
+            const val = parseFloat(normalized);
+            return isNaN(val) || val < 0 ? 0 : val;
+        }
+
+        function formatBRL(value) {
+            return Number(value || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        }
+
+        function getReservedIndices(wishlist) {
+            if (!wishlist || !wishlist.reserved) return [];
+            if (Array.isArray(wishlist.reservedOptionIndices) && wishlist.reservedOptionIndices.length > 0) {
+                return wishlist.reservedOptionIndices
+                    .map(n => Number(n))
+                    .filter(n => !isNaN(n) && n >= 0 && n < (wishlist.options || []).length);
+            }
+            if (wishlist.reservedOptionIndex !== null && wishlist.reservedOptionIndex !== undefined) {
+                const idx = Number(wishlist.reservedOptionIndex);
+                if (!isNaN(idx) && idx >= 0 && idx < (wishlist.options || []).length) {
+                    return [idx];
+                }
+            }
+            return [];
+        }
+
+        function calculateSelectedTotal(wishlist, indices) {
+            const options = wishlist?.options || [];
+            return indices.reduce((sum, idx) => sum + parsePriceBRL(options[idx]?.price), 0);
+        }
 
         // ==================== CONTADOR REGRESSIVO (01/01 ÀS 00:00) ====================
         function startSecretSantaCountdown() {
@@ -788,7 +843,7 @@
             const toast = document.getElementById('toast');
             document.getElementById('toast-message').textContent = msg;
             toast.classList.remove('translate-y-32', 'opacity-0');
-            setTimeout(() => toast.classList.add('translate-y-32', 'opacity-0'), 3800);
+            setTimeout(() => toast.classList.add('translate-y-32', 'opacity-0'), 4200);
         };
 
         window.copyTextToClipboard = function(text) {
@@ -1111,7 +1166,6 @@
             document.getElementById('header-username').textContent = userObj.displayName;
             document.getElementById('footer-user-info').textContent = `Conectado como: ${userObj.displayName}`;
 
-            // Exibe botão Admin exclusivamente para Yuri Brian
             const adminBtn = document.getElementById('btn-admin-panel');
             if (isCurrentUserAdmin()) {
                 adminBtn.classList.remove('hidden');
@@ -1151,7 +1205,6 @@
 
         // ==================== LÓGICA DO SORTEADOR E CONTROLE ADM ====================
         function generateSecretSantaAssignments(userKeys) {
-            // Embaralha Fisher-Yates e cria um ciclo único garantido (ninguém tira a si mesmo)
             const shuffled = [...userKeys];
             for (let i = shuffled.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
@@ -1221,14 +1274,12 @@
             const myAssignedKey = drawSettings.assignments?.[loggedUser.usernameKey] || null;
             const hasRevealed = Boolean(drawSettings.revealedBy?.[loggedUser.usernameKey]);
 
-            // 1. Card Principal do Perfil
             const iconWrap = document.getElementById('draw-card-icon-wrap');
             const badge = document.getElementById('draw-card-badge');
             const title = document.getElementById('draw-card-title');
             const subtitle = document.getElementById('draw-card-subtitle');
             const mainBtn = document.getElementById('main-draw-btn');
 
-            // 2. Botões Header Desktop, Barra Mobile e Modal de Perfil
             const headerBtn = document.getElementById('header-draw-btn');
             const headerLabel = document.getElementById('header-draw-label');
             const mobileBtn = document.getElementById('mobile-draw-btn');
@@ -1236,7 +1287,6 @@
             const profileModalStatus = document.getElementById('profile-modal-draw-status');
 
             if (!isUnlocked || !myAssignedKey) {
-                // Bloqueado
                 iconWrap.className = "w-12 h-12 rounded-2xl bg-stone-100 text-stone-400 flex items-center justify-center shrink-0";
                 iconWrap.innerHTML = `<i data-lucide="lock" class="w-6 h-6"></i>`;
                 badge.className = "text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-stone-100 text-stone-500";
@@ -1260,7 +1310,6 @@
                 profileModalBtn.innerHTML = `<i data-lucide="lock" class="w-3.5 h-3.5"></i><span>Sortear</span>`;
                 profileModalStatus.textContent = "Aguardando ADM liberar";
             } else if (!hasRevealed) {
-                // Liberado e pronto para sortear
                 iconWrap.className = "w-12 h-12 rounded-2xl bg-holiday-goldLight text-holiday-berry flex items-center justify-center shrink-0";
                 iconWrap.innerHTML = `<i data-lucide="sparkles" class="w-6 h-6"></i>`;
                 badge.className = "text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800";
@@ -1284,7 +1333,6 @@
                 profileModalBtn.innerHTML = `<i data-lucide="shuffle" class="w-3.5 h-3.5"></i><span>Sortear</span>`;
                 profileModalStatus.textContent = "Liberado! Pronto para sortear";
             } else {
-                // Já sorteou
                 iconWrap.className = "w-12 h-12 rounded-2xl bg-holiday-pine text-holiday-goldLight flex items-center justify-center shrink-0";
                 iconWrap.innerHTML = `<i data-lucide="gift" class="w-6 h-6"></i>`;
                 badge.className = "text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-holiday-goldLight text-holiday-pine";
@@ -1309,7 +1357,6 @@
                 profileModalStatus.textContent = "Você já realizou seu sorteio";
             }
 
-            // Atualiza controles do Painel ADM se estiver aberto
             const adminPill = document.getElementById('admin-draw-status-pill');
             const adminDesc = document.getElementById('admin-draw-status-desc');
             const releaseBtn = document.getElementById('btn-admin-release-draw');
@@ -1654,7 +1701,6 @@
         function subscribeToRealtimeData() {
             if (!db || !loggedUser) return;
 
-            // 1. Configuração e estado do sorteio
             const drawDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'secret_santa_config', 'draw_state');
             onSnapshot(drawDocRef, (docSnap) => {
                 if (docSnap.exists()) {
@@ -1668,7 +1714,6 @@
                 }
             });
 
-            // 2. Diretório de usuários
             const usersColRef = collection(db, 'artifacts', appId, 'public', 'data', 'secret_santa_users');
             onSnapshot(usersColRef, (snapshot) => {
                 usersDirectory = {};
@@ -1690,7 +1735,6 @@
                 }
             });
 
-            // 3. Listas de presentes
             const wishlistsColRef = collection(db, 'artifacts', appId, 'public', 'data', 'secret_santa_wishlists');
             onSnapshot(wishlistsColRef, (snapshot) => {
                 allWishlists = [];
@@ -1754,6 +1798,7 @@
             renderWishlists();
         };
 
+        // ==================== BANNER DE MINHAS ESCOLHAS (ATÉ R$ 100,00) ====================
         function updateMyReservationBanner() {
             const banner = document.getElementById('my-reservation-banner');
             const myReservedList = allWishlists.find(w => w.reserved && w.reservedBy === loggedUser.usernameKey);
@@ -1763,12 +1808,56 @@
                 return;
             }
 
-            const chosenOpt = (myReservedList.options || [])[myReservedList.reservedOptionIndex] || (myReservedList.options || [])[0];
+            const selectedIndices = getReservedIndices(myReservedList);
+            const totalSpent = calculateSelectedTotal(myReservedList, selectedIndices);
+            const remaining = Math.max(0, MAX_GIFT_BUDGET - totalSpent);
+
             banner.classList.remove('hidden');
-            document.getElementById('banner-gift-title').textContent = chosenOpt ? chosenOpt.title : 'Presente selecionado';
-            document.getElementById('banner-gift-recipient').textContent = `Para: ${myReservedList.displayName} (Opção ${(myReservedList.reservedOptionIndex ?? 0) + 1})`;
-            document.getElementById('banner-gift-link').href = chosenOpt ? chosenOpt.url : '#';
-            document.getElementById('banner-unreserve-btn').onclick = () => promptUnreserve(myReservedList.id, myReservedList.displayName);
+            document.getElementById('banner-gift-recipient').textContent =
+                `Para: ${myReservedList.displayName} (${selectedIndices.length} ${selectedIndices.length === 1 ? 'presente selecionado' : 'presentes selecionados'})`;
+            document.getElementById('banner-budget-pill').textContent =
+                `${formatBRL(totalSpent)} / ${formatBRL(MAX_GIFT_BUDGET)}`;
+
+            const remainingEl = document.getElementById('banner-budget-remaining');
+            if (remaining > 0.009) {
+                remainingEl.textContent = `Saldo disponível para adicionar mais presentes de ${myReservedList.displayName}: ${formatBRL(remaining)}.`;
+            } else {
+                remainingEl.textContent = `Você atingiu o limite máximo de ${formatBRL(MAX_GIFT_BUDGET)}.`;
+            }
+
+            document.getElementById('banner-unreserve-all-btn').onclick = () =>
+                promptUnreserveAll(myReservedList.id, myReservedList.displayName);
+
+            const itemsContainer = document.getElementById('banner-selected-items-list');
+            const options = myReservedList.options || [];
+
+            itemsContainer.innerHTML = selectedIndices.map(idx => {
+                const opt = options[idx];
+                if (!opt) return '';
+                const itemPrice = parsePriceBRL(opt.price);
+                return `
+                    <div class="bg-white/10 border border-white/15 rounded-2xl p-3 flex items-center justify-between gap-2.5">
+                        <div class="min-w-0">
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-holiday-goldLight block">
+                                Opção ${idx + 1} • ${itemPrice > 0 ? formatBRL(itemPrice) : 'Sem valor'}
+                            </span>
+                            <p class="text-xs font-bold text-white truncate">${escapeHtml(opt.title)}</p>
+                        </div>
+                        <div class="flex items-center gap-1.5 shrink-0">
+                            <a href="${escapeHtml(opt.url)}" target="_blank" rel="noopener noreferrer" title="Abrir na loja"
+                               class="p-2 rounded-xl bg-white text-holiday-pine hover:bg-holiday-goldLight transition-colors">
+                                <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+                            </a>
+                            <button type="button" onclick="promptUnreserveSingleItem('${myReservedList.id}', ${idx})" title="Remover este item"
+                                class="p-2 rounded-xl bg-red-500/80 hover:bg-red-600 text-white transition-colors cursor-pointer">
+                                <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            lucide.createIcons();
         }
 
         // ==================== RENDERIZAÇÃO DOS CARTÕES ====================
@@ -1801,6 +1890,10 @@
                 const options = wishlist.options || [];
                 const initial = escapeHtml((wishlist.displayName || '?').charAt(0).toUpperCase());
                 const liveAvatar = getParticipantAvatar(wishlist.id, wishlist.avatarUrl);
+
+                const mySelectedIndices = reservedByMe ? getReservedIndices(wishlist) : [];
+                const myCurrentTotal = reservedByMe ? calculateSelectedTotal(wishlist, mySelectedIndices) : 0;
+                const myRemainingBudget = Math.max(0, MAX_GIFT_BUDGET - myCurrentTotal);
 
                 const avatarHtml = liveAvatar
                     ? `<img src="${escapeHtml(liveAvatar)}" alt="${escapeHtml(wishlist.displayName)}" class="w-12 h-12 rounded-2xl object-cover border-2 border-holiday-gold/60 shrink-0 shadow-xs">`
@@ -1836,12 +1929,14 @@
                             ${isReserved ? `
                                 <span class="w-full sm:w-auto min-h-[38px] px-3.5 py-2 rounded-xl bg-holiday-berry text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-xs">
                                     <i data-lucide="check-circle-2" class="w-4 h-4"></i>
-                                    <span>${reservedByMe ? 'Você escolheu este presente!' : 'Presente já escolhido!'}</span>
+                                    <span>${reservedByMe
+                                        ? `Você escolheu ${mySelectedIndices.length} ${mySelectedIndices.length === 1 ? 'item' : 'itens'} (${formatBRL(myCurrentTotal)} / R$ 100)`
+                                        : 'Presente já escolhido!'}</span>
                                 </span>
                                 ${reservedByMe ? `
-                                    <button onclick="promptUnreserve('${wishlist.id}', '${escapeHtml(wishlist.displayName).replace(/'/g, "\\'")}')" class="w-full sm:w-auto min-h-[40px] px-3 py-2 rounded-xl bg-stone-200 hover:bg-red-100 text-stone-700 hover:text-red-700 text-xs font-bold flex items-center justify-center gap-1 transition-colors cursor-pointer">
+                                    <button onclick="promptUnreserveAll('${wishlist.id}', '${escapeHtml(wishlist.displayName).replace(/'/g, "\\'")}')" class="w-full sm:w-auto min-h-[40px] px-3 py-2 rounded-xl bg-stone-200 hover:bg-red-100 text-stone-700 hover:text-red-700 text-xs font-bold flex items-center justify-center gap-1 transition-colors cursor-pointer">
                                         <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
-                                        <span>Desmarcar minha escolha</span>
+                                        <span>Desmarcar tudo</span>
                                     </button>
                                 ` : ''}
                             ` : `
@@ -1858,7 +1953,10 @@
                             const smartFallback = getSmartGiftIllustration(opt.title, opt.url);
                             const imgUrl = opt.imageUrl && opt.imageUrl.trim() !== '' ? opt.imageUrl : smartFallback;
                             const domain = extractDomain(opt.url);
-                            const isThisOptionChosenByMe = reservedByMe && wishlist.reservedOptionIndex === idx;
+                            const isThisOptionChosenByMe = reservedByMe && mySelectedIndices.includes(idx);
+                            const itemPrice = parsePriceBRL(opt.price);
+                            const canAfford = (myCurrentTotal + itemPrice) <= (MAX_GIFT_BUDGET + 0.009);
+                            const canSelectMore = !isMine && (!isReserved || reservedByMe) && !isThisOptionChosenByMe && canAfford;
 
                             return `
                             <div class="rounded-2xl border ${isThisOptionChosenByMe ? 'border-holiday-pine ring-2 ring-holiday-pine/30 bg-emerald-50/30' : 'border-stone-200 bg-white'} flex flex-col overflow-hidden transition-all">
@@ -1871,7 +1969,7 @@
                                     </span>
                                     ${isThisOptionChosenByMe ? `
                                         <span class="absolute top-2.5 right-2.5 bg-holiday-pine text-white text-[11px] font-bold px-2.5 py-1 rounded-lg flex items-center gap-1">
-                                            <i data-lucide="check" class="w-3 h-3"></i> Sua escolha
+                                            <i data-lucide="check" class="w-3 h-3"></i> Escolhido
                                         </span>
                                     ` : ''}
                                 </div>
@@ -1895,12 +1993,24 @@
                                             <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
                                         </a>
 
-                                        ${!isMine && !isReserved ? `
+                                        ${isThisOptionChosenByMe ? `
+                                            <button onclick="promptUnreserveSingleItem('${wishlist.id}', ${idx})"
+                                                class="min-h-[42px] px-3.5 py-2.5 rounded-xl text-xs font-bold bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 transition-all flex items-center gap-1.5 cursor-pointer">
+                                                <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                                                <span>Remover</span>
+                                            </button>
+                                        ` : canSelectMore ? `
                                             <button onclick="openReserveModal('${wishlist.id}', ${idx})"
                                                 class="min-h-[42px] px-4 py-2.5 rounded-xl text-xs font-bold bg-holiday-pine hover:bg-holiday-pineLight active:scale-[0.98] text-white shadow-xs transition-all flex items-center gap-1.5 cursor-pointer">
                                                 <i data-lucide="shopping-bag" class="w-3.5 h-3.5"></i>
-                                                <span>Vou dar este!</span>
+                                                <span>${reservedByMe ? '+ Adicionar' : 'Vou dar este!'}</span>
                                             </button>
+                                        ` : (!isMine && (!isReserved || reservedByMe) && !canAfford) ? `
+                                            <span title="Passa do limite de R$ 100,00 (Saldo: ${formatBRL(myRemainingBudget)})"
+                                                class="min-h-[42px] px-3 py-2 rounded-xl text-[11px] font-bold bg-stone-100 text-stone-400 flex items-center gap-1 cursor-not-allowed">
+                                                <i data-lucide="ban" class="w-3.5 h-3.5"></i>
+                                                <span>Limite R$ 100</span>
+                                            </span>
                                         ` : ''}
                                     </div>
                                 </div>
@@ -2020,8 +2130,8 @@
                             class="opt-title w-full px-3.5 py-2.5 rounded-xl border border-stone-300 focus:border-holiday-pine outline-none text-base sm:text-sm">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-stone-700 mb-1">Preço Estimado</label>
-                        <input type="text" placeholder="Ex: R$ 150,00" value="${escapeHtml(data.price || '')}"
+                        <label class="block text-xs font-semibold text-stone-700 mb-1">Preço (R$) *</label>
+                        <input type="text" required placeholder="Ex: R$ 45,00" value="${escapeHtml(data.price || '')}"
                             class="opt-price w-full px-3.5 py-2.5 rounded-xl border border-stone-300 focus:border-holiday-pine outline-none text-base sm:text-sm">
                     </div>
                 </div>
@@ -2177,16 +2287,21 @@
                 const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'secret_santa_wishlists', loggedUser.usernameKey);
                 const latestAvatar = getParticipantAvatar(loggedUser.usernameKey, loggedUser.avatarUrl);
 
+                const validIndices = existing
+                    ? getReservedIndices(existing).filter(i => i < options.length)
+                    : [];
+
                 await setDoc(docRef, {
                     usernameKey: loggedUser.usernameKey,
                     displayName: loggedUser.displayName,
                     avatarUrl: latestAvatar,
                     generalNotes: document.getElementById('general-notes').value.trim(),
                     options,
-                    reserved: existing ? Boolean(existing.reserved) : false,
-                    reservedBy: existing ? (existing.reservedBy || null) : null,
-                    reservedByName: existing ? (existing.reservedByName || null) : null,
-                    reservedOptionIndex: existing ? (existing.reservedOptionIndex ?? null) : null,
+                    reserved: validIndices.length > 0,
+                    reservedBy: validIndices.length > 0 ? existing.reservedBy : null,
+                    reservedByName: validIndices.length > 0 ? existing.reservedByName : null,
+                    reservedOptionIndex: validIndices.length > 0 ? validIndices[0] : null,
+                    reservedOptionIndices: validIndices,
                     updatedAt: serverTimestamp()
                 });
 
@@ -2233,22 +2348,49 @@
             modal.classList.add('flex');
         };
 
-        // ==================== RESERVAR E DESMARCAR (OPÇÃO A + E-MAIL) ====================
+        // ==================== RESERVAR MÚLTIPLOS PRESENTES ATÉ R$ 100,00 ====================
         window.openReserveModal = function(wishlistId, optionIdx) {
             const wishlist = allWishlists.find(w => w.id === wishlistId);
             if (!wishlist) return;
 
-            const alreadyReservedOne = allWishlists.find(w => w.reserved && w.reservedBy === loggedUser.usernameKey);
-            if (alreadyReservedOne) {
-                showToast(`Você já escolheu o presente de ${alreadyReservedOne.displayName}. Desmarque-o primeiro se quiser trocar.`);
+            // Impede escolher presentes de duas pessoas diferentes
+            const alreadyReservedOther = allWishlists.find(
+                w => w.reserved && w.reservedBy === loggedUser.usernameKey && w.id !== wishlistId
+            );
+            if (alreadyReservedOther) {
+                showToast(`Você já está presenteando ${alreadyReservedOther.displayName}. Desmarque a lista dele(a) primeiro se quiser trocar de pessoa.`);
                 return;
             }
 
             const option = wishlist.options[optionIdx];
-            pendingReserveData = { wishlist, option, optionIdx };
+            if (!option) return;
+
+            const currentIndices = (wishlist.reserved && wishlist.reservedBy === loggedUser.usernameKey)
+                ? getReservedIndices(wishlist)
+                : [];
+
+            if (currentIndices.includes(optionIdx)) {
+                showToast("Você já selecionou esta opção!");
+                return;
+            }
+
+            const currentTotal = calculateSelectedTotal(wishlist, currentIndices);
+            const newItemPrice = parsePriceBRL(option.price);
+            const projectedTotal = currentTotal + newItemPrice;
+
+            if (projectedTotal > MAX_GIFT_BUDGET + 0.009) {
+                showToast(`Não é possível adicionar: a soma passaria de ${formatBRL(MAX_GIFT_BUDGET)} (Total ficaria ${formatBRL(projectedTotal)}).`);
+                return;
+            }
+
+            pendingReserveData = { wishlist, option, optionIdx, currentIndices, projectedTotal };
 
             document.getElementById('reserve-modal-desc').innerHTML =
-                `Você vai presentear <strong>${escapeHtml(wishlist.displayName)}</strong> com:<br><span class="font-bold text-holiday-pine">"${escapeHtml(option.title)}"</span>`;
+                `Você vai presentear <strong>${escapeHtml(wishlist.displayName)}</strong> com:<br><span class="font-bold text-holiday-pine">"${escapeHtml(option.title)}"</span>${newItemPrice > 0 ? ` (${formatBRL(newItemPrice)})` : ''}`;
+
+            document.getElementById('reserve-modal-budget-summary').textContent =
+                `${formatBRL(projectedTotal)} / ${formatBRL(MAX_GIFT_BUDGET)}`;
+
             document.getElementById('reserve-email-input').value = loggedUser.email || '';
 
             const modal = document.getElementById('reserve-modal');
@@ -2266,8 +2408,9 @@
         document.getElementById('btn-confirm-reserve').addEventListener('click', async () => {
             if (!pendingReserveData || !db || !loggedUser) return;
 
-            const { wishlist, option, optionIdx } = pendingReserveData;
+            const { wishlist, option, optionIdx, currentIndices, projectedTotal } = pendingReserveData;
             const targetEmail = document.getElementById('reserve-email-input').value.trim();
+            const updatedIndices = [...currentIndices, optionIdx].sort((a, b) => a - b);
 
             try {
                 const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'secret_santa_wishlists', wishlist.id);
@@ -2275,7 +2418,8 @@
                     reserved: true,
                     reservedBy: loggedUser.usernameKey,
                     reservedByName: loggedUser.displayName,
-                    reservedOptionIndex: optionIdx
+                    reservedOptionIndex: updatedIndices[0],
+                    reservedOptionIndices: updatedIndices
                 });
 
                 if (targetEmail && targetEmail !== loggedUser.email) {
@@ -2285,23 +2429,32 @@
                     await setDoc(userRef, { email: targetEmail }, { merge: true });
                 }
 
+                const chosenTitles = updatedIndices
+                    .map(i => wishlist.options[i]?.title)
+                    .filter(Boolean)
+                    .join(' + ');
+
+                const chosenUrls = updatedIndices
+                    .map(i => wishlist.options[i]?.url)
+                    .filter(Boolean)
+                    .join(' | ');
+
                 if (targetEmail && EMAILJS_CONFIG.publicKey && EMAILJS_CONFIG.serviceId && EMAILJS_CONFIG.templateId && window.emailjs) {
                     emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, {
                         to_email: targetEmail,
                         to_name: loggedUser.displayName,
                         recipient_name: wishlist.displayName,
-                        gift_title: option.title,
-                        gift_price: option.price || 'Não informado',
-                        gift_url: option.url,
+                        gift_title: chosenTitles,
+                        gift_price: formatBRL(projectedTotal),
+                        gift_url: chosenUrls,
                         gift_notes: option.notes || 'Nenhuma'
                     }).then(() => {
-                        showToast(`Presente reservado e enviado para ${targetEmail}!`);
-                    }).catch((err) => {
-                        console.error("Erro EmailJS:", err);
-                        showToast("Presente reservado! Toque em 'E-mail' no topo se precisar.");
+                        showToast(`Presente adicionado (${formatBRL(projectedTotal)} / R$ 100) e enviado por e-mail!`);
+                    }).catch(() => {
+                        showToast(`Presente adicionado (${formatBRL(projectedTotal)} / R$ 100)!`);
                     });
                 } else {
-                    showToast(`Presente de ${wishlist.displayName} reservado com sucesso!`);
+                    showToast(`Presente adicionado! Total acumulado: ${formatBRL(projectedTotal)} / R$ 100,00`);
                 }
 
                 closeReserveModal();
@@ -2314,26 +2467,69 @@
         window.sendEmailBackup = function() {
             const myReservedList = allWishlists.find(w => w.reserved && w.reservedBy === loggedUser.usernameKey);
             if (!myReservedList) return;
-            const opt = myReservedList.options[myReservedList.reservedOptionIndex] || myReservedList.options[0];
-            const subject = encodeURIComponent(`Meu Amigo Secreto - Presente para ${myReservedList.displayName}`);
+            const indices = getReservedIndices(myReservedList);
+            const totalSpent = calculateSelectedTotal(myReservedList, indices);
+
+            const itemsLines = indices.map((idx, count) => {
+                const opt = myReservedList.options[idx];
+                if (!opt) return '';
+                return `${count + 1}. ${opt.title} (${opt.price || 'Sem preço'})\n   Link: ${opt.url}${opt.notes ? `\n   Obs: ${opt.notes}` : ''}`;
+            }).filter(Boolean).join('\n\n');
+
+            const subject = encodeURIComponent(`Meu Amigo Secreto - Presentes para ${myReservedList.displayName}`);
             const body = encodeURIComponent(
                 `Olá ${loggedUser.displayName}!\n\n` +
-                `Aqui estão os detalhes do presente que você escolheu no Amigo Secreto:\n\n` +
-                `• Amigo Secreto: ${myReservedList.displayName}\n` +
-                `• Presente escolhido: ${opt.title}\n` +
-                `• Preço estimado: ${opt.price || 'Não informado'}\n` +
-                `• Observações: ${opt.notes || 'Nenhuma'}\n` +
-                `• Link para comprar: ${opt.url}\n\n` +
-                `Caso precise desmarcar ou trocar, basta acessar o site com sua conta (${loggedUser.displayName}).`
+                `Aqui está o resumo dos presentes que você escolheu para ${myReservedList.displayName} (Total: ${formatBRL(totalSpent)} / R$ 100,00):\n\n` +
+                `${itemsLines}\n\n` +
+                `Caso precise ajustar sua escolha, basta acessar o site com sua conta (${loggedUser.displayName}).`
             );
             window.location.href = `mailto:${loggedUser.email || ''}?subject=${subject}&body=${body}`;
         };
 
-        window.promptUnreserve = function(wishlistId, displayName) {
-            document.getElementById('confirm-title').textContent = "Desmarcar sua escolha?";
+        window.promptUnreserveSingleItem = function(wishlistId, optionIdx) {
+            const wishlist = allWishlists.find(w => w.id === wishlistId);
+            if (!wishlist) return;
+            const option = wishlist.options[optionIdx];
+            const currentIndices = getReservedIndices(wishlist);
+            const remainingIndices = currentIndices.filter(i => i !== optionIdx);
+
+            document.getElementById('confirm-title').textContent = "Remover este presente da escolha?";
+            document.getElementById('confirm-message').innerHTML = remainingIndices.length > 0
+                ? `Deseja desmarcar <strong>"${escapeHtml(option?.title || 'este item')}"</strong>? Os outros itens que você escolheu para ${escapeHtml(wishlist.displayName)} continuarão reservados.`
+                : `Deseja desmarcar <strong>"${escapeHtml(option?.title || 'este item')}"</strong>? Como é o único item selecionado, a lista de ${escapeHtml(wishlist.displayName)} voltará a ficar disponível para todos.`;
+            document.getElementById('confirm-action-btn').textContent = "Sim, remover item";
+
+            pendingConfirmAction = async () => {
+                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'secret_santa_wishlists', wishlistId);
+                if (remainingIndices.length > 0) {
+                    await updateDoc(docRef, {
+                        reserved: true,
+                        reservedOptionIndex: remainingIndices[0],
+                        reservedOptionIndices: remainingIndices
+                    });
+                    showToast("Item removido da sua seleção.");
+                } else {
+                    await updateDoc(docRef, {
+                        reserved: false,
+                        reservedBy: null,
+                        reservedByName: null,
+                        reservedOptionIndex: null,
+                        reservedOptionIndices: []
+                    });
+                    showToast("Sua escolha foi desmarcada com sucesso.");
+                }
+            };
+
+            const modal = document.getElementById('confirm-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        };
+
+        window.promptUnreserveAll = function(wishlistId, displayName) {
+            document.getElementById('confirm-title').textContent = "Desmarcar todos os presentes?";
             document.getElementById('confirm-message').innerHTML =
-                `Deseja cancelar sua escolha para <strong>${escapeHtml(displayName)}</strong>? Todas as opções dessa pessoa voltarão a ficar disponíveis para o grupo.`;
-            document.getElementById('confirm-action-btn').textContent = "Sim, desmarcar";
+                `Deseja cancelar toda a sua seleção para <strong>${escapeHtml(displayName)}</strong>? Todas as opções dessa pessoa voltarão a ficar disponíveis para o grupo.`;
+            document.getElementById('confirm-action-btn').textContent = "Sim, desmarcar tudo";
 
             pendingConfirmAction = async () => {
                 const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'secret_santa_wishlists', wishlistId);
@@ -2341,7 +2537,8 @@
                     reserved: false,
                     reservedBy: null,
                     reservedByName: null,
-                    reservedOptionIndex: null
+                    reservedOptionIndex: null,
+                    reservedOptionIndices: []
                 });
                 showToast("Sua escolha foi desmarcada com sucesso.");
             };
