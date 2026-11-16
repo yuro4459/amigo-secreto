@@ -142,21 +142,27 @@
                     </div>
                 </div>
 
-                <!-- Ações Admin, Perfil, Meus Desejos e Sair -->
-                <div class="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+                <!-- Ações Admin, Sorteio, Perfil, Meus Desejos e Sair -->
+                <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
                     <!-- Botão Exclusivo Admin (Yuri Brian) -->
                     <button id="btn-admin-panel" onclick="openAdminModal()" title="Painel do Administrador" class="hidden min-h-[42px] px-2.5 sm:px-3.5 py-2 rounded-xl bg-holiday-gold text-stone-900 hover:bg-holiday-goldLight font-bold text-xs sm:text-sm items-center gap-1.5 shadow-sm transition-colors cursor-pointer">
                         <i data-lucide="shield-check" class="w-4 h-4 text-holiday-pine"></i>
                         <span>Admin</span>
                     </button>
 
-                    <button onclick="openProfileModal()" title="Alterar foto de perfil" class="min-h-[42px] flex items-center gap-2 bg-holiday-pineLight/70 hover:bg-holiday-pineLight px-2.5 sm:px-3.5 py-1.5 rounded-2xl border border-emerald-700/60 text-xs text-emerald-100 transition-colors cursor-pointer">
+                    <!-- Botão de Sorteio no Perfil (Desktop) -->
+                    <button id="header-draw-btn" onclick="openDrawModal()" class="hidden md:flex min-h-[42px] px-3.5 py-2 rounded-xl bg-white/10 text-emerald-100 border border-white/15 font-bold text-xs items-center gap-1.5 transition-all cursor-pointer">
+                        <i id="header-draw-icon" data-lucide="lock" class="w-4 h-4 text-holiday-goldLight"></i>
+                        <span id="header-draw-label">Sorteio Bloqueado</span>
+                    </button>
+
+                    <button onclick="openProfileModal()" title="Seu Perfil e Sorteio" class="min-h-[42px] flex items-center gap-2 bg-holiday-pineLight/70 hover:bg-holiday-pineLight px-2.5 sm:px-3.5 py-1.5 rounded-2xl border border-emerald-700/60 text-xs text-emerald-100 transition-colors cursor-pointer">
                         <div id="header-avatar-container" class="w-7 h-7 rounded-full bg-holiday-berry text-holiday-goldLight font-bold flex items-center justify-center overflow-hidden border border-holiday-gold/50 shrink-0">
                             <span id="header-avatar-initial">?</span>
                             <img id="header-avatar-img" src="" alt="Perfil" class="w-full h-full object-cover hidden">
                         </div>
                         <span class="hidden sm:inline">Olá, <strong id="header-username" class="text-white">Participante</strong></span>
-                        <i data-lucide="camera" class="w-3.5 h-3.5 text-holiday-goldLight"></i>
+                        <i data-lucide="user-cog" class="w-3.5 h-3.5 text-holiday-goldLight"></i>
                     </button>
 
                     <button onclick="openMyWishesModal()" class="hidden md:flex items-center justify-center gap-2 bg-holiday-berry hover:bg-holiday-berryLight text-white font-semibold px-4 py-2.5 rounded-xl shadow-sm transition-all active:scale-95 text-sm cursor-pointer">
@@ -166,7 +172,6 @@
 
                     <button onclick="logoutUser()" title="Sair da conta" class="min-h-[42px] px-2.5 sm:px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 active:bg-white/30 text-white text-xs sm:text-sm font-semibold flex items-center gap-1.5 transition-colors cursor-pointer">
                         <i data-lucide="log-out" class="w-4 h-4"></i>
-                        <span class="hidden sm:inline md:hidden">Sair</span>
                     </button>
                 </div>
             </div>
@@ -174,6 +179,70 @@
 
         <!-- Conteúdo Principal -->
         <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-5 sm:py-8">
+
+            <!-- Card de Sorteio Individual no Perfil -->
+            <section id="profile-draw-card" class="mb-6 bg-white rounded-3xl p-4 sm:p-5 shadow-sm border border-holiday-sand flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+                <div class="flex items-center gap-3.5">
+                    <div id="draw-card-icon-wrap" class="w-12 h-12 rounded-2xl bg-stone-100 text-stone-400 flex items-center justify-center shrink-0">
+                        <i id="draw-card-icon" data-lucide="lock" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <span id="draw-card-badge" class="text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-stone-100 text-stone-500">
+                                Aguardando Liberação
+                            </span>
+                        </div>
+                        <h2 id="draw-card-title" class="font-serif text-lg font-bold text-stone-800 mt-0.5">
+                            Seu Sorteio do Amigo Secreto
+                        </h2>
+                        <p id="draw-card-subtitle" class="text-xs text-stone-500">
+                            O botão de sortear está desativado até o administrador liberar o sorteio.
+                        </p>
+                    </div>
+                </div>
+
+                <button id="main-draw-btn" onclick="openDrawModal()" disabled
+                    class="min-h-[46px] px-5 py-2.5 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all shrink-0 bg-stone-200 text-stone-400 cursor-not-allowed">
+                    <i data-lucide="lock" class="w-4 h-4"></i>
+                    <span>Sortear Amigo Secreto</span>
+                </button>
+            </section>
+
+            <!-- Contador Regressivo até 01/01 às 00:00 -->
+            <section id="countdown-card" class="mb-6 bg-white rounded-3xl p-4 sm:p-6 shadow-sm border border-holiday-gold/50 relative overflow-hidden">
+                <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+                    <div class="flex items-center gap-3 text-center sm:text-left">
+                        <div class="w-11 h-11 rounded-2xl bg-holiday-berry/10 text-holiday-berry border border-holiday-berry/20 flex items-center justify-center shrink-0">
+                            <i data-lucide="clock" class="w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <span class="text-[11px] font-bold uppercase tracking-wider text-holiday-berry block">Contagem Regressiva</span>
+                            <h2 id="countdown-title" class="font-serif text-lg sm:text-xl font-bold text-stone-800 leading-tight">
+                                Entrega dos Presentes • 01 de Janeiro às 00:00
+                            </h2>
+                        </div>
+                    </div>
+
+                    <div id="countdown-boxes" class="grid grid-cols-4 gap-2 sm:gap-3 w-full md:w-auto">
+                        <div class="bg-holiday-cream border border-holiday-sand rounded-2xl px-2.5 py-2 sm:px-4 sm:py-2.5 text-center min-w-[66px] sm:min-w-[78px]">
+                            <span id="cd-days" class="block font-serif text-xl sm:text-2xl font-bold text-holiday-pine tabular-nums">--</span>
+                            <span class="text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider text-stone-500">Dias</span>
+                        </div>
+                        <div class="bg-holiday-cream border border-holiday-sand rounded-2xl px-2.5 py-2 sm:px-4 sm:py-2.5 text-center min-w-[66px] sm:min-w-[78px]">
+                            <span id="cd-hours" class="block font-serif text-xl sm:text-2xl font-bold text-holiday-pine tabular-nums">--</span>
+                            <span class="text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider text-stone-500">Horas</span>
+                        </div>
+                        <div class="bg-holiday-cream border border-holiday-sand rounded-2xl px-2.5 py-2 sm:px-4 sm:py-2.5 text-center min-w-[66px] sm:min-w-[78px]">
+                            <span id="cd-minutes" class="block font-serif text-xl sm:text-2xl font-bold text-holiday-pine tabular-nums">--</span>
+                            <span class="text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider text-stone-500">Min</span>
+                        </div>
+                        <div class="bg-holiday-berry text-white rounded-2xl px-2.5 py-2 sm:px-4 sm:py-2.5 text-center min-w-[66px] sm:min-w-[78px] shadow-xs">
+                            <span id="cd-seconds" class="block font-serif text-xl sm:text-2xl font-bold text-holiday-goldLight tabular-nums">--</span>
+                            <span class="text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider text-white/85">Seg</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
             
             <!-- Banner de Resumo da Minha Reserva -->
             <div id="my-reservation-banner" class="hidden mb-6 bg-gradient-to-r from-holiday-pine to-holiday-pineLight text-white p-4 sm:p-5 rounded-3xl shadow-md border border-holiday-gold/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -255,27 +324,106 @@
         </footer>
 
         <!-- ==================== BARRA INFERIOR FIXA MOBILE (iOS / ANDROID) ==================== -->
-        <nav class="md:hidden fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-holiday-sand z-40 px-3 pt-2 pb-safe shadow-[0_-4px_20px_rgba(0,0,0,0.06)]">
-            <div class="grid grid-cols-3 gap-2 max-w-md mx-auto">
-                <button onclick="scrollToTopList()" class="min-h-[46px] rounded-2xl bg-holiday-cream active:bg-holiday-sand text-holiday-pine font-bold text-xs flex flex-col items-center justify-center gap-0.5 transition-colors cursor-pointer">
+        <nav class="md:hidden fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-holiday-sand z-40 px-2.5 pt-2 pb-safe shadow-[0_-4px_20px_rgba(0,0,0,0.06)]">
+            <div class="grid grid-cols-4 gap-1.5 max-w-md mx-auto">
+                <button onclick="scrollToTopList()" class="min-h-[46px] rounded-2xl bg-holiday-cream active:bg-holiday-sand text-holiday-pine font-bold text-[11px] flex flex-col items-center justify-center gap-0.5 transition-colors cursor-pointer">
                     <i data-lucide="list-checks" class="w-4 h-4"></i>
                     <span>Listas</span>
                 </button>
-                <button onclick="openMyWishesModal()" class="min-h-[46px] rounded-2xl bg-holiday-berry active:bg-holiday-berryLight text-white font-bold text-xs flex flex-col items-center justify-center gap-0.5 shadow-sm transition-colors cursor-pointer">
+                <button onclick="openMyWishesModal()" class="min-h-[46px] rounded-2xl bg-holiday-berry active:bg-holiday-berryLight text-white font-bold text-[11px] flex flex-col items-center justify-center gap-0.5 shadow-sm transition-colors cursor-pointer">
                     <i data-lucide="sparkles" class="w-4 h-4 text-holiday-goldLight"></i>
-                    <span>Meus Desejos</span>
+                    <span>Desejos</span>
                 </button>
-                <button onclick="openProfileModal()" class="min-h-[46px] rounded-2xl bg-holiday-cream active:bg-holiday-sand text-stone-700 font-bold text-xs flex flex-col items-center justify-center gap-0.5 transition-colors cursor-pointer">
+                <button id="mobile-draw-btn" onclick="openDrawModal()" disabled class="min-h-[46px] rounded-2xl bg-stone-100 text-stone-400 font-bold text-[11px] flex flex-col items-center justify-center gap-0.5 transition-colors cursor-not-allowed">
+                    <i data-lucide="lock" class="w-4 h-4"></i>
+                    <span>Sortear</span>
+                </button>
+                <button onclick="openProfileModal()" class="min-h-[46px] rounded-2xl bg-holiday-cream active:bg-holiday-sand text-stone-700 font-bold text-[11px] flex flex-col items-center justify-center gap-0.5 transition-colors cursor-pointer">
                     <i data-lucide="user-circle" class="w-4 h-4 text-holiday-pine"></i>
-                    <span>Minha Foto</span>
+                    <span>Perfil</span>
                 </button>
             </div>
         </nav>
     </div>
 
+    <!-- ==================== MODAL: SORTEADOR DO AMIGO SECRETO ==================== -->
+    <div id="draw-modal" class="fixed inset-0 bg-stone-900/70 backdrop-blur-xs z-50 hidden items-end sm:items-center justify-center p-0 sm:p-4">
+        <div class="bg-white rounded-t-3xl sm:rounded-3xl max-w-md w-full p-6 sm:p-8 pb-safe shadow-2xl border-t sm:border border-holiday-gold/40 relative text-center">
+            <button onclick="closeDrawModal()" class="absolute top-5 right-5 text-stone-400 hover:text-stone-700 p-2 rounded-full hover:bg-stone-100 transition-colors cursor-pointer">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+
+            <!-- Estado 1: Bloqueado pelo ADM -->
+            <div id="draw-state-locked" class="py-4">
+                <div class="w-16 h-16 rounded-2xl bg-stone-100 text-stone-400 flex items-center justify-center mx-auto mb-4">
+                    <i data-lucide="lock" class="w-8 h-8"></i>
+                </div>
+                <h3 class="font-serif text-2xl font-bold text-stone-800 mb-2">Sorteio Ainda Bloqueado</h3>
+                <p class="text-sm text-stone-500 mb-6">
+                    Aguarde o administrador liberar o sorteio para todos os participantes. Assim que for liberado, o botão ficará ativo automaticamente!
+                </p>
+                <button onclick="closeDrawModal()" class="w-full min-h-[46px] rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold text-sm cursor-pointer">
+                    Entendi
+                </button>
+            </div>
+
+            <!-- Estado 2: Liberado e Pronto para Sortear -->
+            <div id="draw-state-ready" class="hidden py-2">
+                <div class="w-16 h-16 rounded-2xl bg-holiday-goldLight text-holiday-berry flex items-center justify-center mx-auto mb-4 shadow-xs">
+                    <i data-lucide="sparkles" class="w-8 h-8"></i>
+                </div>
+                <h3 class="font-serif text-2xl font-bold text-stone-800 mb-2">O Sorteio Foi Liberado!</h3>
+                <p class="text-sm text-stone-500 mb-6">
+                    Toque no botão abaixo para descobrir quem você tirou no Amigo Secreto. Só você verá o resultado!
+                </p>
+
+                <!-- Caixa de Roleta Animada -->
+                <div id="draw-roulette-box" class="hidden mb-6 p-5 rounded-2xl bg-holiday-cream border-2 border-holiday-gold">
+                    <span class="text-[11px] font-bold uppercase tracking-wider text-holiday-berry block mb-1">Sorteando...</span>
+                    <div id="draw-roulette-name" class="font-serif text-2xl font-bold text-holiday-pine animate-pulse">
+                        ---
+                    </div>
+                </div>
+
+                <button id="btn-execute-draw" onclick="executeMyDraw()" class="w-full min-h-[50px] rounded-2xl bg-holiday-berry hover:bg-holiday-berryLight active:scale-[0.99] text-white font-bold text-base shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer">
+                    <i data-lucide="shuffle" class="w-5 h-5 text-holiday-goldLight"></i>
+                    <span>Sortear Agora!</span>
+                </button>
+            </div>
+
+            <!-- Estado 3: Já Sorteado (Resultado Revelado) -->
+            <div id="draw-state-revealed" class="hidden py-2">
+                <span class="inline-block text-[11px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full mb-3">
+                    Seu Amigo Secreto é:
+                </span>
+
+                <div class="bg-gradient-to-br from-holiday-pine to-holiday-pineLight text-white p-6 rounded-3xl shadow-lg border border-holiday-gold/50 mb-5">
+                    <div id="revealed-avatar-wrap" class="w-20 h-20 rounded-full bg-holiday-berry text-holiday-goldLight border-4 border-holiday-goldLight mx-auto mb-3 overflow-hidden flex items-center justify-center text-3xl font-serif font-bold shadow-md">
+                        <img id="revealed-avatar-img" src="" alt="Amigo" class="w-full h-full object-cover hidden">
+                        <span id="revealed-avatar-initial">?</span>
+                    </div>
+                    <h3 id="revealed-friend-name" class="font-serif text-2xl sm:text-3xl font-bold text-white">
+                        Nome do Amigo
+                    </h3>
+                    <p class="text-xs text-emerald-200 mt-1">Guarde segredo! 🤫🎄</p>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                    <button id="btn-view-friend-wishes" onclick="filterByDrawnFriend()" class="w-full min-h-[46px] rounded-xl bg-holiday-berry hover:bg-holiday-berryLight text-white font-bold text-sm flex items-center justify-center gap-2 cursor-pointer shadow-xs">
+                        <i data-lucide="gift" class="w-4 h-4"></i>
+                        <span>Ver Lista de Desejos Dele(a)</span>
+                    </button>
+                    <button onclick="closeDrawModal()" class="w-full min-h-[42px] rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-600 font-semibold text-xs cursor-pointer">
+                        Fechar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- ==================== MODAL: PAINEL ADMINISTRADOR (YURI BRIAN) ==================== -->
     <div id="admin-modal" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs z-50 hidden items-end sm:items-center justify-center p-0 sm:p-4">
-        <div class="bg-white rounded-t-3xl sm:rounded-3xl max-w-3xl w-full p-5 sm:p-8 shadow-2xl border-t sm:border border-holiday-sand relative h-[90dvh] sm:h-auto sm:max-h-[88vh] flex flex-col">
+        <div class="bg-white rounded-t-3xl sm:rounded-3xl max-w-3xl w-full p-5 sm:p-8 shadow-2xl border-t sm:border border-holiday-sand relative h-[92dvh] sm:h-auto sm:max-h-[90vh] flex flex-col">
             <button onclick="closeAdminModal()" class="absolute top-4 sm:top-5 right-4 sm:right-5 text-stone-400 hover:text-stone-700 p-2 rounded-full hover:bg-stone-100 transition-colors cursor-pointer">
                 <i data-lucide="x" class="w-5 h-5"></i>
             </button>
@@ -286,7 +434,35 @@
                 </div>
                 <div>
                     <h2 class="font-serif text-xl sm:text-2xl font-bold text-stone-800">Painel do Administrador</h2>
-                    <p class="text-xs text-stone-500">Usuários cadastrados e e-mails vinculados (senhas e escolhas secretas permanecem ocultas).</p>
+                    <p class="text-xs text-stone-500">Controle o sorteio e visualize os participantes cadastrados (senhas e pares permanecem ocultos).</p>
+                </div>
+            </div>
+
+            <!-- Controle do Sorteio Geral (Exclusivo ADM) -->
+            <div class="bg-gradient-to-r from-holiday-pine to-holiday-pineLight text-white p-4 rounded-2xl mb-4 shrink-0 border border-holiday-gold/40">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-[11px] font-bold uppercase tracking-wider text-holiday-goldLight">Controle do Sorteio</span>
+                            <span id="admin-draw-status-pill" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-500/80 text-white">
+                                Bloqueado
+                            </span>
+                        </div>
+                        <p id="admin-draw-status-desc" class="text-xs text-emerald-100 mt-1">
+                            Os botões de sortear estão desativados para todos os participantes.
+                        </p>
+                    </div>
+
+                    <div class="flex items-center gap-2 shrink-0">
+                        <button id="btn-admin-release-draw" onclick="adminReleaseDraw()" class="min-h-[42px] px-4 py-2 rounded-xl bg-holiday-gold hover:bg-holiday-goldLight text-stone-900 font-bold text-xs flex items-center gap-1.5 shadow-sm transition-colors cursor-pointer">
+                            <i data-lucide="unlock" class="w-4 h-4"></i>
+                            <span>Liberar Sorteio</span>
+                        </button>
+                        <button id="btn-admin-reset-draw" onclick="adminLockAndResetDraw()" class="hidden min-h-[42px] px-3.5 py-2 rounded-xl bg-red-500/85 hover:bg-red-600 text-white font-bold text-xs items-center gap-1.5 transition-colors cursor-pointer">
+                            <i data-lucide="lock" class="w-4 h-4"></i>
+                            <span>Bloquear / Reiniciar</span>
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -294,13 +470,18 @@
             <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-holiday-cream p-3.5 rounded-2xl border border-holiday-sand mb-4 shrink-0">
                 <div class="flex items-center gap-4 text-xs">
                     <div>
-                        <span class="text-stone-400 block font-semibold uppercase tracking-wider text-[10px]">Total de Usuários</span>
+                        <span class="text-stone-400 block font-semibold uppercase tracking-wider text-[10px]">Participantes</span>
                         <strong id="admin-total-users" class="text-lg font-serif text-holiday-pine">0</strong>
                     </div>
                     <div class="h-7 w-px bg-holiday-sand"></div>
                     <div>
                         <span class="text-stone-400 block font-semibold uppercase tracking-wider text-[10px]">Com E-mail</span>
                         <strong id="admin-total-emails" class="text-lg font-serif text-holiday-berry">0</strong>
+                    </div>
+                    <div class="h-7 w-px bg-holiday-sand"></div>
+                    <div>
+                        <span class="text-stone-400 block font-semibold uppercase tracking-wider text-[10px]">Já Sortearam</span>
+                        <strong id="admin-total-revealed" class="text-lg font-serif text-emerald-700">0/0</strong>
                     </div>
                 </div>
 
@@ -316,18 +497,31 @@
         </div>
     </div>
 
-    <!-- ==================== MODAL: EDITAR FOTO DE PERFIL ==================== -->
+    <!-- ==================== MODAL: PERFIL E FOTO ==================== -->
     <div id="profile-modal" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs z-50 hidden items-start sm:items-center justify-center p-0 sm:p-4 overflow-y-auto">
         <div id="profile-modal-sheet" class="bg-white rounded-b-3xl sm:rounded-3xl max-w-md w-full p-6 pb-safe shadow-2xl border-b sm:border border-holiday-sand relative my-0 sm:my-auto">
             <button onclick="closeProfileModal()" class="absolute top-5 right-5 text-stone-400 hover:text-stone-700 p-2 rounded-full hover:bg-stone-100 transition-colors cursor-pointer">
                 <i data-lucide="x" class="w-5 h-5"></i>
             </button>
 
-            <h3 class="font-serif text-xl font-bold text-stone-800 text-center mb-1">Sua Foto de Perfil</h3>
-            <p class="text-xs text-stone-500 text-center mb-5">Essa foto aparecerá sincronizada para todos no celular e no computador.</p>
+            <h3 class="font-serif text-xl font-bold text-stone-800 text-center mb-1">Seu Perfil</h3>
+            <p class="text-xs text-stone-500 text-center mb-4">Gerencie sua foto ou acesse o sorteio do seu amigo secreto.</p>
+
+            <!-- Atalho de Sorteio dentro do Perfil -->
+            <div class="bg-holiday-cream p-3.5 rounded-2xl border border-holiday-sand mb-5 flex items-center justify-between gap-3">
+                <div class="min-w-0">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-stone-400 block">Sorteio Individual</span>
+                    <span id="profile-modal-draw-status" class="text-xs font-bold text-stone-700 truncate block">Aguardando ADM liberar</span>
+                </div>
+                <button type="button" id="profile-modal-draw-btn" onclick="closeProfileModal(); openDrawModal();" disabled
+                    class="min-h-[38px] px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 shrink-0 bg-stone-200 text-stone-400 cursor-not-allowed">
+                    <i data-lucide="lock" class="w-3.5 h-3.5"></i>
+                    <span>Sortear</span>
+                </button>
+            </div>
 
             <div class="flex flex-col items-center mb-5">
-                <div class="w-28 h-28 rounded-full bg-holiday-pine text-holiday-goldLight border-4 border-holiday-goldLight shadow-md overflow-hidden flex items-center justify-center text-3xl font-serif font-bold mb-4">
+                <div class="w-24 h-24 rounded-full bg-holiday-pine text-holiday-goldLight border-4 border-holiday-goldLight shadow-md overflow-hidden flex items-center justify-center text-3xl font-serif font-bold mb-3.5">
                     <img id="profile-modal-img" src="" alt="Sua foto" class="w-full h-full object-cover hidden">
                     <span id="profile-modal-initial">?</span>
                 </div>
@@ -356,7 +550,7 @@
         </div>
     </div>
 
-    <!-- ==================== MODAL: GERENCIAR MINHAS OPÇÕES DE PRESENTE (OTIMIZADO P/ TECLADO IOS) ==================== -->
+    <!-- ==================== MODAL: GERENCIAR MINHAS OPÇÕES DE PRESENTE ==================== -->
     <div id="wishes-modal" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs z-50 hidden items-start sm:items-center justify-center p-0 sm:p-4">
         <div id="wishes-modal-sheet" class="bg-white rounded-b-3xl sm:rounded-3xl max-w-2xl w-full p-4 sm:p-8 shadow-2xl border-b sm:border border-holiday-sand relative h-[100dvh] sm:h-auto sm:max-h-[90vh] flex flex-col">
             <button onclick="closeMyWishesModal()" class="absolute top-3.5 sm:top-5 right-3.5 sm:right-5 text-stone-400 hover:text-stone-700 p-2 rounded-full hover:bg-stone-100 transition-colors cursor-pointer z-10">
@@ -499,6 +693,7 @@
         let authMode = 'login';
         let allWishlists = [];
         let usersDirectory = {};
+        let drawSettings = { isUnlocked: false, assignments: {}, revealedBy: {} };
         let activeParticipantFilter = 'ALL';
         let pendingReserveData = null;
         let pendingConfirmAction = null;
@@ -507,6 +702,50 @@
         let pendingProfileAvatar = '';
 
         lucide.createIcons();
+
+        // ==================== CONTADOR REGRESSIVO (01/01 ÀS 00:00) ====================
+        function startSecretSantaCountdown() {
+            const now = new Date();
+            const targetYear = (now.getMonth() === 0 && now.getDate() === 1) ? now.getFullYear() : now.getFullYear() + 1;
+            const targetDate = new Date(targetYear, 0, 1, 0, 0, 0);
+
+            const titleEl = document.getElementById('countdown-title');
+            const daysEl = document.getElementById('cd-days');
+            const hoursEl = document.getElementById('cd-hours');
+            const minutesEl = document.getElementById('cd-minutes');
+            const secondsEl = document.getElementById('cd-seconds');
+
+            if (titleEl) {
+                titleEl.textContent = `Entrega dos Presentes • 01 de Janeiro de ${targetYear} às 00:00`;
+            }
+
+            function updateTimer() {
+                const diff = targetDate.getTime() - Date.now();
+
+                if (diff <= 0) {
+                    if (daysEl) daysEl.textContent = '00';
+                    if (hoursEl) hoursEl.textContent = '00';
+                    if (minutesEl) minutesEl.textContent = '00';
+                    if (secondsEl) secondsEl.textContent = '00';
+                    if (titleEl) titleEl.textContent = 'Chegou a hora do Amigo Secreto! Feliz Ano Novo! 🥂🎁';
+                    return;
+                }
+
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+                const minutes = Math.floor((diff / (1000 * 60)) % 60);
+                const seconds = Math.floor((diff / 1000) % 60);
+
+                if (daysEl) daysEl.textContent = String(days).padStart(2, '0');
+                if (hoursEl) hoursEl.textContent = String(hours).padStart(2, '0');
+                if (minutesEl) minutesEl.textContent = String(minutes).padStart(2, '0');
+                if (secondsEl) secondsEl.textContent = String(seconds).padStart(2, '0');
+            }
+
+            updateTimer();
+            setInterval(updateTimer, 1000);
+        }
+        startSecretSantaCountdown();
 
         function isCurrentUserAdmin() {
             if (!loggedUser) return false;
@@ -883,6 +1122,7 @@
             }
 
             updateHeaderAvatarUI();
+            updateDrawUI();
             subscribeToRealtimeData();
         }
 
@@ -909,6 +1149,307 @@
             document.getElementById('auth-password').value = '';
         };
 
+        // ==================== LÓGICA DO SORTEADOR E CONTROLE ADM ====================
+        function generateSecretSantaAssignments(userKeys) {
+            // Embaralha Fisher-Yates e cria um ciclo único garantido (ninguém tira a si mesmo)
+            const shuffled = [...userKeys];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            const assignments = {};
+            for (let i = 0; i < shuffled.length; i++) {
+                const giver = shuffled[i];
+                const receiver = shuffled[(i + 1) % shuffled.length];
+                assignments[giver] = receiver;
+            }
+            return assignments;
+        }
+
+        window.adminReleaseDraw = async function() {
+            if (!isCurrentUserAdmin() || !db) return;
+
+            const userKeys = Object.keys(usersDirectory);
+            if (userKeys.length < 2) {
+                showToast("É necessário ter pelo menos 2 participantes cadastrados para liberar o sorteio.");
+                return;
+            }
+
+            const btn = document.getElementById('btn-admin-release-draw');
+            btn.disabled = true;
+
+            try {
+                const assignments = generateSecretSantaAssignments(userKeys);
+                const drawDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'secret_santa_config', 'draw_state');
+                await setDoc(drawDocRef, {
+                    isUnlocked: true,
+                    assignments,
+                    revealedBy: {},
+                    unlockedAt: serverTimestamp()
+                });
+                showToast("Sorteio liberado para todos os participantes!");
+            } catch (err) {
+                console.error("Erro ao liberar sorteio:", err);
+                showToast("Erro ao liberar sorteio.");
+            } finally {
+                btn.disabled = false;
+            }
+        };
+
+        window.adminLockAndResetDraw = async function() {
+            if (!isCurrentUserAdmin() || !db) return;
+
+            try {
+                const drawDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'secret_santa_config', 'draw_state');
+                await setDoc(drawDocRef, {
+                    isUnlocked: false,
+                    assignments: {},
+                    revealedBy: {},
+                    updatedAt: serverTimestamp()
+                });
+                showToast("Sorteio bloqueado e reiniciado.");
+            } catch (err) {
+                console.error("Erro ao bloquear sorteio:", err);
+                showToast("Erro ao bloquear sorteio.");
+            }
+        };
+
+        function updateDrawUI() {
+            if (!loggedUser) return;
+
+            const isUnlocked = Boolean(drawSettings.isUnlocked);
+            const myAssignedKey = drawSettings.assignments?.[loggedUser.usernameKey] || null;
+            const hasRevealed = Boolean(drawSettings.revealedBy?.[loggedUser.usernameKey]);
+
+            // 1. Card Principal do Perfil
+            const iconWrap = document.getElementById('draw-card-icon-wrap');
+            const badge = document.getElementById('draw-card-badge');
+            const title = document.getElementById('draw-card-title');
+            const subtitle = document.getElementById('draw-card-subtitle');
+            const mainBtn = document.getElementById('main-draw-btn');
+
+            // 2. Botões Header Desktop, Barra Mobile e Modal de Perfil
+            const headerBtn = document.getElementById('header-draw-btn');
+            const headerLabel = document.getElementById('header-draw-label');
+            const mobileBtn = document.getElementById('mobile-draw-btn');
+            const profileModalBtn = document.getElementById('profile-modal-draw-btn');
+            const profileModalStatus = document.getElementById('profile-modal-draw-status');
+
+            if (!isUnlocked || !myAssignedKey) {
+                // Bloqueado
+                iconWrap.className = "w-12 h-12 rounded-2xl bg-stone-100 text-stone-400 flex items-center justify-center shrink-0";
+                iconWrap.innerHTML = `<i data-lucide="lock" class="w-6 h-6"></i>`;
+                badge.className = "text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-stone-100 text-stone-500";
+                badge.textContent = "Sorteio Bloqueado";
+                title.textContent = "Seu Sorteio do Amigo Secreto";
+                subtitle.textContent = "O botão de sortear ficará desativado até o ADM liberar o sorteio.";
+
+                mainBtn.disabled = true;
+                mainBtn.className = "min-h-[46px] px-5 py-2.5 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all shrink-0 bg-stone-200 text-stone-400 cursor-not-allowed";
+                mainBtn.innerHTML = `<i data-lucide="lock" class="w-4 h-4"></i><span>Sortear Amigo Secreto</span>`;
+
+                headerBtn.className = "hidden md:flex min-h-[42px] px-3.5 py-2 rounded-xl bg-white/10 text-emerald-100/70 border border-white/10 font-bold text-xs items-center gap-1.5 cursor-not-allowed";
+                headerLabel.textContent = "Sorteio Bloqueado";
+
+                mobileBtn.disabled = true;
+                mobileBtn.className = "min-h-[46px] rounded-2xl bg-stone-100 text-stone-400 font-bold text-[11px] flex flex-col items-center justify-center gap-0.5 cursor-not-allowed";
+                mobileBtn.innerHTML = `<i data-lucide="lock" class="w-4 h-4"></i><span>Sortear</span>`;
+
+                profileModalBtn.disabled = true;
+                profileModalBtn.className = "min-h-[38px] px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 shrink-0 bg-stone-200 text-stone-400 cursor-not-allowed";
+                profileModalBtn.innerHTML = `<i data-lucide="lock" class="w-3.5 h-3.5"></i><span>Sortear</span>`;
+                profileModalStatus.textContent = "Aguardando ADM liberar";
+            } else if (!hasRevealed) {
+                // Liberado e pronto para sortear
+                iconWrap.className = "w-12 h-12 rounded-2xl bg-holiday-goldLight text-holiday-berry flex items-center justify-center shrink-0";
+                iconWrap.innerHTML = `<i data-lucide="sparkles" class="w-6 h-6"></i>`;
+                badge.className = "text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800";
+                badge.textContent = "Liberado pelo ADM!";
+                title.textContent = "Seu sorteio está disponível!";
+                subtitle.textContent = "Toque no botão ao lado para sortear e descobrir seu amigo secreto.";
+
+                mainBtn.disabled = false;
+                mainBtn.className = "min-h-[46px] px-5 py-2.5 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all shrink-0 bg-holiday-berry hover:bg-holiday-berryLight active:scale-[0.98] text-white shadow-md cursor-pointer";
+                mainBtn.innerHTML = `<i data-lucide="shuffle" class="w-4 h-4 text-holiday-goldLight"></i><span>Sortear Meu Amigo</span>`;
+
+                headerBtn.className = "hidden md:flex min-h-[42px] px-3.5 py-2 rounded-xl bg-holiday-gold text-stone-900 hover:bg-holiday-goldLight font-bold text-xs items-center gap-1.5 shadow-xs cursor-pointer";
+                headerLabel.textContent = "Sortear Amigo!";
+
+                mobileBtn.disabled = false;
+                mobileBtn.className = "min-h-[46px] rounded-2xl bg-holiday-gold text-stone-900 active:bg-holiday-goldLight font-bold text-[11px] flex flex-col items-center justify-center gap-0.5 shadow-xs cursor-pointer";
+                mobileBtn.innerHTML = `<i data-lucide="shuffle" class="w-4 h-4 text-holiday-pine"></i><span>Sortear!</span>`;
+
+                profileModalBtn.disabled = false;
+                profileModalBtn.className = "min-h-[38px] px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 shrink-0 bg-holiday-berry text-white hover:bg-holiday-berryLight cursor-pointer";
+                profileModalBtn.innerHTML = `<i data-lucide="shuffle" class="w-3.5 h-3.5"></i><span>Sortear</span>`;
+                profileModalStatus.textContent = "Liberado! Pronto para sortear";
+            } else {
+                // Já sorteou
+                iconWrap.className = "w-12 h-12 rounded-2xl bg-holiday-pine text-holiday-goldLight flex items-center justify-center shrink-0";
+                iconWrap.innerHTML = `<i data-lucide="gift" class="w-6 h-6"></i>`;
+                badge.className = "text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-holiday-goldLight text-holiday-pine";
+                badge.textContent = "Sorteio Realizado";
+                title.textContent = "Você já sorteou seu Amigo Secreto!";
+                subtitle.textContent = "Toque no botão para ver novamente quem você tirou (só você tem acesso).";
+
+                mainBtn.disabled = false;
+                mainBtn.className = "min-h-[46px] px-5 py-2.5 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all shrink-0 bg-holiday-pine hover:bg-holiday-pineLight text-white shadow-xs cursor-pointer";
+                mainBtn.innerHTML = `<i data-lucide="eye" class="w-4 h-4 text-holiday-goldLight"></i><span>Ver Quem Eu Tirei</span>`;
+
+                headerBtn.className = "hidden md:flex min-h-[42px] px-3.5 py-2 rounded-xl bg-white/15 hover:bg-white/25 text-white border border-white/20 font-bold text-xs items-center gap-1.5 cursor-pointer";
+                headerLabel.textContent = "Ver Meu Amigo";
+
+                mobileBtn.disabled = false;
+                mobileBtn.className = "min-h-[46px] rounded-2xl bg-holiday-pine text-white font-bold text-[11px] flex flex-col items-center justify-center gap-0.5 cursor-pointer";
+                mobileBtn.innerHTML = `<i data-lucide="gift" class="w-4 h-4 text-holiday-goldLight"></i><span>Meu Amigo</span>`;
+
+                profileModalBtn.disabled = false;
+                profileModalBtn.className = "min-h-[38px] px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 shrink-0 bg-holiday-pine text-white hover:bg-holiday-pineLight cursor-pointer";
+                profileModalBtn.innerHTML = `<i data-lucide="eye" class="w-3.5 h-3.5"></i><span>Ver Amigo</span>`;
+                profileModalStatus.textContent = "Você já realizou seu sorteio";
+            }
+
+            // Atualiza controles do Painel ADM se estiver aberto
+            const adminPill = document.getElementById('admin-draw-status-pill');
+            const adminDesc = document.getElementById('admin-draw-status-desc');
+            const releaseBtn = document.getElementById('btn-admin-release-draw');
+            const resetBtn = document.getElementById('btn-admin-reset-draw');
+
+            if (adminPill && adminDesc && releaseBtn && resetBtn) {
+                if (isUnlocked) {
+                    adminPill.className = "text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-400 text-stone-900";
+                    adminPill.textContent = "Liberado";
+                    adminDesc.textContent = "Os participantes já podem clicar no botão de sortear em seus perfis.";
+                    releaseBtn.classList.add('hidden');
+                    resetBtn.classList.remove('hidden');
+                    resetBtn.classList.add('flex');
+                } else {
+                    adminPill.className = "text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-500/80 text-white";
+                    adminPill.textContent = "Bloqueado";
+                    adminDesc.textContent = "Os botões de sortear estão desativados até você clicar em Liberar Sorteio.";
+                    releaseBtn.classList.remove('hidden');
+                    resetBtn.classList.add('hidden');
+                    resetBtn.classList.remove('flex');
+                }
+            }
+
+            lucide.createIcons();
+        }
+
+        window.openDrawModal = function() {
+            if (!loggedUser) return;
+            const isUnlocked = Boolean(drawSettings.isUnlocked);
+            const myAssignedKey = drawSettings.assignments?.[loggedUser.usernameKey] || null;
+            const hasRevealed = Boolean(drawSettings.revealedBy?.[loggedUser.usernameKey]);
+
+            const stateLocked = document.getElementById('draw-state-locked');
+            const stateReady = document.getElementById('draw-state-ready');
+            const stateRevealed = document.getElementById('draw-state-revealed');
+
+            stateLocked.classList.add('hidden');
+            stateReady.classList.add('hidden');
+            stateRevealed.classList.add('hidden');
+
+            if (!isUnlocked || !myAssignedKey) {
+                stateLocked.classList.remove('hidden');
+            } else if (!hasRevealed) {
+                document.getElementById('draw-roulette-box').classList.add('hidden');
+                document.getElementById('btn-execute-draw').classList.remove('hidden');
+                stateReady.classList.remove('hidden');
+            } else {
+                populateRevealedFriendUI(myAssignedKey);
+                stateRevealed.classList.remove('hidden');
+            }
+
+            const modal = document.getElementById('draw-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            lucide.createIcons();
+        };
+
+        window.closeDrawModal = function() {
+            const modal = document.getElementById('draw-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        };
+
+        window.executeMyDraw = async function() {
+            if (!db || !loggedUser || !drawSettings.isUnlocked) return;
+            const myAssignedKey = drawSettings.assignments?.[loggedUser.usernameKey];
+            if (!myAssignedKey) {
+                showToast("Seu usuário não estava cadastrado quando o sorteio foi gerado. Peça ao ADM para reiniciar o sorteio.");
+                return;
+            }
+
+            const executeBtn = document.getElementById('btn-execute-draw');
+            const rouletteBox = document.getElementById('draw-roulette-box');
+            const rouletteName = document.getElementById('draw-roulette-name');
+
+            executeBtn.classList.add('hidden');
+            rouletteBox.classList.remove('hidden');
+
+            const candidateNames = Object.values(usersDirectory)
+                .filter(u => u.usernameKey !== loggedUser.usernameKey)
+                .map(u => u.displayName);
+
+            let tick = 0;
+            const interval = setInterval(() => {
+                if (candidateNames.length > 0) {
+                    rouletteName.textContent = candidateNames[tick % candidateNames.length];
+                }
+                tick++;
+            }, 90);
+
+            setTimeout(async () => {
+                clearInterval(interval);
+                try {
+                    const drawDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'secret_santa_config', 'draw_state');
+                    await updateDoc(drawDocRef, {
+                        [`revealedBy.${loggedUser.usernameKey}`]: true
+                    });
+                } catch (err) {
+                    console.error("Erro ao registrar sorteio:", err);
+                }
+
+                document.getElementById('draw-state-ready').classList.add('hidden');
+                populateRevealedFriendUI(myAssignedKey);
+                document.getElementById('draw-state-revealed').classList.remove('hidden');
+                lucide.createIcons();
+            }, 1800);
+        };
+
+        function populateRevealedFriendUI(friendKey) {
+            const friendData = usersDirectory[friendKey] || {};
+            const displayName = friendData.displayName || friendKey;
+            const avatarUrl = friendData.avatarUrl || '';
+
+            document.getElementById('revealed-friend-name').textContent = displayName;
+            const imgEl = document.getElementById('revealed-avatar-img');
+            const initEl = document.getElementById('revealed-avatar-initial');
+            initEl.textContent = displayName.charAt(0).toUpperCase();
+
+            if (avatarUrl) {
+                imgEl.src = avatarUrl;
+                imgEl.classList.remove('hidden');
+                initEl.classList.add('hidden');
+            } else {
+                imgEl.classList.add('hidden');
+                initEl.classList.remove('hidden');
+            }
+        }
+
+        window.filterByDrawnFriend = function() {
+            if (!loggedUser) return;
+            const friendKey = drawSettings.assignments?.[loggedUser.usernameKey];
+            closeDrawModal();
+            if (friendKey && allWishlists.some(w => w.id === friendKey)) {
+                setFilter(friendKey);
+                document.getElementById('wishlists-container')?.scrollIntoView({ behavior: 'smooth' });
+            } else {
+                showToast("Seu amigo secreto ainda não cadastrou a lista de desejos dele!");
+            }
+        };
+
         // ==================== PAINEL ADMINISTRADOR (EXCLUSIVO YURI BRIAN) ====================
         window.openAdminModal = function() {
             if (!isCurrentUserAdmin()) {
@@ -916,6 +1457,7 @@
                 return;
             }
             document.getElementById('admin-search-input').value = '';
+            updateDrawUI();
             renderAdminUsersList();
             const modal = document.getElementById('admin-modal');
             modal.classList.remove('hidden');
@@ -934,6 +1476,7 @@
             const listContainer = document.getElementById('admin-users-list');
             const totalUsersEl = document.getElementById('admin-total-users');
             const totalEmailsEl = document.getElementById('admin-total-emails');
+            const totalRevealedEl = document.getElementById('admin-total-revealed');
             const query = (document.getElementById('admin-search-input')?.value || '').trim().toLowerCase();
 
             const allUsers = Object.values(usersDirectory).sort((a, b) =>
@@ -942,6 +1485,11 @@
 
             totalUsersEl.textContent = allUsers.length;
             totalEmailsEl.textContent = allUsers.filter(u => u.email && u.email.trim() !== '').length;
+
+            const revealedCount = allUsers.filter(u => Boolean(drawSettings.revealedBy?.[u.usernameKey])).length;
+            if (totalRevealedEl) {
+                totalRevealedEl.textContent = `${revealedCount}/${allUsers.length}`;
+            }
 
             const filtered = allUsers.filter(u => {
                 if (!query) return true;
@@ -964,6 +1512,7 @@
                 const hasEmail = user.email && user.email.trim() !== '';
                 const wishlist = allWishlists.find(w => w.id === user.usernameKey);
                 const wishesCount = wishlist?.options?.length || 0;
+                const userDrew = Boolean(drawSettings.revealedBy?.[user.usernameKey]);
 
                 let createdDateText = '';
                 if (user.createdAt && typeof user.createdAt.toDate === 'function') {
@@ -983,6 +1532,11 @@
                                 <span class="font-bold text-stone-800 text-sm sm:text-base truncate">${escapeHtml(user.displayName)}</span>
                                 <span class="text-[11px] text-stone-400 font-mono">@${escapeHtml(user.usernameKey)}</span>
                                 ${user.usernameKey === ADMIN_USERNAME_KEY ? `<span class="text-[10px] font-bold bg-holiday-goldLight text-holiday-pine px-2 py-0.5 rounded-full">Admin</span>` : ''}
+                                ${drawSettings.isUnlocked ? (
+                                    userDrew
+                                        ? `<span class="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full">Já sorteou</span>`
+                                        : `<span class="text-[10px] font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full">Pendente</span>`
+                                ) : ''}
                             </div>
                             <div class="flex items-center gap-2 mt-1 flex-wrap text-xs">
                                 ${hasEmail ? `
@@ -1025,6 +1579,7 @@
             document.getElementById('profile-avatar-url').value = pendingProfileAvatar.startsWith('http') ? pendingProfileAvatar : '';
             document.getElementById('profile-modal-initial').textContent = (loggedUser.displayName || '?').charAt(0).toUpperCase();
             updateProfileModalPreview(pendingProfileAvatar);
+            updateDrawUI();
 
             const modal = document.getElementById('profile-modal');
             modal.classList.remove('hidden');
@@ -1095,10 +1650,25 @@
             }
         };
 
-        // ==================== SINCRONIZAÇÃO EM TEMPO REAL (USUÁRIOS + LISTAS) ====================
+        // ==================== SINCRONIZAÇÃO EM TEMPO REAL (USUÁRIOS + LISTAS + SORTEIO) ====================
         function subscribeToRealtimeData() {
             if (!db || !loggedUser) return;
 
+            // 1. Configuração e estado do sorteio
+            const drawDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'secret_santa_config', 'draw_state');
+            onSnapshot(drawDocRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    drawSettings = docSnap.data();
+                } else {
+                    drawSettings = { isUnlocked: false, assignments: {}, revealedBy: {} };
+                }
+                updateDrawUI();
+                if (!document.getElementById('admin-modal').classList.contains('hidden')) {
+                    renderAdminUsersList();
+                }
+            });
+
+            // 2. Diretório de usuários
             const usersColRef = collection(db, 'artifacts', appId, 'public', 'data', 'secret_santa_users');
             onSnapshot(usersColRef, (snapshot) => {
                 usersDirectory = {};
@@ -1120,6 +1690,7 @@
                 }
             });
 
+            // 3. Listas de presentes
             const wishlistsColRef = collection(db, 'artifacts', appId, 'public', 'data', 'secret_santa_wishlists');
             onSnapshot(wishlistsColRef, (snapshot) => {
                 allWishlists = [];
@@ -1707,7 +2278,6 @@
                     reservedOptionIndex: optionIdx
                 });
 
-                // Se preencheu e-mail na hora de reservar, salva também no perfil do usuário
                 if (targetEmail && targetEmail !== loggedUser.email) {
                     loggedUser.email = targetEmail;
                     localStorage.setItem('amigo_secreto_session', JSON.stringify(loggedUser));
