@@ -275,7 +275,7 @@
             </button>
 
             <h3 class="font-serif text-xl font-bold text-stone-800 text-center mb-1">Sua Foto de Perfil</h3>
-            <p class="text-xs text-stone-500 text-center mb-5">Essa foto aparecerá no seu cartão da lista de desejos.</p>
+            <p class="text-xs text-stone-500 text-center mb-5">Essa foto aparecerá sincronizada para todos no celular e no computador.</p>
 
             <div class="flex flex-col items-center mb-5">
                 <div class="w-28 h-28 rounded-full bg-holiday-pine text-holiday-goldLight border-4 border-holiday-goldLight shadow-md overflow-hidden flex items-center justify-center text-3xl font-serif font-bold mb-4">
@@ -449,6 +449,7 @@
         let loggedUser = null;
         let authMode = 'login';
         let allWishlists = [];
+        let usersDirectory = {}; // Mapa em tempo real de todos os usuários (avatares e nomes sincronizados)
         let activeParticipantFilter = 'ALL';
         let pendingReserveData = null;
         let pendingConfirmAction = null;
@@ -518,13 +519,11 @@
             return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
         }
 
-        // Extrai título aproximado a partir do slug da URL (útil quando Amazon/ML bloqueiam scraping)
         function extractTitleFromUrlSlug(url) {
             try {
                 const u = new URL(url);
                 const segments = u.pathname.split('/').filter(s => s && s.length > 4 && !['dp', 'gp', 'product', 'produto', 'item', 'p', 's'].includes(s.toLowerCase()));
                 if (segments.length === 0) return '';
-                // Pega o segmento mais descritivo (geralmente o maior com hífens)
                 const best = segments.sort((a, b) => b.length - a.length)[0];
                 const cleaned = decodeURIComponent(best)
                     .replace(/[-_]+/g, ' ')
@@ -761,8 +760,11 @@
             const initEl = document.getElementById('header-avatar-initial');
             initEl.textContent = (loggedUser.displayName || '?').charAt(0).toUpperCase();
 
-            if (loggedUser.avatarUrl) {
-                imgEl.src = loggedUser.avatarUrl;
+            // Prioriza sempre a foto mais recente sincronizada da nuvem
+            const syncedAvatar = usersDirectory[loggedUser.usernameKey]?.avatarUrl ?? loggedUser.avatarUrl ?? '';
+
+            if (syncedAvatar) {
+                imgEl.src = syncedAvatar;
                 imgEl.classList.remove('hidden');
                 initEl.classList.add('hidden');
             } else {
@@ -780,7 +782,7 @@
             document.getElementById('header-username').textContent = userObj.displayName;
             document.getElementById('footer-user-info').textContent = `Conectado como: ${userObj.displayName}`;
             updateHeaderAvatarUI();
-            subscribeToWishlists();
+            subscribeToRealtimeData();
         }
 
         function checkSavedSession() {
@@ -807,7 +809,8 @@
         // ==================== MODAL DE FOTO DE PERFIL ====================
         window.openProfileModal = function() {
             if (!loggedUser) return;
-            pendingProfileAvatar = loggedUser.avatarUrl || '';
+            const currentAvatar = usersDirectory[loggedUser.usernameKey]?.avatarUrl ?? loggedUser.avatarUrl ?? '';
+            pendingProfileAvatar = currentAvatar;
             document.getElementById('profile-avatar-url').value = pendingProfileAvatar.startsWith('http') ? pendingProfileAvatar : '';
             document.getElementById('profile-modal-initial').textContent = (loggedUser.displayName || '?').charAt(0).toUpperCase();
             updateProfileModalPreview(pendingProfileAvatar);
@@ -854,9 +857,15 @@
             btn.textContent = 'Salvando...';
 
             try {
+                // Salva na coleção de usuários (todos os aparelhos recebem na hora via onSnapshot)
                 const userRef = doc(db, 'artifacts', appId, 'public', 'data', 'secret_santa_users', loggedUser.usernameKey);
-                await updateDoc(userRef, { avatarUrl: pendingProfileAvatar });
+                await setDoc(userRef, {
+                    usernameKey: loggedUser.usernameKey,
+                    displayName: loggedUser.displayName,
+                    avatarUrl: pendingProfileAvatar
+                }, { merge: true });
 
+                // Também espelha na wishlist se já existir
                 const existingWishlist = allWishlists.find(w => w.id === loggedUser.usernameKey);
                 if (existingWishlist) {
                     const wishRef = doc(db, 'artifacts', appId, 'public', 'data', 'secret_santa_wishlists', loggedUser.usernameKey);
@@ -867,7 +876,7 @@
                 localStorage.setItem('amigo_secreto_session', JSON.stringify(loggedUser));
                 updateHeaderAvatarUI();
                 closeProfileModal();
-                showToast(pendingProfileAvatar ? "Foto de perfil atualizada!" : "Foto de perfil removida.");
+                showToast(pendingProfileAvatar ? "Foto de perfil atualizada para todos!" : "Foto de perfil removida.");
             } catch (err) {
                 console.error("Erro ao salvar foto:", err);
                 showToast("Erro ao atualizar foto de perfil.");
@@ -877,12 +886,33 @@
             }
         };
 
-        // ==================== SINCRONIZAÇÃO FIRESTORE ====================
-        function subscribeToWishlists() {
+        // ==================== SINCRONIZAÇÃO EM TEMPO REAL (USUÁRIOS + LISTAS) ====================
+        function subscribeToRealtimeData() {
             if (!db || !loggedUser) return;
-            const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'secret_santa_wishlists');
 
-            onSnapshot(colRef, (snapshot) => {
+            // 1. Escuta em tempo real todos os perfis/fotos de usuários
+            const usersColRef = collection(db, 'artifacts', appId, 'public', 'data', 'secret_santa_users');
+            onSnapshot(usersColRef, (snapshot) => {
+                usersDirectory = {};
+                snapshot.forEach((docSnap) => {
+                    usersDirectory[docSnap.id] = docSnap.data();
+                });
+
+                // Se o usuário logado abriu em outro dispositivo (ex: celular), sincroniza a foto da nuvem automaticamente
+                const myCloudProfile = usersDirectory[loggedUser.usernameKey];
+                if (myCloudProfile && myCloudProfile.avatarUrl !== loggedUser.avatarUrl) {
+                    loggedUser.avatarUrl = myCloudProfile.avatarUrl || '';
+                    localStorage.setItem('amigo_secreto_session', JSON.stringify(loggedUser));
+                    updateHeaderAvatarUI();
+                }
+
+                updateFiltersUI();
+                renderWishlists();
+            });
+
+            // 2. Escuta em tempo real todas as listas de presentes
+            const wishlistsColRef = collection(db, 'artifacts', appId, 'public', 'data', 'secret_santa_wishlists');
+            onSnapshot(wishlistsColRef, (snapshot) => {
                 allWishlists = [];
                 snapshot.forEach((docSnap) => {
                     allWishlists.push({ id: docSnap.id, ...docSnap.data() });
@@ -899,8 +929,13 @@
             });
         }
 
+        function getParticipantAvatar(usernameKey, fallbackAvatar = '') {
+            return usersDirectory[usernameKey]?.avatarUrl || fallbackAvatar || '';
+        }
+
         function updateFiltersUI() {
             const container = document.getElementById('participants-filter');
+            if (!container) return;
             if (activeParticipantFilter !== 'ALL' && !allWishlists.some(w => w.id === activeParticipantFilter)) {
                 activeParticipantFilter = 'ALL';
             }
@@ -914,8 +949,9 @@
             allWishlists.forEach(w => {
                 const isActive = activeParticipantFilter === w.id;
                 const optCount = (w.options || []).length;
-                const miniAvatar = w.avatarUrl
-                    ? `<img src="${escapeHtml(w.avatarUrl)}" class="w-5 h-5 rounded-full object-cover shrink-0 border border-white/40">`
+                const avatarSrc = getParticipantAvatar(w.id, w.avatarUrl);
+                const miniAvatar = avatarSrc
+                    ? `<img src="${escapeHtml(avatarSrc)}" class="w-5 h-5 rounded-full object-cover shrink-0 border border-white/40">`
                     : '';
 
                 html += `
@@ -956,6 +992,7 @@
         window.renderWishlists = function() {
             const container = document.getElementById('wishlists-container');
             const emptyState = document.getElementById('empty-state');
+            if (!container || !emptyState) return;
             const statusFilter = document.getElementById('status-filter').value;
 
             const filtered = allWishlists.filter(w => {
@@ -980,9 +1017,10 @@
                 const reservedByMe = isReserved && wishlist.reservedBy === loggedUser.usernameKey;
                 const options = wishlist.options || [];
                 const initial = escapeHtml((wishlist.displayName || '?').charAt(0).toUpperCase());
+                const liveAvatar = getParticipantAvatar(wishlist.id, wishlist.avatarUrl);
 
-                const avatarHtml = wishlist.avatarUrl
-                    ? `<img src="${escapeHtml(wishlist.avatarUrl)}" alt="${escapeHtml(wishlist.displayName)}" class="w-12 h-12 rounded-2xl object-cover border-2 border-holiday-gold/60 shrink-0 shadow-xs">`
+                const avatarHtml = liveAvatar
+                    ? `<img src="${escapeHtml(liveAvatar)}" alt="${escapeHtml(wishlist.displayName)}" class="w-12 h-12 rounded-2xl object-cover border-2 border-holiday-gold/60 shrink-0 shadow-xs">`
                     : `<div class="w-12 h-12 rounded-2xl bg-holiday-pine text-holiday-goldLight font-serif font-bold text-lg flex items-center justify-center shrink-0">${initial}</div>`;
 
                 return `
@@ -1247,7 +1285,6 @@
             });
         }
 
-        // Busca em cascata: 1) Microlink -> 2) JsonLink -> 3) Extração do slug + Ilustração temática
         window.fetchOptionPreview = async function(idx, btn) {
             const block = document.getElementById(`option-block-${idx}`);
             const urlInput = block.querySelector('.opt-url');
@@ -1275,7 +1312,6 @@
             let foundTitle = '';
             let foundImg = '';
 
-            // Tentativa 1: Microlink
             try {
                 const res1 = await fetch(`https://api.microlink.io?url=${encodeURIComponent(rawUrl)}`);
                 const json1 = await res1.json();
@@ -1285,7 +1321,6 @@
                 }
             } catch {}
 
-            // Tentativa 2: JsonLink (caso a loja tenha bloqueado o Microlink)
             if (!foundImg) {
                 try {
                     const res2 = await fetch(`https://jsonlink.io/api/extract?url=${encodeURIComponent(rawUrl)}`);
@@ -1295,7 +1330,6 @@
                 } catch {}
             }
 
-            // Limpa título ou tenta extrair da própria URL
             if (foundTitle && !/^(amazon|mercado livre|shopee|shein|access denied|robot|just a moment)/i.test(foundTitle.trim())) {
                 if (!titleInput.value) {
                     titleInput.value = foundTitle.split(' | ')[0].split(' - ')[0].trim();
@@ -1305,7 +1339,6 @@
                 if (slugTitle) titleInput.value = slugTitle;
             }
 
-            // Aplica imagem encontrada ou ícone temático automático
             if (foundImg) {
                 imageInput.value = foundImg;
                 previewImg.src = foundImg;
@@ -1353,11 +1386,12 @@
             try {
                 const existing = allWishlists.find(w => w.id === loggedUser.usernameKey);
                 const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'secret_santa_wishlists', loggedUser.usernameKey);
+                const latestAvatar = getParticipantAvatar(loggedUser.usernameKey, loggedUser.avatarUrl);
 
                 await setDoc(docRef, {
                     usernameKey: loggedUser.usernameKey,
                     displayName: loggedUser.displayName,
-                    avatarUrl: loggedUser.avatarUrl || '',
+                    avatarUrl: latestAvatar,
                     generalNotes: document.getElementById('general-notes').value.trim(),
                     options,
                     reserved: existing ? Boolean(existing.reserved) : false,
