@@ -251,7 +251,14 @@
 
         // Configuração do ambiente Firebase
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'amigo-secreto-default';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+        const firebaseConfig = {
+  apiKey: "AIzaSyBIHxqFrJkCA12SaCpxh6OcnObgehEtdJc",
+  authDomain: "amigo-secreto-d904c.firebaseapp.com",
+  projectId: "amigo-secreto-d904c",
+  storageBucket: "amigo-secreto-d904c.firebasestorage.app",
+  messagingSenderId: "692068429648",
+  appId: "1:692068429648:web:8842f4aba365b26f8f8655"
+};
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
         let db = null;
