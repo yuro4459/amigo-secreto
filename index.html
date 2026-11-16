@@ -53,6 +53,8 @@
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         .pb-safe { padding-bottom: max(0.75rem, env(safe-area-inset-bottom)); }
         .pt-safe { padding-top: max(0.75rem, env(safe-area-inset-top)); }
+        /* Garante que ao focar no campo no iOS ele nunca fique colado na borda */
+        input, select, textarea { scroll-margin-top: 100px; scroll-margin-bottom: 180px; }
     </style>
 </head>
 <body class="bg-holiday-cream text-stone-800 font-sans antialiased min-h-[100dvh] flex flex-col selection:bg-holiday-berry selection:text-white">
@@ -267,9 +269,8 @@
     </div>
 
     <!-- ==================== MODAL: EDITAR FOTO DE PERFIL ==================== -->
-    <div id="profile-modal" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs z-50 hidden items-end sm:items-center justify-center p-0 sm:p-4">
-        <div class="bg-white rounded-t-3xl sm:rounded-3xl max-w-md w-full p-6 pb-safe shadow-2xl border-t sm:border border-holiday-sand relative">
-            <div class="w-12 h-1.5 bg-stone-300 rounded-full mx-auto mb-4 sm:hidden"></div>
+    <div id="profile-modal" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs z-50 hidden items-start sm:items-center justify-center p-0 sm:p-4 overflow-y-auto">
+        <div id="profile-modal-sheet" class="bg-white rounded-b-3xl sm:rounded-3xl max-w-md w-full p-6 pb-safe shadow-2xl border-b sm:border border-holiday-sand relative my-0 sm:my-auto">
             <button onclick="closeProfileModal()" class="absolute top-5 right-5 text-stone-400 hover:text-stone-700 p-2 rounded-full hover:bg-stone-100 transition-colors cursor-pointer">
                 <i data-lucide="x" class="w-5 h-5"></i>
             </button>
@@ -307,26 +308,24 @@
         </div>
     </div>
 
-    <!-- ==================== MODAL: GERENCIAR MINHAS OPÇÕES DE PRESENTE ==================== -->
-    <div id="wishes-modal" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs z-50 hidden items-end sm:items-center justify-center p-0 sm:p-4">
-        <div class="bg-white rounded-t-3xl sm:rounded-3xl max-w-2xl w-full p-5 sm:p-8 shadow-2xl border-t sm:border border-holiday-sand relative h-[92dvh] sm:h-auto sm:max-h-[90vh] flex flex-col">
-            <div class="w-12 h-1.5 bg-stone-300 rounded-full mx-auto mb-3 sm:hidden shrink-0"></div>
-
-            <button onclick="closeMyWishesModal()" class="absolute top-4 sm:top-5 right-4 sm:right-5 text-stone-400 hover:text-stone-700 p-2 rounded-full hover:bg-stone-100 transition-colors cursor-pointer">
+    <!-- ==================== MODAL: GERENCIAR MINHAS OPÇÕES DE PRESENTE (OTIMIZADO P/ TECLADO IOS) ==================== -->
+    <div id="wishes-modal" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs z-50 hidden items-start sm:items-center justify-center p-0 sm:p-4">
+        <div id="wishes-modal-sheet" class="bg-white rounded-b-3xl sm:rounded-3xl max-w-2xl w-full p-4 sm:p-8 shadow-2xl border-b sm:border border-holiday-sand relative h-[100dvh] sm:h-auto sm:max-h-[90vh] flex flex-col">
+            <button onclick="closeMyWishesModal()" class="absolute top-3.5 sm:top-5 right-3.5 sm:right-5 text-stone-400 hover:text-stone-700 p-2 rounded-full hover:bg-stone-100 transition-colors cursor-pointer z-10">
                 <i data-lucide="x" class="w-6 h-6 sm:w-5 sm:h-5"></i>
             </button>
 
-            <div class="flex items-center gap-3 mb-4 shrink-0 pr-8">
-                <div class="p-2.5 bg-holiday-goldLight text-holiday-berry rounded-xl shrink-0">
-                    <i data-lucide="gift" class="w-6 h-6"></i>
+            <div class="flex items-center gap-3 mb-3 sm:mb-4 shrink-0 pr-10 pt-safe sm:pt-0">
+                <div class="p-2 bg-holiday-goldLight text-holiday-berry rounded-xl shrink-0">
+                    <i data-lucide="gift" class="w-5 h-5 sm:w-6 sm:h-6"></i>
                 </div>
                 <div>
-                    <h2 class="font-serif text-xl sm:text-2xl font-bold text-stone-800">Minhas Opções de Presente</h2>
-                    <p class="text-xs text-stone-500">Adicione uma ou mais opções para o seu amigo secreto escolher</p>
+                    <h2 class="font-serif text-lg sm:text-2xl font-bold text-stone-800 leading-tight">Minhas Opções de Presente</h2>
+                    <p class="text-[11px] sm:text-xs text-stone-500">Adicione uma ou mais opções para o seu amigo secreto escolher</p>
                 </div>
             </div>
 
-            <form id="wishlist-form" onsubmit="handleSaveWishlist(event)" class="flex-1 overflow-y-auto pr-0.5 space-y-4 pb-safe">
+            <form id="wishlist-form" onsubmit="handleSaveWishlist(event)" class="flex-1 overflow-y-auto overscroll-contain pr-0.5 space-y-4 pb-44 sm:pb-4">
                 <!-- Observação Geral -->
                 <div class="bg-holiday-cream p-3.5 sm:p-4 rounded-2xl border border-holiday-sand">
                     <label class="block text-xs font-bold uppercase tracking-wider text-stone-500 mb-1.5">Observações Gerais (Tamanhos, Cores, Dicas)</label>
@@ -342,7 +341,7 @@
                     <span>+ Adicionar outra opção de presente</span>
                 </button>
 
-                <div class="pt-4 pb-2 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-2.5 border-t border-stone-100 sticky bottom-0 bg-white">
+                <div class="pt-3 pb-2 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-2.5 border-t border-stone-100 bg-white">
                     <button type="button" id="btn-delete-all-modal" onclick="promptDeleteAllMyGifts()" class="hidden min-h-[44px] px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-red-600 bg-red-50 hover:bg-red-100 transition-colors flex items-center justify-center gap-1.5 cursor-pointer">
                         <i data-lucide="trash-2" class="w-4 h-4"></i>
                         <span>Remover todos os meus presentes</span>
@@ -363,9 +362,8 @@
     </div>
 
     <!-- ==================== MODAL: CONFIRMAÇÃO DE RESERVA + E-MAIL ==================== -->
-    <div id="reserve-modal" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs z-50 hidden items-end sm:items-center justify-center p-0 sm:p-4">
-        <div class="bg-white rounded-t-3xl sm:rounded-3xl max-w-md w-full p-6 pb-safe shadow-2xl border-t sm:border border-holiday-sand">
-            <div class="w-12 h-1.5 bg-stone-300 rounded-full mx-auto mb-4 sm:hidden"></div>
+    <div id="reserve-modal" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs z-50 hidden items-start sm:items-center justify-center p-0 sm:p-4 overflow-y-auto">
+        <div id="reserve-modal-sheet" class="bg-white rounded-b-3xl sm:rounded-3xl max-w-md w-full p-6 pb-safe shadow-2xl border-b sm:border border-holiday-sand my-0 sm:my-auto">
             <div class="w-14 h-14 rounded-2xl bg-holiday-goldLight text-holiday-berry flex items-center justify-center mx-auto mb-3">
                 <i data-lucide="shopping-bag" class="w-7 h-7"></i>
             </div>
@@ -449,7 +447,7 @@
         let loggedUser = null;
         let authMode = 'login';
         let allWishlists = [];
-        let usersDirectory = {}; // Mapa em tempo real de todos os usuários (avatares e nomes sincronizados)
+        let usersDirectory = {};
         let activeParticipantFilter = 'ALL';
         let pendingReserveData = null;
         let pendingConfirmAction = null;
@@ -458,6 +456,35 @@
         let pendingProfileAvatar = '';
 
         lucide.createIcons();
+
+        // ==================== CORREÇÃO DE TECLADO VIRTUAL (iOS SAFARI / ANDROID) ====================
+        function setupMobileKeyboardProtection() {
+            const wishesSheet = document.getElementById('wishes-modal-sheet');
+
+            // 1. Redimensiona o modal de desejos para a altura real acima do teclado do iPhone
+            if (window.visualViewport) {
+                const handleViewportResize = () => {
+                    if (window.innerWidth < 640 && wishesSheet && !document.getElementById('wishes-modal').classList.contains('hidden')) {
+                        wishesSheet.style.height = `${window.visualViewport.height}px`;
+                    } else if (wishesSheet) {
+                        wishesSheet.style.height = '';
+                    }
+                };
+                window.visualViewport.addEventListener('resize', handleViewportResize);
+                window.visualViewport.addEventListener('scroll', handleViewportResize);
+            }
+
+            // 2. Ao tocar em qualquer input, aguarda o teclado subir e centraliza o campo na tela
+            document.addEventListener('focusin', (e) => {
+                const target = e.target;
+                if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT')) {
+                    setTimeout(() => {
+                        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 320);
+                }
+            });
+        }
+        setupMobileKeyboardProtection();
 
         window.scrollToTopList = function() {
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -566,7 +593,7 @@
             dot.classList.add(isOnline ? 'bg-emerald-400' : 'bg-red-400');
         }
 
-        // ==================== COMPRESSÃO DE IMAGEM (PERFIL E PRINT DE PRESENTE) ====================
+        // ==================== COMPRESSÃO DE IMAGEM ====================
         function compressImageFile(file, maxSize = 200, squareCrop = true) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -760,7 +787,6 @@
             const initEl = document.getElementById('header-avatar-initial');
             initEl.textContent = (loggedUser.displayName || '?').charAt(0).toUpperCase();
 
-            // Prioriza sempre a foto mais recente sincronizada da nuvem
             const syncedAvatar = usersDirectory[loggedUser.usernameKey]?.avatarUrl ?? loggedUser.avatarUrl ?? '';
 
             if (syncedAvatar) {
@@ -857,7 +883,6 @@
             btn.textContent = 'Salvando...';
 
             try {
-                // Salva na coleção de usuários (todos os aparelhos recebem na hora via onSnapshot)
                 const userRef = doc(db, 'artifacts', appId, 'public', 'data', 'secret_santa_users', loggedUser.usernameKey);
                 await setDoc(userRef, {
                     usernameKey: loggedUser.usernameKey,
@@ -865,7 +890,6 @@
                     avatarUrl: pendingProfileAvatar
                 }, { merge: true });
 
-                // Também espelha na wishlist se já existir
                 const existingWishlist = allWishlists.find(w => w.id === loggedUser.usernameKey);
                 if (existingWishlist) {
                     const wishRef = doc(db, 'artifacts', appId, 'public', 'data', 'secret_santa_wishlists', loggedUser.usernameKey);
@@ -890,7 +914,6 @@
         function subscribeToRealtimeData() {
             if (!db || !loggedUser) return;
 
-            // 1. Escuta em tempo real todos os perfis/fotos de usuários
             const usersColRef = collection(db, 'artifacts', appId, 'public', 'data', 'secret_santa_users');
             onSnapshot(usersColRef, (snapshot) => {
                 usersDirectory = {};
@@ -898,7 +921,6 @@
                     usersDirectory[docSnap.id] = docSnap.data();
                 });
 
-                // Se o usuário logado abriu em outro dispositivo (ex: celular), sincroniza a foto da nuvem automaticamente
                 const myCloudProfile = usersDirectory[loggedUser.usernameKey];
                 if (myCloudProfile && myCloudProfile.avatarUrl !== loggedUser.avatarUrl) {
                     loggedUser.avatarUrl = myCloudProfile.avatarUrl || '';
@@ -910,7 +932,6 @@
                 renderWishlists();
             });
 
-            // 2. Escuta em tempo real todas as listas de presentes
             const wishlistsColRef = collection(db, 'artifacts', appId, 'public', 'data', 'secret_santa_wishlists');
             onSnapshot(wishlistsColRef, (snapshot) => {
                 allWishlists = [];
@@ -1151,14 +1172,20 @@
             }
 
             const modal = document.getElementById('wishes-modal');
+            const sheet = document.getElementById('wishes-modal-sheet');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
+            if (window.innerWidth < 640 && window.visualViewport) {
+                sheet.style.height = `${window.visualViewport.height}px`;
+            }
         };
 
         window.closeMyWishesModal = function() {
             const modal = document.getElementById('wishes-modal');
+            const sheet = document.getElementById('wishes-modal-sheet');
             modal.classList.add('hidden');
             modal.classList.remove('flex');
+            sheet.style.height = '';
         };
 
         window.addOptionBlock = function(data = {}) {
