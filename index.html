@@ -2,7 +2,10 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#1B4332">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Amigo Secreto - Lista de Desejos</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -39,14 +42,22 @@
             }
         }
     </script>
+    <style>
+        /* Oculta barra de rolagem horizontal nos filtros mantendo o deslize suave */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        /* Suporte a áreas seguras (notch e barra inferior do iOS/Android) */
+        .pb-safe { padding-bottom: max(0.75rem, env(safe-area-inset-bottom)); }
+        .pt-safe { padding-top: max(0.75rem, env(safe-area-inset-top)); }
+    </style>
 </head>
-<body class="bg-holiday-cream text-stone-800 font-sans antialiased min-h-screen flex flex-col selection:bg-holiday-berry selection:text-white">
+<body class="bg-holiday-cream text-stone-800 font-sans antialiased min-h-[100dvh] flex flex-col selection:bg-holiday-berry selection:text-white">
 
     <!-- ==================== TELA DE LOGIN / CADASTRO ==================== -->
-    <div id="auth-screen" class="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-holiday-pine via-holiday-pineLight to-stone-900">
-        <div class="bg-white rounded-3xl max-w-md w-full p-7 sm:p-9 shadow-2xl border border-holiday-gold/30">
+    <div id="auth-screen" class="min-h-[100dvh] flex items-center justify-center p-4 sm:p-6 bg-gradient-to-br from-holiday-pine via-holiday-pineLight to-stone-900">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-9 shadow-2xl border border-holiday-gold/30">
             <div class="text-center mb-6">
-                <div class="w-16 h-16 bg-holiday-berry text-holiday-goldLight rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-md">
+                <div class="w-16 h-16 bg-holiday-berry text-holiday-goldLight rounded-2xl flex items-center justify-center mx-auto mb-3.5 shadow-md">
                     <i data-lucide="gift" class="w-8 h-8"></i>
                 </div>
                 <h1 class="font-serif text-3xl font-bold text-stone-800">Amigo Secreto</h1>
@@ -54,38 +65,38 @@
             </div>
 
             <!-- Abas Entrar / Criar Conta -->
-            <div class="grid grid-cols-2 gap-2 p-1 bg-holiday-cream rounded-xl mb-6 border border-holiday-sand">
-                <button type="button" id="tab-login" onclick="switchAuthMode('login')" class="py-2 rounded-lg text-sm font-bold transition-all bg-holiday-pine text-white shadow-xs cursor-pointer">
+            <div class="grid grid-cols-2 gap-2 p-1.5 bg-holiday-cream rounded-2xl mb-6 border border-holiday-sand">
+                <button type="button" id="tab-login" onclick="switchAuthMode('login')" class="min-h-[42px] rounded-xl text-sm font-bold transition-all bg-holiday-pine text-white shadow-xs cursor-pointer">
                     Entrar
                 </button>
-                <button type="button" id="tab-register" onclick="switchAuthMode('register')" class="py-2 rounded-lg text-sm font-bold transition-all text-stone-600 hover:text-stone-900 cursor-pointer">
+                <button type="button" id="tab-register" onclick="switchAuthMode('register')" class="min-h-[42px] rounded-xl text-sm font-bold transition-all text-stone-600 hover:text-stone-900 cursor-pointer">
                     Criar Conta
                 </button>
             </div>
 
             <form id="auth-form" onsubmit="handleAuthSubmit(event)" class="space-y-4">
                 <div>
-                    <label class="block text-sm font-semibold text-stone-700 mb-1">Seu Nome de Usuário *</label>
+                    <label class="block text-sm font-semibold text-stone-700 mb-1.5">Seu Nome de Usuário *</label>
                     <input type="text" id="auth-username" required placeholder="Ex: Yuri Brian" autocomplete="username"
-                        class="w-full px-4 py-2.5 rounded-xl border border-stone-300 focus:border-holiday-pine focus:ring-2 focus:ring-holiday-pine/20 outline-none text-sm">
+                        class="w-full px-4 py-3 rounded-xl border border-stone-300 focus:border-holiday-pine focus:ring-2 focus:ring-holiday-pine/20 outline-none text-base sm:text-sm">
                 </div>
 
                 <div id="auth-email-group" class="hidden">
-                    <label class="block text-sm font-semibold text-stone-700 mb-1">Seu E-mail (Opcional)</label>
+                    <label class="block text-sm font-semibold text-stone-700 mb-1.5">Seu E-mail (Opcional)</label>
                     <input type="email" id="auth-email" placeholder="seuemail@exemplo.com" autocomplete="email"
-                        class="w-full px-4 py-2.5 rounded-xl border border-stone-300 focus:border-holiday-pine focus:ring-2 focus:ring-holiday-pine/20 outline-none text-sm">
-                    <p class="text-[11px] text-stone-400 mt-1">Usado para enviar os detalhes do presente que você escolher.</p>
+                        class="w-full px-4 py-3 rounded-xl border border-stone-300 focus:border-holiday-pine focus:ring-2 focus:ring-holiday-pine/20 outline-none text-base sm:text-sm">
+                    <p class="text-xs text-stone-400 mt-1">Usado para enviar os detalhes do presente que você escolher.</p>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-semibold text-stone-700 mb-1">Senha *</label>
+                    <label class="block text-sm font-semibold text-stone-700 mb-1.5">Senha *</label>
                     <input type="password" id="auth-password" required placeholder="Crie ou digite sua senha" autocomplete="current-password"
-                        class="w-full px-4 py-2.5 rounded-xl border border-stone-300 focus:border-holiday-pine focus:ring-2 focus:ring-holiday-pine/20 outline-none text-sm">
+                        class="w-full px-4 py-3 rounded-xl border border-stone-300 focus:border-holiday-pine focus:ring-2 focus:ring-holiday-pine/20 outline-none text-base sm:text-sm">
                 </div>
 
-                <p id="auth-error" class="text-xs text-red-600 font-medium hidden bg-red-50 p-3 rounded-xl border border-red-200"></p>
+                <p id="auth-error" class="text-xs text-red-600 font-medium hidden bg-red-50 p-3.5 rounded-xl border border-red-200"></p>
 
-                <button type="submit" id="btn-auth-submit" class="w-full bg-holiday-berry hover:bg-holiday-berryLight text-white font-bold py-3 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer">
+                <button type="submit" id="btn-auth-submit" class="w-full min-h-[48px] bg-holiday-berry hover:bg-holiday-berryLight active:scale-[0.99] text-white font-bold py-3 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer text-base sm:text-sm">
                     <span id="auth-submit-text">Entrar na Lista</span>
                     <i data-lucide="arrow-right" class="w-4 h-4"></i>
                 </button>
@@ -94,90 +105,84 @@
     </div>
 
     <!-- ==================== APLICATIVO PRINCIPAL ==================== -->
-    <div id="app-container" class="hidden flex-1 flex-col">
+    <div id="app-container" class="hidden flex-1 flex-col pb-24 md:pb-0">
         <!-- Header Festivo -->
-        <header class="bg-holiday-pine text-holiday-cream shadow-md sticky top-0 z-30 border-b border-holiday-pineLight">
-            <div class="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
-                <div class="flex items-center gap-3 w-full md:w-auto justify-between md:justify-start">
-                    <div class="flex items-center gap-3">
-                        <div class="bg-holiday-berry p-2.5 rounded-2xl shadow-inner border border-holiday-gold/30">
-                            <i data-lucide="gift" class="w-7 h-7 text-holiday-goldLight"></i>
-                        </div>
-                        <div>
-                            <h1 class="font-serif text-2xl sm:text-3xl font-bold tracking-tight text-white">Amigo Secreto</h1>
-                            <div class="flex items-center gap-2 text-xs text-emerald-200/90">
-                                <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse" id="status-dot"></span>
-                                <span id="status-text">Conectando...</span>
-                            </div>
+        <header class="bg-holiday-pine text-holiday-cream shadow-md sticky top-0 z-30 border-b border-holiday-pineLight pt-safe">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-3">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="bg-holiday-berry p-2 sm:p-2.5 rounded-2xl shadow-inner border border-holiday-gold/30 shrink-0">
+                        <i data-lucide="gift" class="w-6 h-6 sm:w-7 sm:h-7 text-holiday-goldLight"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <h1 class="font-serif text-xl sm:text-3xl font-bold tracking-tight text-white truncate">Amigo Secreto</h1>
+                        <div class="flex items-center gap-2 text-xs text-emerald-200/90">
+                            <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse shrink-0" id="status-dot"></span>
+                            <span id="status-text" class="truncate">Conectando...</span>
                         </div>
                     </div>
-
-                    <!-- Info Usuário Mobile -->
-                    <button onclick="logoutUser()" title="Sair da conta" class="md:hidden flex items-center gap-1.5 text-xs bg-white/10 hover:bg-white/20 px-3 py-2 rounded-xl text-white cursor-pointer">
-                        <i data-lucide="log-out" class="w-4 h-4"></i>
-                        <span>Sair</span>
-                    </button>
                 </div>
 
-                <div class="flex flex-wrap items-center gap-2.5 w-full md:w-auto justify-end">
+                <!-- Ações Desktop e Sair Mobile -->
+                <div class="flex items-center gap-2.5 shrink-0">
                     <div class="hidden md:flex items-center gap-2 bg-holiday-pineLight/60 px-3.5 py-2 rounded-xl border border-emerald-700/50 text-xs text-emerald-100">
                         <i data-lucide="user-check" class="w-4 h-4 text-holiday-gold"></i>
                         <span>Olá, <strong id="header-username" class="text-white">Participante</strong></span>
                     </div>
 
-                    <button onclick="openMyWishesModal()" class="flex-1 sm:flex-initial flex items-center justify-center gap-2 bg-holiday-berry hover:bg-holiday-berryLight text-white font-semibold px-4 py-2.5 rounded-xl shadow-sm transition-all active:scale-95 text-sm cursor-pointer">
+                    <button onclick="openMyWishesModal()" class="hidden md:flex items-center justify-center gap-2 bg-holiday-berry hover:bg-holiday-berryLight text-white font-semibold px-4 py-2.5 rounded-xl shadow-sm transition-all active:scale-95 text-sm cursor-pointer">
                         <i data-lucide="sparkles" class="w-4 h-4"></i>
                         <span>Meus Desejos</span>
                     </button>
 
-                    <button onclick="logoutUser()" title="Trocar de conta" class="hidden md:flex items-center gap-1.5 bg-white/10 hover:bg-white/20 text-white px-3 py-2.5 rounded-xl text-sm transition-colors cursor-pointer">
+                    <button onclick="logoutUser()" title="Sair da conta" class="min-h-[40px] px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 active:bg-white/30 text-white text-xs sm:text-sm font-semibold flex items-center gap-1.5 transition-colors cursor-pointer">
                         <i data-lucide="log-out" class="w-4 h-4"></i>
+                        <span class="md:hidden">Sair</span>
                     </button>
                 </div>
             </div>
         </header>
 
         <!-- Conteúdo Principal -->
-        <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8">
+        <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-5 sm:py-8">
             
             <!-- Banner de Resumo da Minha Reserva (Aparece apenas para quem já escolheu um presente) -->
-            <div id="my-reservation-banner" class="hidden mb-6 bg-gradient-to-r from-holiday-pine to-holiday-pineLight text-white p-5 rounded-2xl shadow-md border border-holiday-gold/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div class="flex items-start gap-3.5">
-                    <div class="p-2.5 bg-white/15 rounded-xl shrink-0 mt-0.5">
+            <div id="my-reservation-banner" class="hidden mb-6 bg-gradient-to-r from-holiday-pine to-holiday-pineLight text-white p-4 sm:p-5 rounded-3xl shadow-md border border-holiday-gold/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div class="flex items-start gap-3">
+                    <div class="p-2.5 bg-white/15 rounded-2xl shrink-0 mt-0.5">
                         <i data-lucide="shopping-bag" class="w-6 h-6 text-holiday-goldLight"></i>
                     </div>
                     <div>
-                        <span class="text-[11px] uppercase tracking-wider font-bold text-holiday-goldLight">Sua Escolha Secreta (Visível só para você)</span>
+                        <span class="text-[11px] uppercase tracking-wider font-bold text-holiday-goldLight">Sua Escolha Secreta (Só você vê)</span>
                         <h3 id="banner-gift-title" class="font-serif text-lg font-bold text-white leading-snug">Presente escolhido</h3>
                         <p id="banner-gift-recipient" class="text-xs text-emerald-100 mt-0.5">Para: Participante</p>
                     </div>
                 </div>
-                <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto justify-end">
-                    <a id="banner-gift-link" href="#" target="_blank" rel="noopener noreferrer" class="px-3.5 py-2 rounded-xl bg-white text-holiday-pine font-bold text-xs flex items-center gap-1.5 hover:bg-holiday-goldLight transition-colors">
+                <div class="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 w-full sm:w-auto">
+                    <a id="banner-gift-link" href="#" target="_blank" rel="noopener noreferrer" class="col-span-2 sm:col-span-1 min-h-[42px] px-4 py-2 rounded-xl bg-white text-holiday-pine font-bold text-xs flex items-center justify-center gap-1.5 hover:bg-holiday-goldLight transition-colors">
                         <span>Abrir Loja</span>
                         <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
                     </a>
-                    <button onclick="sendEmailBackup()" class="px-3.5 py-2 rounded-xl bg-white/15 hover:bg-white/25 text-white font-semibold text-xs flex items-center gap-1.5 transition-colors cursor-pointer">
+                    <button onclick="sendEmailBackup()" class="min-h-[42px] px-3.5 py-2 rounded-xl bg-white/15 hover:bg-white/25 text-white font-semibold text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer">
                         <i data-lucide="mail" class="w-3.5 h-3.5"></i>
-                        <span>Enviar p/ E-mail</span>
+                        <span>E-mail</span>
                     </button>
-                    <button id="banner-unreserve-btn" class="px-3.5 py-2 rounded-xl bg-red-500/80 hover:bg-red-600 text-white font-semibold text-xs flex items-center gap-1.5 transition-colors cursor-pointer">
+                    <button id="banner-unreserve-btn" class="min-h-[42px] px-3.5 py-2 rounded-xl bg-red-500/85 hover:bg-red-600 text-white font-semibold text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer">
                         <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
                         <span>Desmarcar</span>
                     </button>
                 </div>
             </div>
 
-            <!-- Barra de Filtros -->
-            <section class="mb-8 bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-holiday-sand">
-                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div class="flex-1">
-                        <label class="block text-xs font-bold uppercase tracking-wider text-stone-400 mb-2">Filtrar por Participante</label>
-                        <div id="participants-filter" class="flex flex-wrap gap-2"></div>
+            <!-- Barra de Filtros Otimizada para Touch -->
+            <section class="mb-6 sm:mb-8 bg-white p-4 sm:p-5 rounded-3xl shadow-sm border border-holiday-sand">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-3.5">
+                    <div class="flex-1 min-w-0">
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-stone-400 mb-2">Participantes (deslize para ver)</label>
+                        <div id="participants-filter" class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 snap-x"></div>
                     </div>
 
-                    <div class="flex items-center gap-2 self-start md:self-end">
-                        <select id="status-filter" onchange="renderWishlists()" class="bg-holiday-cream border border-holiday-sand text-stone-700 text-sm rounded-xl px-3.5 py-2 font-medium focus:outline-none focus:ring-2 focus:ring-holiday-pine">
+                    <div class="flex items-center gap-2 self-stretch md:self-end">
+                        <select id="status-filter" onchange="renderWishlists()" class="w-full md:w-auto min-h-[42px] bg-holiday-cream border border-holiday-sand text-stone-700 text-base sm:text-sm rounded-xl px-3.5 py-2 font-medium focus:outline-none focus:ring-2 focus:ring-holiday-pine">
                             <option value="ALL">Todos os status</option>
                             <option value="AVAILABLE">Disponíveis</option>
                             <option value="RESERVED">Já escolhidos</option>
@@ -193,128 +198,154 @@
             </div>
 
             <!-- Estado Vazio -->
-            <div id="empty-state" class="hidden py-16 px-4 text-center bg-white rounded-3xl border border-dashed border-holiday-gold">
+            <div id="empty-state" class="hidden py-14 px-5 text-center bg-white rounded-3xl border border-dashed border-holiday-gold">
                 <div class="w-16 h-16 bg-holiday-goldLight text-holiday-berry rounded-2xl flex items-center justify-center mx-auto mb-4">
                     <i data-lucide="sparkles" class="w-8 h-8"></i>
                 </div>
                 <h3 class="font-serif text-xl font-bold text-stone-800 mb-2">Nenhuma solicitação cadastrada ainda!</h3>
                 <p class="text-stone-500 max-w-md mx-auto mb-6 text-sm sm:text-base">
-                    Clique abaixo para cadastrar suas opções de presentes com os links das lojas.
+                    Toque no botão abaixo para cadastrar suas opções de presentes com os links das lojas.
                 </p>
-                <button onclick="openMyWishesModal()" class="inline-flex items-center gap-2 bg-holiday-pine hover:bg-holiday-pineLight text-white font-semibold px-5 py-3 rounded-xl transition-all cursor-pointer">
+                <button onclick="openMyWishesModal()" class="w-full sm:w-auto min-h-[48px] inline-flex items-center justify-center gap-2 bg-holiday-pine hover:bg-holiday-pineLight text-white font-semibold px-6 py-3 rounded-2xl transition-all cursor-pointer">
                     <i data-lucide="plus-circle" class="w-5 h-5"></i>
-                    Cadastrar Minhas Opções de Presente
+                    Cadastrar Minhas Opções
                 </button>
             </div>
 
             <!-- Lista de Solicitações por Participante -->
-            <div id="wishlists-container" class="space-y-8"></div>
+            <div id="wishlists-container" class="space-y-6 sm:space-y-8"></div>
         </main>
 
-        <!-- Footer -->
-        <footer class="bg-white border-t border-holiday-sand py-6 mt-12">
-            <div class="max-w-6xl mx-auto px-4 text-center text-xs sm:text-sm text-stone-500 flex flex-col sm:flex-row items-center justify-between gap-2">
+        <!-- Footer Desktop -->
+        <footer class="hidden md:block bg-white border-t border-holiday-sand py-6 mt-12">
+            <div class="max-w-6xl mx-auto px-4 text-center text-xs sm:text-sm text-stone-500 flex items-center justify-between gap-2">
                 <p>Amigo Secreto • Cada participante escolhe 1 presente por lista 🎄✨</p>
                 <p id="footer-user-info" class="text-xs text-stone-400"></p>
             </div>
         </footer>
+
+        <!-- ==================== BARRA INFERIOR FIXA MOBILE (iOS / ANDROID) ==================== -->
+        <nav class="md:hidden fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-holiday-sand z-40 px-3 pt-2 pb-safe shadow-[0_-4px_20px_rgba(0,0,0,0.06)]">
+            <div class="grid grid-cols-2 gap-2.5 max-w-md mx-auto">
+                <button onclick="scrollToTopList()" class="min-h-[46px] rounded-2xl bg-holiday-cream active:bg-holiday-sand text-holiday-pine font-bold text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer">
+                    <i data-lucide="list-checks" class="w-4 h-4"></i>
+                    <span>Ver Listas</span>
+                </button>
+                <button onclick="openMyWishesModal()" class="min-h-[46px] rounded-2xl bg-holiday-berry active:bg-holiday-berryLight text-white font-bold text-xs flex items-center justify-center gap-2 shadow-sm transition-colors cursor-pointer">
+                    <i data-lucide="sparkles" class="w-4 h-4 text-holiday-goldLight"></i>
+                    <span>Meus Desejos</span>
+                </button>
+            </div>
+        </nav>
     </div>
 
-    <!-- ==================== MODAL: GERENCIAR MINHAS OPÇÕES DE PRESENTE ==================== -->
-    <div id="wishes-modal" class="fixed inset-0 bg-stone-900/60 backdrop-blur-sm z-50 hidden items-center justify-center p-4 overflow-y-auto">
-        <div class="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-holiday-sand my-8 relative max-h-[90vh] flex flex-col">
-            <button onclick="closeMyWishesModal()" class="absolute top-5 right-5 text-stone-400 hover:text-stone-700 p-2 rounded-full hover:bg-stone-100 transition-colors cursor-pointer">
-                <i data-lucide="x" class="w-5 h-5"></i>
+    <!-- ==================== MODAL: GERENCIAR MINHAS OPÇÕES DE PRESENTE (BOTTOM SHEET NO MOBILE) ==================== -->
+    <div id="wishes-modal" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs z-50 hidden items-end sm:items-center justify-center p-0 sm:p-4">
+        <div class="bg-white rounded-t-3xl sm:rounded-3xl max-w-2xl w-full p-5 sm:p-8 shadow-2xl border-t sm:border border-holiday-sand relative h-[92dvh] sm:h-auto sm:max-h-[90vh] flex flex-col">
+            <!-- Tracinho visual estilo iOS Bottom Sheet -->
+            <div class="w-12 h-1.5 bg-stone-300 rounded-full mx-auto mb-3 sm:hidden shrink-0"></div>
+
+            <button onclick="closeMyWishesModal()" class="absolute top-4 sm:top-5 right-4 sm:right-5 text-stone-400 hover:text-stone-700 p-2 rounded-full hover:bg-stone-100 transition-colors cursor-pointer">
+                <i data-lucide="x" class="w-6 h-6 sm:w-5 sm:h-5"></i>
             </button>
 
-            <div class="flex items-center gap-3 mb-4 shrink-0">
-                <div class="p-2.5 bg-holiday-goldLight text-holiday-berry rounded-xl">
+            <div class="flex items-center gap-3 mb-4 shrink-0 pr-8">
+                <div class="p-2.5 bg-holiday-goldLight text-holiday-berry rounded-xl shrink-0">
                     <i data-lucide="gift" class="w-6 h-6"></i>
                 </div>
                 <div>
-                    <h2 class="font-serif text-2xl font-bold text-stone-800">Minhas Opções de Presente</h2>
+                    <h2 class="font-serif text-xl sm:text-2xl font-bold text-stone-800">Minhas Opções de Presente</h2>
                     <p class="text-xs text-stone-500">Adicione uma ou mais opções para o seu amigo secreto escolher</p>
                 </div>
             </div>
 
-            <form id="wishlist-form" onsubmit="handleSaveWishlist(event)" class="flex-1 overflow-y-auto pr-1 space-y-5">
+            <form id="wishlist-form" onsubmit="handleSaveWishlist(event)" class="flex-1 overflow-y-auto pr-0.5 space-y-4 pb-safe">
                 <!-- Observação Geral (Tamanho de roupa, calçado, gostos) -->
-                <div class="bg-holiday-cream p-4 rounded-2xl border border-holiday-sand">
+                <div class="bg-holiday-cream p-3.5 sm:p-4 rounded-2xl border border-holiday-sand">
                     <label class="block text-xs font-bold uppercase tracking-wider text-stone-500 mb-1.5">Observações Gerais (Tamanhos, Cores, Dicas)</label>
                     <input type="text" id="general-notes" placeholder="Ex: Camiseta M, Calçado 41, gosto de café e livros..."
-                        class="w-full px-3.5 py-2 rounded-xl border border-stone-300 bg-white focus:border-holiday-pine outline-none text-sm">
+                        class="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 bg-white focus:border-holiday-pine outline-none text-base sm:text-sm">
                 </div>
 
                 <!-- Container Dinâmico das Opções de Presente -->
                 <div id="options-editor-list" class="space-y-4"></div>
 
-                <button type="button" onclick="addOptionBlock()" class="w-full py-3 rounded-2xl border-2 border-dashed border-holiday-gold text-holiday-pine hover:bg-holiday-goldLight/40 font-bold text-sm flex items-center justify-center gap-2 transition-colors cursor-pointer">
+                <button type="button" onclick="addOptionBlock()" class="w-full min-h-[48px] py-3 rounded-2xl border-2 border-dashed border-holiday-gold text-holiday-pine hover:bg-holiday-goldLight/40 active:bg-holiday-goldLight/60 font-bold text-sm flex items-center justify-center gap-2 transition-colors cursor-pointer">
                     <i data-lucide="plus-circle" class="w-5 h-5 text-holiday-berry"></i>
                     <span>+ Adicionar outra opção de presente</span>
                 </button>
 
-                <div class="pt-4 flex items-center justify-end gap-3 border-t border-stone-100 sticky bottom-0 bg-white">
-                    <button type="button" onclick="closeMyWishesModal()" class="px-4 py-2.5 rounded-xl text-sm font-semibold text-stone-600 hover:bg-stone-100 transition-colors cursor-pointer">
-                        Cancelar
+                <div class="pt-4 pb-2 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-2.5 border-t border-stone-100 sticky bottom-0 bg-white">
+                    <button type="button" id="btn-delete-all-modal" onclick="promptDeleteAllMyGifts()" class="hidden min-h-[44px] px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-red-600 bg-red-50 hover:bg-red-100 transition-colors flex items-center justify-center gap-1.5 cursor-pointer">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        <span>Remover todos os meus presentes</span>
                     </button>
-                    <button type="submit" id="btn-save-wishlist" class="bg-holiday-berry hover:bg-holiday-berryLight text-white font-semibold px-6 py-2.5 rounded-xl shadow-sm transition-all flex items-center gap-2 cursor-pointer">
-                        <i data-lucide="check" class="w-4 h-4"></i>
-                        <span>Salvar Minhas Opções</span>
-                    </button>
+
+                    <div class="flex items-center gap-2.5 sm:ml-auto">
+                        <button type="button" onclick="closeMyWishesModal()" class="flex-1 sm:flex-initial min-h-[46px] px-4 py-2.5 rounded-xl text-sm font-semibold text-stone-600 bg-stone-100 sm:bg-transparent hover:bg-stone-100 transition-colors cursor-pointer">
+                            Cancelar
+                        </button>
+                        <button type="submit" id="btn-save-wishlist" class="flex-1 sm:flex-initial min-h-[46px] bg-holiday-berry hover:bg-holiday-berryLight text-white font-semibold px-6 py-2.5 rounded-xl shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer">
+                            <i data-lucide="check" class="w-4 h-4"></i>
+                            <span>Salvar Lista</span>
+                        </button>
+                    </div>
                 </div>
             </form>
         </div>
     </div>
 
     <!-- ==================== MODAL: CONFIRMAÇÃO DE RESERVA + E-MAIL ==================== -->
-    <div id="reserve-modal" class="fixed inset-0 bg-stone-900/60 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-holiday-sand">
-            <div class="w-14 h-14 rounded-2xl bg-holiday-goldLight text-holiday-berry flex items-center justify-center mx-auto mb-4">
+    <div id="reserve-modal" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs z-50 hidden items-end sm:items-center justify-center p-0 sm:p-4">
+        <div class="bg-white rounded-t-3xl sm:rounded-3xl max-w-md w-full p-6 pb-safe shadow-2xl border-t sm:border border-holiday-sand">
+            <div class="w-12 h-1.5 bg-stone-300 rounded-full mx-auto mb-4 sm:hidden"></div>
+            <div class="w-14 h-14 rounded-2xl bg-holiday-goldLight text-holiday-berry flex items-center justify-center mx-auto mb-3">
                 <i data-lucide="shopping-bag" class="w-7 h-7"></i>
             </div>
             <h3 class="font-serif text-xl font-bold text-stone-800 text-center mb-2">Confirmar escolha de presente?</h3>
             <p id="reserve-modal-desc" class="text-sm text-stone-600 text-center mb-4"></p>
 
             <div class="bg-holiday-cream p-3.5 rounded-2xl border border-holiday-sand mb-5">
-                <label class="block text-xs font-bold text-stone-700 mb-1">Receber detalhes e link por e-mail:</label>
+                <label class="block text-xs font-bold text-stone-700 mb-1.5">Receber detalhes e link por e-mail:</label>
                 <input type="email" id="reserve-email-input" placeholder="seuemail@exemplo.com"
-                    class="w-full px-3.5 py-2 rounded-xl border border-stone-300 bg-white text-sm focus:border-holiday-pine outline-none">
-                <p class="text-[11px] text-stone-500 mt-1">O cartão inteiro ficará bloqueado para outros participantes, mas só você verá qual opção escolheu.</p>
+                    class="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 bg-white text-base sm:text-sm focus:border-holiday-pine outline-none">
+                <p class="text-[11px] text-stone-500 mt-1.5">O cartão inteiro ficará bloqueado para outros participantes, mas só você verá qual opção escolheu.</p>
             </div>
 
-            <div class="flex items-center gap-3">
-                <button type="button" onclick="closeReserveModal()" class="flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold text-stone-600 bg-stone-100 hover:bg-stone-200 transition-colors cursor-pointer">
+            <div class="flex items-center gap-3 pb-2">
+                <button type="button" onclick="closeReserveModal()" class="flex-1 min-h-[46px] px-4 py-2.5 rounded-xl text-sm font-semibold text-stone-600 bg-stone-100 hover:bg-stone-200 transition-colors cursor-pointer">
                     Cancelar
                 </button>
-                <button type="button" id="btn-confirm-reserve" class="flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold text-white bg-holiday-pine hover:bg-holiday-pineLight transition-colors cursor-pointer">
+                <button type="button" id="btn-confirm-reserve" class="flex-1 min-h-[46px] px-4 py-2.5 rounded-xl text-sm font-semibold text-white bg-holiday-pine hover:bg-holiday-pineLight transition-colors cursor-pointer">
                     Confirmar Escolha
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Modal Genérico (Desmarcar reserva) -->
-    <div id="confirm-modal" class="fixed inset-0 bg-stone-900/60 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-holiday-sand text-center">
+    <!-- Modal Genérico (Desmarcar reserva / Excluir todos os presentes) -->
+    <div id="confirm-modal" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs z-50 hidden items-end sm:items-center justify-center p-0 sm:p-4">
+        <div class="bg-white rounded-t-3xl sm:rounded-3xl max-w-md w-full p-6 pb-safe shadow-2xl border-t sm:border border-holiday-sand text-center">
+            <div class="w-12 h-1.5 bg-stone-300 rounded-full mx-auto mb-4 sm:hidden"></div>
             <div class="w-14 h-14 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center mx-auto mb-4">
-                <i data-lucide="rotate-ccw" class="w-7 h-7"></i>
+                <i id="confirm-modal-icon" data-lucide="rotate-ccw" class="w-7 h-7"></i>
             </div>
-            <h3 id="confirm-title" class="font-serif text-xl font-bold text-stone-800 mb-2">Desmarcar escolha?</h3>
+            <h3 id="confirm-title" class="font-serif text-xl font-bold text-stone-800 mb-2">Confirmar ação</h3>
             <p id="confirm-message" class="text-sm text-stone-600 mb-6"></p>
-            <div class="flex items-center justify-center gap-3">
-                <button onclick="closeConfirmModal()" class="flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold text-stone-600 bg-stone-100 hover:bg-stone-200 transition-colors cursor-pointer">
+            <div class="flex items-center justify-center gap-3 pb-2">
+                <button onclick="closeConfirmModal()" class="flex-1 min-h-[46px] px-4 py-2.5 rounded-xl text-sm font-semibold text-stone-600 bg-stone-100 hover:bg-stone-200 transition-colors cursor-pointer">
                     Cancelar
                 </button>
-                <button id="confirm-action-btn" class="flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition-colors cursor-pointer">
-                    Sim, desmarcar
+                <button id="confirm-action-btn" class="flex-1 min-h-[46px] px-4 py-2.5 rounded-xl text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition-colors cursor-pointer">
+                    Confirmar
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Toast -->
-    <div id="toast" class="fixed bottom-5 right-5 bg-stone-900 text-white px-4 py-3 rounded-2xl shadow-xl text-sm font-medium flex items-center gap-2.5 transform translate-y-20 opacity-0 transition-all duration-300 z-50">
-        <i data-lucide="info" class="w-4 h-4 text-holiday-gold"></i>
+    <!-- Toast (Posicionado acima da barra inferior no mobile) -->
+    <div id="toast" class="fixed bottom-20 md:bottom-5 left-4 right-4 md:left-auto md:right-5 bg-stone-900 text-white px-4 py-3.5 rounded-2xl shadow-xl text-sm font-medium flex items-center gap-2.5 transform translate-y-32 opacity-0 transition-all duration-300 z-50">
+        <i data-lucide="info" class="w-4 h-4 text-holiday-gold shrink-0"></i>
         <span id="toast-message">Mensagem</span>
     </div>
 
@@ -322,7 +353,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, doc, setDoc, getDoc, updateDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, doc, setDoc, getDoc, updateDoc, deleteDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Configuração do Firebase
         const appId = 'amigo-secreto-default';
@@ -335,11 +366,11 @@
             appId: "1:692068429648:web:8842f4aba365b26f8f8655"
         };
 
-        // Configuração Opcional do EmailJS (Preencha se criar conta gratuita em emailjs.com)
+        // Configuração Opcional do EmailJS
         const EMAILJS_CONFIG = {
-            publicKey: "BYU9snB7yN8-7GK6K",   // Ex: "user_XXXXXXXXXXXX"
-            serviceId: "service_jsio7p2",   // Ex: "service_XXXXXXX"
-            templateId: "template_mv3ogad"   // Ex: "template_XXXXXXX"
+            publicKey: "",
+            serviceId: "",
+            templateId: ""
         };
         if (EMAILJS_CONFIG.publicKey && window.emailjs) {
             emailjs.init(EMAILJS_CONFIG.publicKey);
@@ -348,7 +379,7 @@
         let db = null;
         let auth = null;
         let firebaseReady = false;
-        let loggedUser = null; // { usernameKey, displayName, email }
+        let loggedUser = null;
         let authMode = 'login';
         let allWishlists = [];
         let activeParticipantFilter = 'ALL';
@@ -358,11 +389,15 @@
 
         lucide.createIcons();
 
+        window.scrollToTopList = function() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
         window.showToast = function(msg) {
             const toast = document.getElementById('toast');
             document.getElementById('toast-message').textContent = msg;
-            toast.classList.remove('translate-y-20', 'opacity-0');
-            setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3800);
+            toast.classList.remove('translate-y-32', 'opacity-0');
+            setTimeout(() => toast.classList.add('translate-y-32', 'opacity-0'), 3800);
         };
 
         // Inicializar Firebase
@@ -405,13 +440,13 @@
             document.getElementById('auth-error').classList.add('hidden');
 
             if (mode === 'login') {
-                tabLogin.className = "py-2 rounded-lg text-sm font-bold transition-all bg-holiday-pine text-white shadow-xs cursor-pointer";
-                tabRegister.className = "py-2 rounded-lg text-sm font-bold transition-all text-stone-600 hover:text-stone-900 cursor-pointer";
+                tabLogin.className = "min-h-[42px] rounded-xl text-sm font-bold transition-all bg-holiday-pine text-white shadow-xs cursor-pointer";
+                tabRegister.className = "min-h-[42px] rounded-xl text-sm font-bold transition-all text-stone-600 hover:text-stone-900 cursor-pointer";
                 emailGroup.classList.add('hidden');
                 submitText.textContent = "Entrar na Lista";
             } else {
-                tabRegister.className = "py-2 rounded-lg text-sm font-bold transition-all bg-holiday-pine text-white shadow-xs cursor-pointer";
-                tabLogin.className = "py-2 rounded-lg text-sm font-bold transition-all text-stone-600 hover:text-stone-900 cursor-pointer";
+                tabRegister.className = "min-h-[42px] rounded-xl text-sm font-bold transition-all bg-holiday-pine text-white shadow-xs cursor-pointer";
+                tabLogin.className = "min-h-[42px] rounded-xl text-sm font-bold transition-all text-stone-600 hover:text-stone-900 cursor-pointer";
                 emailGroup.classList.remove('hidden');
                 submitText.textContent = "Criar Conta e Entrar";
             }
@@ -465,7 +500,7 @@
                     showToast(`Conta criada! Bem-vindo(a), ${rawName}!`);
                 } else {
                     if (!userSnap.exists()) {
-                        showAuthError("Usuário não encontrado. Clique em 'Criar Conta' acima para se cadastrar.");
+                        showAuthError("Usuário não encontrado. Toque em 'Criar Conta' acima para se cadastrar.");
                         btn.disabled = false;
                         return;
                     }
@@ -557,7 +592,7 @@
             }
 
             let html = `
-                <button onclick="setFilter('ALL')" class="px-3.5 py-2 rounded-xl text-sm font-semibold transition-all cursor-pointer ${activeParticipantFilter === 'ALL' ? 'bg-holiday-pine text-white shadow-sm' : 'bg-holiday-cream text-stone-700 hover:bg-holiday-sand'}">
+                <button onclick="setFilter('ALL')" class="snap-start shrink-0 min-h-[38px] px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer ${activeParticipantFilter === 'ALL' ? 'bg-holiday-pine text-white shadow-sm' : 'bg-holiday-cream text-stone-700 hover:bg-holiday-sand'}">
                     Todos (${allWishlists.length})
                 </button>
             `;
@@ -566,7 +601,7 @@
                 const isActive = activeParticipantFilter === w.id;
                 const optCount = (w.options || []).length;
                 html += `
-                    <button onclick="setFilter('${w.id}')" class="px-3.5 py-2 rounded-xl text-sm font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${isActive ? 'bg-holiday-pine text-white shadow-sm' : 'bg-holiday-cream text-stone-700 hover:bg-holiday-sand'}">
+                    <button onclick="setFilter('${w.id}')" class="snap-start shrink-0 min-h-[38px] px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${isActive ? 'bg-holiday-pine text-white shadow-sm' : 'bg-holiday-cream text-stone-700 hover:bg-holiday-sand'}">
                         <span>${escapeHtml(w.displayName)}</span>
                         <span class="text-xs px-1.5 py-0.5 rounded-md ${isActive ? 'bg-white/20 text-white' : 'bg-stone-200/70 text-stone-600'}">${optCount}</span>
                     </button>
@@ -630,14 +665,14 @@
                 return `
                 <section class="bg-white rounded-3xl border ${isReserved ? 'border-stone-200' : 'border-holiday-sand'} shadow-sm overflow-hidden">
                     <!-- Cabeçalho da Solicitação do Participante -->
-                    <div class="p-5 sm:px-7 bg-holiday-cream/70 border-b border-holiday-sand flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div class="p-4 sm:px-7 sm:py-5 bg-holiday-cream/70 border-b border-holiday-sand flex flex-col sm:flex-row sm:items-center justify-between gap-3.5">
                         <div class="flex items-center gap-3">
                             <div class="w-11 h-11 rounded-2xl bg-holiday-pine text-holiday-goldLight font-serif font-bold text-lg flex items-center justify-center shrink-0">
                                 ${escapeHtml((wishlist.displayName || '?').charAt(0).toUpperCase())}
                             </div>
-                            <div>
+                            <div class="min-w-0">
                                 <div class="flex items-center gap-2 flex-wrap">
-                                    <h2 class="font-serif text-xl font-bold text-stone-800">${escapeHtml(wishlist.displayName)}</h2>
+                                    <h2 class="font-serif text-lg sm:text-xl font-bold text-stone-800">${escapeHtml(wishlist.displayName)}</h2>
                                     ${isMine ? `<span class="text-[11px] font-bold bg-holiday-goldLight text-holiday-pine px-2.5 py-0.5 rounded-full">Sua Lista</span>` : ''}
                                 </div>
                                 ${wishlist.generalNotes ? `<p class="text-xs text-stone-600 mt-0.5"><strong>Dicas/Tamanhos:</strong> ${escapeHtml(wishlist.generalNotes)}</p>` : ''}
@@ -646,19 +681,23 @@
 
                         <div class="flex items-center gap-2 flex-wrap">
                             ${isMine ? `
-                                <button onclick="openMyWishesModal()" class="px-3.5 py-2 rounded-xl bg-holiday-pine hover:bg-holiday-pineLight text-white text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer">
+                                <button onclick="openMyWishesModal()" class="flex-1 sm:flex-initial min-h-[40px] px-3.5 py-2 rounded-xl bg-holiday-pine hover:bg-holiday-pineLight text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer">
                                     <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
-                                    <span>Editar Minhas Opções</span>
+                                    <span>Editar Opções</span>
+                                </button>
+                                <button onclick="promptDeleteAllMyGifts()" class="flex-1 sm:flex-initial min-h-[40px] px-3.5 py-2 rounded-xl bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer">
+                                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                                    <span>Remover todos</span>
                                 </button>
                             ` : ''}
 
                             ${isReserved ? `
-                                <span class="px-3.5 py-2 rounded-xl bg-holiday-berry text-white text-xs font-bold flex items-center gap-1.5 shadow-xs">
+                                <span class="w-full sm:w-auto min-h-[38px] px-3.5 py-2 rounded-xl bg-holiday-berry text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-xs">
                                     <i data-lucide="check-circle-2" class="w-4 h-4"></i>
                                     <span>${reservedByMe ? 'Você escolheu este presente!' : 'Presente já escolhido!'}</span>
                                 </span>
                                 ${reservedByMe ? `
-                                    <button onclick="promptUnreserve('${wishlist.id}', '${escapeHtml(wishlist.displayName).replace(/'/g, "\\'")}')" class="px-3 py-2 rounded-xl bg-stone-200 hover:bg-red-100 text-stone-700 hover:text-red-700 text-xs font-bold flex items-center gap-1 transition-colors cursor-pointer">
+                                    <button onclick="promptUnreserve('${wishlist.id}', '${escapeHtml(wishlist.displayName).replace(/'/g, "\\'")}')" class="w-full sm:w-auto min-h-[40px] px-3 py-2 rounded-xl bg-stone-200 hover:bg-red-100 text-stone-700 hover:text-red-700 text-xs font-bold flex items-center justify-center gap-1 transition-colors cursor-pointer">
                                         <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
                                         <span>Desmarcar minha escolha</span>
                                     </button>
@@ -672,7 +711,7 @@
                     </div>
 
                     <!-- Grid das Opções de Presente desta Pessoa -->
-                    <div class="p-5 sm:p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 ${isReserved && !reservedByMe ? 'opacity-65' : ''}">
+                    <div class="p-4 sm:p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 ${isReserved && !reservedByMe ? 'opacity-65' : ''}">
                         ${options.map((opt, idx) => {
                             const fallbackImg = `https://placehold.co/600x400/FAF8F5/1B4332?text=${encodeURIComponent(opt.title || 'Opção ' + (idx + 1))}`;
                             const imgUrl = opt.imageUrl && opt.imageUrl.trim() !== '' ? opt.imageUrl : fallbackImg;
@@ -709,14 +748,14 @@
 
                                     <div class="mt-auto pt-3 border-t border-stone-100 flex items-center gap-2">
                                         <a href="${escapeHtml(opt.url)}" target="_blank" rel="noopener noreferrer"
-                                           class="flex-1 bg-holiday-cream hover:bg-holiday-sand text-stone-800 font-semibold text-xs py-2.5 px-3 rounded-xl flex items-center justify-center gap-1.5 transition-colors">
+                                           class="flex-1 min-h-[42px] bg-holiday-cream hover:bg-holiday-sand active:bg-holiday-sand text-stone-800 font-semibold text-xs py-2.5 px-3 rounded-xl flex items-center justify-center gap-1.5 transition-colors">
                                             <span>Ver na Loja</span>
                                             <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
                                         </a>
 
                                         ${!isMine && !isReserved ? `
                                             <button onclick="openReserveModal('${wishlist.id}', ${idx})"
-                                                class="px-3.5 py-2.5 rounded-xl text-xs font-bold bg-holiday-pine hover:bg-holiday-pineLight text-white shadow-xs transition-all flex items-center gap-1.5 cursor-pointer">
+                                                class="min-h-[42px] px-4 py-2.5 rounded-xl text-xs font-bold bg-holiday-pine hover:bg-holiday-pineLight active:scale-[0.98] text-white shadow-xs transition-all flex items-center gap-1.5 cursor-pointer">
                                                 <i data-lucide="shopping-bag" class="w-3.5 h-3.5"></i>
                                                 <span>Vou dar este!</span>
                                             </button>
@@ -743,9 +782,12 @@
             const existing = allWishlists.find(w => w.id === loggedUser.usernameKey);
             document.getElementById('general-notes').value = existing?.generalNotes || '';
 
+            const deleteAllBtn = document.getElementById('btn-delete-all-modal');
             if (existing && existing.options && existing.options.length > 0) {
+                deleteAllBtn.classList.remove('hidden');
                 existing.options.forEach(opt => addOptionBlock(opt));
             } else {
+                deleteAllBtn.classList.add('hidden');
                 addOptionBlock();
             }
 
@@ -772,34 +814,34 @@
             block.innerHTML = `
                 <div class="flex items-center justify-between border-b border-stone-100 pb-2">
                     <span class="text-xs font-bold uppercase tracking-wider text-holiday-pine option-label">Opção de Presente</span>
-                    <button type="button" onclick="removeOptionBlock('option-block-${idx}')" class="text-xs text-red-500 hover:text-red-700 font-semibold flex items-center gap-1 cursor-pointer">
+                    <button type="button" onclick="removeOptionBlock('option-block-${idx}')" class="min-h-[32px] px-2 text-xs text-red-500 hover:text-red-700 font-semibold flex items-center gap-1 cursor-pointer">
                         <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Remover
                     </button>
                 </div>
 
                 <div>
                     <label class="block text-xs font-semibold text-stone-700 mb-1">Link de onde comprar *</label>
-                    <div class="flex gap-2">
+                    <div class="flex flex-col sm:flex-row gap-2">
                         <input type="url" required placeholder="https://www.loja.com.br/produto..." value="${escapeHtml(data.url || '')}"
-                            class="opt-url flex-1 px-3.5 py-2 rounded-xl border border-stone-300 focus:border-holiday-pine outline-none text-sm">
+                            class="opt-url flex-1 px-3.5 py-2.5 rounded-xl border border-stone-300 focus:border-holiday-pine outline-none text-base sm:text-sm">
                         <button type="button" onclick="fetchOptionPreview(${idx}, this)"
-                            class="bg-holiday-pine hover:bg-holiday-pineLight text-white px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 shrink-0 cursor-pointer">
+                            class="min-h-[42px] bg-holiday-pine hover:bg-holiday-pineLight text-white px-4 py-2 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 shrink-0 cursor-pointer">
                             <i data-lucide="wand-2" class="w-3.5 h-3.5"></i>
                             <span>Puxar Foto</span>
                         </button>
                     </div>
-                    <p class="opt-feedback text-[11px] mt-1 hidden"></p>
+                    <p class="opt-feedback text-xs mt-1 hidden"></p>
                 </div>
 
                 <div class="flex items-center gap-3 bg-holiday-cream p-2.5 rounded-xl border border-holiday-sand">
                     <img src="${escapeHtml(data.imageUrl || 'https://placehold.co/150x150/FAF8F5/9E2A2B?text=Foto')}"
                          onerror="this.src='https://placehold.co/150x150/FAF8F5/9E2A2B?text=Sem+Foto'"
-                         class="opt-preview w-14 h-14 rounded-lg object-cover bg-white border border-stone-200 shrink-0">
+                         class="opt-preview w-16 h-16 rounded-xl object-cover bg-white border border-stone-200 shrink-0">
                     <div class="flex-1 min-w-0">
-                        <label class="block text-[11px] font-semibold text-stone-600 mb-0.5">Link direto da imagem (automático ou manual)</label>
+                        <label class="block text-[11px] font-semibold text-stone-600 mb-1">Link direto da imagem (automático ou manual)</label>
                         <input type="url" placeholder="https://..." value="${escapeHtml(data.imageUrl || '')}"
                             oninput="this.closest('.option-block').querySelector('.opt-preview').src = this.value || 'https://placehold.co/150x150/FAF8F5/9E2A2B?text=Foto'"
-                            class="opt-image w-full px-2.5 py-1 rounded-lg border border-stone-300 bg-white text-xs outline-none">
+                            class="opt-image w-full px-3 py-1.5 rounded-lg border border-stone-300 bg-white text-base sm:text-xs outline-none">
                     </div>
                 </div>
 
@@ -807,19 +849,19 @@
                     <div class="sm:col-span-2">
                         <label class="block text-xs font-semibold text-stone-700 mb-1">Nome do Presente *</label>
                         <input type="text" required placeholder="Ex: Fone Bluetooth JBL" value="${escapeHtml(data.title || '')}"
-                            class="opt-title w-full px-3.5 py-2 rounded-xl border border-stone-300 focus:border-holiday-pine outline-none text-sm">
+                            class="opt-title w-full px-3.5 py-2.5 rounded-xl border border-stone-300 focus:border-holiday-pine outline-none text-base sm:text-sm">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-stone-700 mb-1">Preço Estimado</label>
                         <input type="text" placeholder="Ex: R$ 150,00" value="${escapeHtml(data.price || '')}"
-                            class="opt-price w-full px-3.5 py-2 rounded-xl border border-stone-300 focus:border-holiday-pine outline-none text-sm">
+                            class="opt-price w-full px-3.5 py-2.5 rounded-xl border border-stone-300 focus:border-holiday-pine outline-none text-base sm:text-sm">
                     </div>
                 </div>
 
                 <div>
                     <label class="block text-xs font-semibold text-stone-700 mb-1">Detalhes específicos (Cor, voltagem, modelo)</label>
                     <input type="text" placeholder="Ex: Cor preta, 110v" value="${escapeHtml(data.notes || '')}"
-                        class="opt-notes w-full px-3.5 py-2 rounded-xl border border-stone-300 focus:border-holiday-pine outline-none text-sm">
+                        class="opt-notes w-full px-3.5 py-2.5 rounded-xl border border-stone-300 focus:border-holiday-pine outline-none text-base sm:text-sm">
                 </div>
             `;
 
@@ -831,7 +873,7 @@
         window.removeOptionBlock = function(blockId) {
             const container = document.getElementById('options-editor-list');
             if (container.children.length <= 1) {
-                showToast("Você precisa manter pelo menos 1 opção de presente.");
+                showToast("Para apagar sua lista inteira, toque em 'Remover todos os meus presentes'.");
                 return;
             }
             document.getElementById(blockId)?.remove();
@@ -949,9 +991,40 @@
                 showToast("Erro ao salvar sua lista.");
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = `<i data-lucide="check" class="w-4 h-4"></i><span>Salvar Minhas Opções</span>`;
+                btn.innerHTML = `<i data-lucide="check" class="w-4 h-4"></i><span>Salvar Lista</span>`;
                 lucide.createIcons();
             }
+        };
+
+        // ==================== REMOVER TODOS OS MEUS PRESENTES ====================
+        window.promptDeleteAllMyGifts = function() {
+            if (!loggedUser) return;
+            const existing = allWishlists.find(w => w.id === loggedUser.usernameKey);
+            if (!existing) {
+                showToast("Você ainda não possui presentes cadastrados.");
+                return;
+            }
+
+            document.getElementById('confirm-title').textContent = "Remover todos os seus presentes?";
+            document.getElementById('confirm-message').innerHTML =
+                `Tem certeza que deseja excluir <strong>todas as suas opções de presentes</strong> (${existing.options.length} ${existing.options.length === 1 ? 'item' : 'itens'})? Seu cartão será removido da lista até que você cadastre novos desejos.`;
+            document.getElementById('confirm-action-btn').textContent = "Sim, remover todos";
+
+            pendingConfirmAction = async () => {
+                try {
+                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'secret_santa_wishlists', loggedUser.usernameKey);
+                    await deleteDoc(docRef);
+                    closeMyWishesModal();
+                    showToast("Todos os seus presentes foram removidos com sucesso.");
+                } catch (err) {
+                    console.error("Erro ao remover todos os presentes:", err);
+                    showToast("Erro ao remover seus presentes.");
+                }
+            };
+
+            const modal = document.getElementById('confirm-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
         };
 
         // ==================== RESERVAR E DESMARCAR (OPÇÃO A + E-MAIL) ====================
@@ -999,13 +1072,11 @@
                     reservedOptionIndex: optionIdx
                 });
 
-                // Atualiza e-mail da sessão se o usuário digitou um novo
                 if (targetEmail && targetEmail !== loggedUser.email) {
                     loggedUser.email = targetEmail;
                     localStorage.setItem('amigo_secreto_session', JSON.stringify(loggedUser));
                 }
 
-                // Tenta envio automático via EmailJS se configurado
                 if (targetEmail && EMAILJS_CONFIG.publicKey && EMAILJS_CONFIG.serviceId && EMAILJS_CONFIG.templateId && window.emailjs) {
                     emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, {
                         to_email: targetEmail,
@@ -1018,7 +1089,7 @@
                     }).then(() => {
                         showToast(`Presente reservado e enviado para ${targetEmail}!`);
                     }).catch(() => {
-                        showToast("Presente reservado! Use o botão 'Enviar p/ E-mail' no topo se precisar.");
+                        showToast("Presente reservado! Toque em 'E-mail' no topo se precisar.");
                     });
                 } else {
                     showToast(`Presente de ${wishlist.displayName} reservado com sucesso!`);
@@ -1031,7 +1102,6 @@
             }
         });
 
-        // Backup universal para enviar o presente escolhido por e-mail
         window.sendEmailBackup = function() {
             const myReservedList = allWishlists.find(w => w.reserved && w.reservedBy === loggedUser.usernameKey);
             if (!myReservedList) return;
@@ -1054,6 +1124,7 @@
             document.getElementById('confirm-title').textContent = "Desmarcar sua escolha?";
             document.getElementById('confirm-message').innerHTML =
                 `Deseja cancelar sua escolha para <strong>${escapeHtml(displayName)}</strong>? Todas as opções dessa pessoa voltarão a ficar disponíveis para o grupo.`;
+            document.getElementById('confirm-action-btn').textContent = "Sim, desmarcar";
 
             pendingConfirmAction = async () => {
                 const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'secret_santa_wishlists', wishlistId);
@@ -1086,7 +1157,6 @@
             pendingConfirmAction = null;
         };
 
-        // Utilitários
         function extractDomain(url) {
             try { return new URL(url).hostname.replace('www.', ''); } catch { return 'Loja online'; }
         }
