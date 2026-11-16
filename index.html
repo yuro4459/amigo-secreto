@@ -143,7 +143,6 @@
 
                 <!-- Ações Perfil, Meus Desejos e Sair -->
                 <div class="flex items-center gap-2 sm:gap-2.5 shrink-0">
-                    <!-- Botão Meu Perfil (Foto + Nome) -->
                     <button onclick="openProfileModal()" title="Alterar foto de perfil" class="min-h-[42px] flex items-center gap-2 bg-holiday-pineLight/70 hover:bg-holiday-pineLight px-2.5 sm:px-3.5 py-1.5 rounded-2xl border border-emerald-700/60 text-xs text-emerald-100 transition-colors cursor-pointer">
                         <div id="header-avatar-container" class="w-7 h-7 rounded-full bg-holiday-berry text-holiday-goldLight font-bold flex items-center justify-center overflow-hidden border border-holiday-gold/50 shrink-0">
                             <span id="header-avatar-initial">?</span>
@@ -169,7 +168,7 @@
         <!-- Conteúdo Principal -->
         <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-5 sm:py-8">
             
-            <!-- Banner de Resumo da Minha Reserva (Aparece apenas para quem já escolheu um presente) -->
+            <!-- Banner de Resumo da Minha Reserva -->
             <div id="my-reservation-banner" class="hidden mb-6 bg-gradient-to-r from-holiday-pine to-holiday-pineLight text-white p-4 sm:p-5 rounded-3xl shadow-md border border-holiday-gold/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div class="flex items-start gap-3">
                     <div class="p-2.5 bg-white/15 rounded-2xl shrink-0 mt-0.5">
@@ -197,7 +196,7 @@
                 </div>
             </div>
 
-            <!-- Barra de Filtros Otimizada para Touch -->
+            <!-- Barra de Filtros -->
             <section class="mb-6 sm:mb-8 bg-white p-4 sm:p-5 rounded-3xl shadow-sm border border-holiday-sand">
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-3.5">
                     <div class="flex-1 min-w-0">
@@ -377,7 +376,7 @@
                 <label class="block text-xs font-bold text-stone-700 mb-1.5">Receber detalhes e link por e-mail:</label>
                 <input type="email" id="reserve-email-input" placeholder="seuemail@exemplo.com"
                     class="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 bg-white text-base sm:text-sm focus:border-holiday-pine outline-none">
-                <p class="text-[11px] text-stone-500 mt-1.5">O cartão inteiro ficará bloqueado para outros participantes, mas só você verá qual opção escolheu.</p>
+                <p class="text-[11px] text-stone-500 mt-1.5">O cartão inteiro ficará bloqueado para outros participantes, mas só você verá qual opção escolheu. <strong>Dica:</strong> caso não ache na caixa de entrada, verifique o Spam.</p>
             </div>
 
             <div class="flex items-center gap-3 pb-2">
@@ -447,7 +446,7 @@
         let db = null;
         let auth = null;
         let firebaseReady = false;
-        let loggedUser = null; // { usernameKey, displayName, email, avatarUrl }
+        let loggedUser = null;
         let authMode = 'login';
         let allWishlists = [];
         let activeParticipantFilter = 'ALL';
@@ -469,6 +468,74 @@
             toast.classList.remove('translate-y-32', 'opacity-0');
             setTimeout(() => toast.classList.add('translate-y-32', 'opacity-0'), 3800);
         };
+
+        // ==================== GERADOR DE ILUSTRAÇÃO GENÉRICA POR CATEGORIA ====================
+        function getSmartGiftIllustration(title = '', url = '') {
+            const text = `${title} ${url}`.toLowerCase();
+            let iconSvg = `<path d="M20 12v10H4V12"/><path d="M2 7h20v5H2z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>`;
+            let badge = 'Sugestão de Presente';
+
+            if (/fone|headphone|earbud|jbl|airpods|caixa de som|musica|violao/.test(text)) {
+                iconSvg = `<path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/>`;
+                badge = 'Áudio & Eletrônicos';
+            } else if (/livro|kindle|leitura|box|hq|manga/.test(text)) {
+                iconSvg = `<path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/>`;
+                badge = 'Livros & Leitura';
+            } else if (/camiseta|camisa|blusa|vestido|calca|tenis|sapato|chinelo|bone|bolsa|mochila|roupa|jaqueta|moletom/.test(text)) {
+                iconSvg = `<path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/>`;
+                badge = 'Moda & Acessórios';
+            } else if (/cafe|cafeteira|caneca|garrafa|copo|stanley|vinho|chocolate|cozinha|panela|airfryer/.test(text)) {
+                iconSvg = `<path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><line x1="6" x2="6" y1="2" y2="4"/><line x1="10" x2="10" y1="2" y2="4"/><line x1="14" x2="14" y1="2" y2="4"/>`;
+                badge = 'Casa, Café & Bebidas';
+            } else if (/perfume|creme|maquiagem|hidratante|colonia|boticario|natura|sephora|beleza/.test(text)) {
+                iconSvg = `<path d="M9 3h6v4H9z"/><path d="M10 7v3"/><path d="M14 7v3"/><rect x="6" y="10" width="12" height="11" rx="2"/>`;
+                badge = 'Perfumaria & Beleza';
+            } else if (/jogo|game|nintendo|playstation|xbox|controle|mouse|teclado|funko|lego/.test(text)) {
+                iconSvg = `<line x1="6" x2="10" y1="12" y2="12"/><line x1="8" x2="8" y1="10" y2="14"/><line x1="15" x2="15.01" y1="13" y2="13"/><line x1="18" x2="18.01" y1="11" y2="11"/><rect width="20" height="12" x="2" y="6" rx="2"/>`;
+                badge = 'Games & Geek';
+            } else if (/relogio|smartwatch|pulseira|colar|anel|oculos/.test(text)) {
+                iconSvg = `<circle cx="12" cy="12" r="6"/><polyline points="12 10 12 12 13 13"/><path d="m16.13 7.66-.81-4.05a2 2 0 0 0-2-1.61h-2.68a2 2 0 0 0-2 1.61l-.78 4.05"/><path d="m7.88 16.36.8 4a2 2 0 0 0 2 1.61h2.72a2 2 0 0 0 2-1.61l.81-4.05"/>`;
+                badge = 'Relógios & Estilo';
+            }
+
+            const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400" viewBox="0 0 600 400">
+                <defs>
+                    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#FAF8F5"/>
+                        <stop offset="100%" stop-color="#FAEDCD"/>
+                    </linearGradient>
+                </defs>
+                <rect width="600" height="400" fill="url(#bg)"/>
+                <circle cx="300" cy="175" r="76" fill="#1B4332" opacity="0.1"/>
+                <circle cx="300" cy="175" r="56" fill="#1B4332"/>
+                <g transform="translate(276, 151) scale(2)" fill="none" stroke="#FAEDCD" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    ${iconSvg}
+                </g>
+                <text x="300" y="292" font-family="sans-serif" font-size="20" font-weight="700" fill="#1B4332" text-anchor="middle">${badge}</text>
+                <text x="300" y="320" font-family="sans-serif" font-size="14" fill="#78716C" text-anchor="middle">Toque em "Ver na Loja" para abrir o produto</text>
+            </svg>`;
+
+            return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+        }
+
+        // Extrai título aproximado a partir do slug da URL (útil quando Amazon/ML bloqueiam scraping)
+        function extractTitleFromUrlSlug(url) {
+            try {
+                const u = new URL(url);
+                const segments = u.pathname.split('/').filter(s => s && s.length > 4 && !['dp', 'gp', 'product', 'produto', 'item', 'p', 's'].includes(s.toLowerCase()));
+                if (segments.length === 0) return '';
+                // Pega o segmento mais descritivo (geralmente o maior com hífens)
+                const best = segments.sort((a, b) => b.length - a.length)[0];
+                const cleaned = decodeURIComponent(best)
+                    .replace(/[-_]+/g, ' ')
+                    .replace(/\b(mlb|p|ref|qid|sr|keywords|dp|b0[a-z0-9]{8})\b.*/i, '')
+                    .trim();
+                if (cleaned.length < 4) return '';
+                return cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
+            } catch {
+                return '';
+            }
+        }
 
         // Inicializar Firebase
         async function initFirebase() {
@@ -500,25 +567,29 @@
             dot.classList.add(isOnline ? 'bg-emerald-400' : 'bg-red-400');
         }
 
-        // ==================== COMPRESSÃO DE IMAGEM DE PERFIL ====================
-        function compressAvatarImage(file) {
+        // ==================== COMPRESSÃO DE IMAGEM (PERFIL E PRINT DE PRESENTE) ====================
+        function compressImageFile(file, maxSize = 200, squareCrop = true) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
                 reader.onload = (event) => {
                     const img = new Image();
                     img.onload = () => {
                         const canvas = document.createElement('canvas');
-                        const size = 200;
-                        canvas.width = size;
-                        canvas.height = size;
                         const ctx = canvas.getContext('2d');
 
-                        // Recorte quadrado centralizado
-                        const minDim = Math.min(img.width, img.height);
-                        const sx = (img.width - minDim) / 2;
-                        const sy = (img.height - minDim) / 2;
-
-                        ctx.drawImage(img, sx, sy, minDim, minDim, 0, 0, size, size);
+                        if (squareCrop) {
+                            canvas.width = maxSize;
+                            canvas.height = maxSize;
+                            const minDim = Math.min(img.width, img.height);
+                            const sx = (img.width - minDim) / 2;
+                            const sy = (img.height - minDim) / 2;
+                            ctx.drawImage(img, sx, sy, minDim, minDim, 0, 0, maxSize, maxSize);
+                        } else {
+                            const scale = Math.min(1, maxSize / Math.max(img.width, img.height));
+                            canvas.width = Math.round(img.width * scale);
+                            canvas.height = Math.round(img.height * scale);
+                            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        }
                         resolve(canvas.toDataURL('image/jpeg', 0.78));
                     };
                     img.onerror = reject;
@@ -534,7 +605,7 @@
             if (!file) return;
 
             try {
-                const compressedDataUrl = await compressAvatarImage(file);
+                const compressedDataUrl = await compressImageFile(file, 200, true);
                 if (context === 'register') {
                     pendingRegisterAvatar = compressedDataUrl;
                     const imgEl = document.getElementById('register-avatar-preview');
@@ -549,6 +620,25 @@
             } catch (err) {
                 console.error("Erro ao processar imagem:", err);
                 showToast("Não foi possível carregar esta imagem.");
+            }
+        };
+
+        window.handleGiftFileSelect = async function(input, idx) {
+            const file = input.files?.[0];
+            if (!file) return;
+            const block = document.getElementById(`option-block-${idx}`);
+            if (!block) return;
+
+            try {
+                const compressed = await compressImageFile(file, 450, false);
+                block.querySelector('.opt-image').value = compressed;
+                block.querySelector('.opt-preview').src = compressed;
+                const feedback = block.querySelector('.opt-feedback');
+                feedback.classList.remove('hidden', 'text-amber-600', 'text-stone-500');
+                feedback.classList.add('text-emerald-600');
+                feedback.textContent = "✨ Foto/print anexado do seu aparelho!";
+            } catch {
+                showToast("Não foi possível anexar a foto.");
             }
         };
 
@@ -764,11 +854,9 @@
             btn.textContent = 'Salvando...';
 
             try {
-                // Atualiza no documento do usuário
                 const userRef = doc(db, 'artifacts', appId, 'public', 'data', 'secret_santa_users', loggedUser.usernameKey);
                 await updateDoc(userRef, { avatarUrl: pendingProfileAvatar });
 
-                // Se o usuário já tiver uma lista de desejos publicada, atualiza a foto no cartão dele também
                 const existingWishlist = allWishlists.find(w => w.id === loggedUser.usernameKey);
                 if (existingWishlist) {
                     const wishRef = doc(db, 'artifacts', appId, 'public', 'data', 'secret_santa_wishlists', loggedUser.usernameKey);
@@ -847,7 +935,6 @@
             renderWishlists();
         };
 
-        // Banner superior exclusivo para quem reservou um presente
         function updateMyReservationBanner() {
             const banner = document.getElementById('my-reservation-banner');
             const myReservedList = allWishlists.find(w => w.reserved && w.reservedBy === loggedUser.usernameKey);
@@ -947,8 +1034,8 @@
                     <!-- Grid das Opções de Presente desta Pessoa -->
                     <div class="p-4 sm:p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 ${isReserved && !reservedByMe ? 'opacity-65' : ''}">
                         ${options.map((opt, idx) => {
-                            const fallbackImg = `https://placehold.co/600x400/FAF8F5/1B4332?text=${encodeURIComponent(opt.title || 'Opção ' + (idx + 1))}`;
-                            const imgUrl = opt.imageUrl && opt.imageUrl.trim() !== '' ? opt.imageUrl : fallbackImg;
+                            const smartFallback = getSmartGiftIllustration(opt.title, opt.url);
+                            const imgUrl = opt.imageUrl && opt.imageUrl.trim() !== '' ? opt.imageUrl : smartFallback;
                             const domain = extractDomain(opt.url);
                             const isThisOptionChosenByMe = reservedByMe && wishlist.reservedOptionIndex === idx;
 
@@ -956,7 +1043,7 @@
                             <div class="rounded-2xl border ${isThisOptionChosenByMe ? 'border-holiday-pine ring-2 ring-holiday-pine/30 bg-emerald-50/30' : 'border-stone-200 bg-white'} flex flex-col overflow-hidden transition-all">
                                 <div class="relative h-44 bg-holiday-cream border-b border-stone-100">
                                     <img src="${escapeHtml(imgUrl)}" alt="${escapeHtml(opt.title)}"
-                                         onerror="this.onerror=null; this.src='${fallbackImg}';"
+                                         onerror="this.onerror=null; this.src='${smartFallback}';"
                                          class="w-full h-full object-contain p-3 ${isReserved && !isThisOptionChosenByMe ? 'grayscale opacity-60' : ''}">
                                     <span class="absolute top-2.5 left-2.5 bg-stone-800/85 text-white text-[11px] font-bold px-2.5 py-1 rounded-lg">
                                         Opção ${idx + 1}
@@ -1041,6 +1128,8 @@
             const idx = optionCounter;
             const container = document.getElementById('options-editor-list');
 
+            const initialPreview = data.imageUrl || getSmartGiftIllustration(data.title || '', data.url || '');
+
             const block = document.createElement('div');
             block.className = "option-block bg-white p-4 rounded-2xl border border-stone-200 shadow-xs space-y-3 relative";
             block.id = `option-block-${idx}`;
@@ -1067,14 +1156,31 @@
                     <p class="opt-feedback text-xs mt-1 hidden"></p>
                 </div>
 
-                <div class="flex items-center gap-3 bg-holiday-cream p-2.5 rounded-xl border border-holiday-sand">
-                    <img src="${escapeHtml(data.imageUrl || 'https://placehold.co/150x150/FAF8F5/9E2A2B?text=Foto')}"
-                         onerror="this.src='https://placehold.co/150x150/FAF8F5/9E2A2B?text=Sem+Foto'"
-                         class="opt-preview w-16 h-16 rounded-xl object-cover bg-white border border-stone-200 shrink-0">
-                    <div class="flex-1 min-w-0">
-                        <label class="block text-[11px] font-semibold text-stone-600 mb-1">Link direto da imagem (automático ou manual)</label>
-                        <input type="url" placeholder="https://..." value="${escapeHtml(data.imageUrl || '')}"
-                            oninput="this.closest('.option-block').querySelector('.opt-preview').src = this.value || 'https://placehold.co/150x150/FAF8F5/9E2A2B?text=Foto'"
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 bg-holiday-cream p-3 rounded-xl border border-holiday-sand">
+                    <div class="flex items-center gap-3">
+                        <img src="${escapeHtml(initialPreview)}"
+                             onerror="this.src='${getSmartGiftIllustration()}'"
+                             class="opt-preview w-16 h-16 rounded-xl object-contain bg-white border border-stone-200 shrink-0">
+                        <div class="flex-1 min-w-0 sm:hidden">
+                            <label class="min-h-[38px] px-3 py-1.5 rounded-lg bg-white border border-stone-300 text-stone-700 font-semibold text-xs inline-flex items-center gap-1.5 cursor-pointer">
+                                <i data-lucide="image-plus" class="w-3.5 h-3.5 text-holiday-pine"></i>
+                                <span>Enviar Print / Foto</span>
+                                <input type="file" accept="image/*" class="hidden" onchange="handleGiftFileSelect(this, ${idx})">
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="flex-1 min-w-0 space-y-1.5">
+                        <div class="flex items-center justify-between gap-2">
+                            <label class="block text-[11px] font-semibold text-stone-600">Imagem do produto (automática, link ou print)</label>
+                            <label class="hidden sm:inline-flex px-2.5 py-1 rounded-lg bg-white hover:bg-stone-50 border border-stone-300 text-stone-700 font-semibold text-[11px] items-center gap-1 cursor-pointer shrink-0">
+                                <i data-lucide="image-plus" class="w-3 h-3 text-holiday-pine"></i>
+                                <span>Anexar Print</span>
+                                <input type="file" accept="image/*" class="hidden" onchange="handleGiftFileSelect(this, ${idx})">
+                            </label>
+                        </div>
+                        <input type="text" placeholder="Cole o link da imagem ou deixe o ícone automático" value="${escapeHtml(data.imageUrl || '')}"
+                            oninput="updateOptionImagePreview(${idx}, this.value)"
                             class="opt-image w-full px-3 py-1.5 rounded-lg border border-stone-300 bg-white text-base sm:text-xs outline-none">
                     </div>
                 </div>
@@ -1083,6 +1189,7 @@
                     <div class="sm:col-span-2">
                         <label class="block text-xs font-semibold text-stone-700 mb-1">Nome do Presente *</label>
                         <input type="text" required placeholder="Ex: Fone Bluetooth JBL" value="${escapeHtml(data.title || '')}"
+                            oninput="refreshFallbackIfEmpty(${idx})"
                             class="opt-title w-full px-3.5 py-2.5 rounded-xl border border-stone-300 focus:border-holiday-pine outline-none text-base sm:text-sm">
                     </div>
                     <div>
@@ -1104,6 +1211,25 @@
             lucide.createIcons();
         };
 
+        window.updateOptionImagePreview = function(idx, val) {
+            const block = document.getElementById(`option-block-${idx}`);
+            if (!block) return;
+            const title = block.querySelector('.opt-title').value;
+            const url = block.querySelector('.opt-url').value;
+            block.querySelector('.opt-preview').src = val.trim() || getSmartGiftIllustration(title, url);
+        };
+
+        window.refreshFallbackIfEmpty = function(idx) {
+            const block = document.getElementById(`option-block-${idx}`);
+            if (!block) return;
+            const imgInput = block.querySelector('.opt-image');
+            if (!imgInput.value.trim()) {
+                const title = block.querySelector('.opt-title').value;
+                const url = block.querySelector('.opt-url').value;
+                block.querySelector('.opt-preview').src = getSmartGiftIllustration(title, url);
+            }
+        };
+
         window.removeOptionBlock = function(blockId) {
             const container = document.getElementById('options-editor-list');
             if (container.children.length <= 1) {
@@ -1121,6 +1247,7 @@
             });
         }
 
+        // Busca em cascata: 1) Microlink -> 2) JsonLink -> 3) Extração do slug + Ilustração temática
         window.fetchOptionPreview = async function(idx, btn) {
             const block = document.getElementById(`option-block-${idx}`);
             const urlInput = block.querySelector('.opt-url');
@@ -1143,36 +1270,57 @@
             btn.innerHTML = `<span class="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span><span>Buscando...</span>`;
             feedback.classList.remove('hidden', 'text-emerald-600', 'text-amber-600');
             feedback.classList.add('text-stone-500');
-            feedback.textContent = "Buscando foto e nome do produto...";
+            feedback.textContent = "Buscando foto e nome do produto na loja...";
 
+            let foundTitle = '';
+            let foundImg = '';
+
+            // Tentativa 1: Microlink
             try {
-                const res = await fetch(`https://api.microlink.io?url=${encodeURIComponent(rawUrl)}`);
-                const json = await res.json();
-                if (json.status === 'success' && json.data) {
-                    if (json.data.title && !titleInput.value) {
-                        titleInput.value = json.data.title.split(' | ')[0].split(' - ')[0].trim();
-                    }
-                    const foundImg = json.data.image?.url || json.data.logo?.url || '';
-                    if (foundImg) {
-                        imageInput.value = foundImg;
-                        previewImg.src = foundImg;
-                        feedback.classList.replace('text-stone-500', 'text-emerald-600');
-                        feedback.textContent = "✨ Foto e título carregados!";
-                    } else {
-                        feedback.classList.replace('text-stone-500', 'text-amber-600');
-                        feedback.textContent = "A loja bloqueou a foto automática. Você pode colar o link da imagem no campo abaixo.";
-                    }
-                } else {
-                    throw new Error();
+                const res1 = await fetch(`https://api.microlink.io?url=${encodeURIComponent(rawUrl)}`);
+                const json1 = await res1.json();
+                if (json1.status === 'success' && json1.data) {
+                    foundTitle = json1.data.title || '';
+                    foundImg = json1.data.image?.url || '';
                 }
-            } catch {
-                feedback.classList.replace('text-stone-500', 'text-amber-600');
-                feedback.textContent = "Não foi possível puxar automático deste site. Preencha o nome manualmente.";
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = `<i data-lucide="wand-2" class="w-3.5 h-3.5"></i><span>Puxar Foto</span>`;
-                lucide.createIcons();
+            } catch {}
+
+            // Tentativa 2: JsonLink (caso a loja tenha bloqueado o Microlink)
+            if (!foundImg) {
+                try {
+                    const res2 = await fetch(`https://jsonlink.io/api/extract?url=${encodeURIComponent(rawUrl)}`);
+                    const json2 = await res2.json();
+                    if (!foundTitle && json2.title) foundTitle = json2.title;
+                    if (json2.images && json2.images.length > 0) foundImg = json2.images[0];
+                } catch {}
             }
+
+            // Limpa título ou tenta extrair da própria URL
+            if (foundTitle && !/^(amazon|mercado livre|shopee|shein|access denied|robot|just a moment)/i.test(foundTitle.trim())) {
+                if (!titleInput.value) {
+                    titleInput.value = foundTitle.split(' | ')[0].split(' - ')[0].trim();
+                }
+            } else if (!titleInput.value) {
+                const slugTitle = extractTitleFromUrlSlug(rawUrl);
+                if (slugTitle) titleInput.value = slugTitle;
+            }
+
+            // Aplica imagem encontrada ou ícone temático automático
+            if (foundImg) {
+                imageInput.value = foundImg;
+                previewImg.src = foundImg;
+                feedback.classList.replace('text-stone-500', 'text-emerald-600');
+                feedback.textContent = "✨ Foto e informações carregadas com sucesso!";
+            } else {
+                const smartFallback = getSmartGiftIllustration(titleInput.value, rawUrl);
+                previewImg.src = smartFallback;
+                feedback.classList.replace('text-stone-500', 'text-amber-600');
+                feedback.textContent = "A loja bloqueou a foto automática — colocamos um ícone ilustrativo! Se quiser, você pode anexar um print pelo botão abaixo.";
+            }
+
+            btn.disabled = false;
+            btn.innerHTML = `<i data-lucide="wand-2" class="w-3.5 h-3.5"></i><span>Puxar Foto</span>`;
+            lucide.createIcons();
         };
 
         window.handleSaveWishlist = async function(e) {
