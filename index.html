@@ -49,9 +49,126 @@
         }
     </script>
     <style>
+        :root {
+            --macos-ease: cubic-bezier(0.22, 1, 0.36, 1);
+            --macos-spring: cubic-bezier(0.34, 1.45, 0.64, 1);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
         .pb-safe { padding-bottom: max(0.75rem, env(safe-area-inset-bottom)); }
         .pt-safe { padding-top: max(0.75rem, env(safe-area-inset-top)); }
         input, select, textarea { scroll-margin-top: 100px; scroll-margin-bottom: 180px; }
+
+        /* Rolagem suave nativa no iOS Safari */
+        .ios-scroll {
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior-y: contain;
+        }
+
+        /* ==================== ANIMAÇÕES ESTILO MACOS ==================== */
+        .macos-btn {
+            transition: transform 0.28s var(--macos-spring),
+                        background-color 0.25s var(--macos-ease),
+                        box-shadow 0.28s var(--macos-ease),
+                        border-color 0.25s var(--macos-ease),
+                        opacity 0.25s var(--macos-ease);
+            will-change: transform;
+        }
+        .macos-btn:hover:not(:disabled) {
+            transform: translateY(-1px);
+        }
+        .macos-btn:active:not(:disabled) {
+            transform: scale(0.965);
+            transition-duration: 0.1s;
+        }
+
+        .macos-card {
+            transition: transform 0.42s var(--macos-ease),
+                        box-shadow 0.42s var(--macos-ease),
+                        border-color 0.32s var(--macos-ease);
+            will-change: transform;
+        }
+        @media (hover: hover) {
+            .macos-card:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 18px 38px -14px rgba(27, 67, 50, 0.14);
+            }
+        }
+
+        .macos-gift-item {
+            transition: transform 0.36s var(--macos-ease),
+                        box-shadow 0.36s var(--macos-ease),
+                        border-color 0.28s var(--macos-ease);
+        }
+        @media (hover: hover) {
+            .macos-gift-item:hover {
+                transform: translateY(-2.5px) scale(1.008);
+                box-shadow: 0 12px 26px -10px rgba(0, 0, 0, 0.12);
+            }
+        }
+        .macos-gift-item img {
+            transition: transform 0.55s var(--macos-ease), filter 0.4s var(--macos-ease);
+        }
+        @media (hover: hover) {
+            .macos-gift-item:hover img {
+                transform: scale(1.045);
+            }
+        }
+
+        /* Entrada em cascata (Stagger) */
+        @keyframes macosFadeSlideUp {
+            0% {
+                opacity: 0;
+                transform: translateY(16px) scale(0.985);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        .macos-stagger-in {
+            opacity: 0;
+            animation: macosFadeSlideUp 0.55s var(--macos-ease) forwards;
+        }
+
+        /* Transições de Modais (Backdrop + Sheet/Window com física Spring) */
+        .macos-modal-backdrop {
+            opacity: 0;
+            transition: opacity 0.32s var(--macos-ease);
+        }
+        .macos-modal-backdrop.is-open {
+            opacity: 1;
+        }
+
+        .macos-modal-panel {
+            opacity: 0;
+            transform: translateY(24px) scale(0.96);
+            transition: transform 0.42s var(--macos-spring), opacity 0.3s var(--macos-ease);
+            will-change: transform, opacity;
+        }
+        .macos-modal-backdrop.is-open .macos-modal-panel {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        .macos-modal-top-sheet {
+            opacity: 0;
+            transform: translateY(-20px) scale(0.97);
+            transition: transform 0.4s var(--macos-spring), opacity 0.28s var(--macos-ease);
+            will-change: transform, opacity;
+        }
+        .macos-modal-backdrop.is-open .macos-modal-top-sheet {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        /* Toast estilo Notificação macOS */
+        #toast {
+            transition: transform 0.45s var(--macos-spring), opacity 0.32s var(--macos-ease);
+        }
 
         /* Barrinha de rolagem horizontal visível para Desktop e Mobile */
         .names-scrollbar {
@@ -59,6 +176,7 @@
             scrollbar-width: thin;
             scrollbar-color: #D4A373 #EAE4DC;
             -webkit-overflow-scrolling: touch;
+            scroll-behavior: smooth;
         }
         .names-scrollbar::-webkit-scrollbar {
             height: 7px;
@@ -84,10 +202,10 @@
     <canvas id="new-year-wallpaper" class="fixed inset-0 w-full h-full pointer-events-none z-0"></canvas>
 
     <!-- ==================== TELA DE LOGIN / CADASTRO ==================== -->
-    <div id="auth-screen" class="relative z-10 min-h-[100dvh] flex items-center justify-center p-4 sm:p-6 bg-gradient-to-br from-holiday-pine/95 via-holiday-pineLight/90 to-stone-900/95">
-        <div class="bg-white/95 backdrop-blur-xs rounded-3xl max-w-md w-full p-6 sm:p-9 shadow-2xl border border-holiday-gold/40">
+    <div id="auth-screen" class="relative z-10 min-h-[100dvh] flex items-center justify-center p-4 sm:p-6 bg-gradient-to-br from-holiday-pine/95 via-holiday-pineLight/90 to-stone-900/95 transition-opacity duration-500">
+        <div class="macos-stagger-in bg-white/95 backdrop-blur-xl rounded-3xl max-w-md w-full p-6 sm:p-9 shadow-2xl border border-holiday-gold/40">
             <div class="text-center mb-6">
-                <div class="w-16 h-16 bg-holiday-berry text-holiday-goldLight rounded-2xl flex items-center justify-center mx-auto mb-3.5 shadow-md">
+                <div class="w-16 h-16 bg-holiday-berry text-holiday-goldLight rounded-2xl flex items-center justify-center mx-auto mb-3.5 shadow-md transition-transform duration-500 hover:scale-105">
                     <i data-lucide="gift" class="w-8 h-8"></i>
                 </div>
                 <h1 class="font-serif text-3xl font-bold text-stone-800">Amigo Secreto</h1>
@@ -96,19 +214,19 @@
 
             <!-- Abas Entrar / Criar Conta -->
             <div class="grid grid-cols-2 gap-2 p-1.5 bg-holiday-cream rounded-2xl mb-6 border border-holiday-sand">
-                <button type="button" id="tab-login" onclick="switchAuthMode('login')" class="min-h-[42px] rounded-xl text-sm font-bold transition-all bg-holiday-pine text-white shadow-xs cursor-pointer">
+                <button type="button" id="tab-login" onclick="switchAuthMode('login')" class="macos-btn min-h-[42px] rounded-xl text-sm font-bold bg-holiday-pine text-white shadow-xs cursor-pointer">
                     Entrar
                 </button>
-                <button type="button" id="tab-register" onclick="switchAuthMode('register')" class="min-h-[42px] rounded-xl text-sm font-bold transition-all text-stone-600 hover:text-stone-900 cursor-pointer">
+                <button type="button" id="tab-register" onclick="switchAuthMode('register')" class="macos-btn min-h-[42px] rounded-xl text-sm font-bold text-stone-600 hover:text-stone-900 cursor-pointer">
                     Criar Conta
                 </button>
             </div>
 
             <form id="auth-form" onsubmit="handleAuthSubmit(event)" class="space-y-4">
                 <!-- Foto de Perfil no Cadastro -->
-                <div id="auth-avatar-group" class="hidden flex-col items-center justify-center bg-holiday-cream p-3.5 rounded-2xl border border-holiday-sand">
+                <div id="auth-avatar-group" class="hidden flex-col items-center justify-center bg-holiday-cream p-3.5 rounded-2xl border border-holiday-sand macos-stagger-in">
                     <label class="relative cursor-pointer group">
-                        <div class="w-20 h-20 rounded-full bg-holiday-pine text-holiday-goldLight border-2 border-holiday-gold overflow-hidden flex items-center justify-center shadow-sm">
+                        <div class="w-20 h-20 rounded-full bg-holiday-pine text-holiday-goldLight border-2 border-holiday-gold overflow-hidden flex items-center justify-center shadow-sm transition-transform duration-300 group-hover:scale-105">
                             <img id="register-avatar-preview" src="" alt="Preview" class="w-full h-full object-cover hidden">
                             <i id="register-avatar-icon" data-lucide="camera" class="w-7 h-7"></i>
                         </div>
@@ -123,25 +241,25 @@
                 <div>
                     <label class="block text-sm font-semibold text-stone-700 mb-1.5">Seu Nome de Usuário *</label>
                     <input type="text" id="auth-username" required placeholder="Ex: Yuri Brian" autocomplete="username"
-                        class="w-full px-4 py-3 rounded-xl border border-stone-300 focus:border-holiday-pine focus:ring-2 focus:ring-holiday-pine/20 outline-none text-base sm:text-sm">
+                        class="w-full px-4 py-3 rounded-xl border border-stone-300 focus:border-holiday-pine focus:ring-2 focus:ring-holiday-pine/20 outline-none text-base sm:text-sm transition-all duration-200">
                 </div>
 
-                <div id="auth-email-group" class="hidden">
+                <div id="auth-email-group" class="hidden macos-stagger-in">
                     <label class="block text-sm font-semibold text-stone-700 mb-1.5">Seu E-mail (Opcional)</label>
                     <input type="email" id="auth-email" placeholder="seuemail@exemplo.com" autocomplete="email"
-                        class="w-full px-4 py-3 rounded-xl border border-stone-300 focus:border-holiday-pine focus:ring-2 focus:ring-holiday-pine/20 outline-none text-base sm:text-sm">
+                        class="w-full px-4 py-3 rounded-xl border border-stone-300 focus:border-holiday-pine focus:ring-2 focus:ring-holiday-pine/20 outline-none text-base sm:text-sm transition-all duration-200">
                     <p class="text-xs text-stone-400 mt-1">Usado para enviar os detalhes dos presentes que você escolher.</p>
                 </div>
 
                 <div>
                     <label class="block text-sm font-semibold text-stone-700 mb-1.5">Senha *</label>
                     <input type="password" id="auth-password" required placeholder="Crie ou digite sua senha" autocomplete="current-password"
-                        class="w-full px-4 py-3 rounded-xl border border-stone-300 focus:border-holiday-pine focus:ring-2 focus:ring-holiday-pine/20 outline-none text-base sm:text-sm">
+                        class="w-full px-4 py-3 rounded-xl border border-stone-300 focus:border-holiday-pine focus:ring-2 focus:ring-holiday-pine/20 outline-none text-base sm:text-sm transition-all duration-200">
                 </div>
 
                 <p id="auth-error" class="text-xs text-red-600 font-medium hidden bg-red-50 p-3.5 rounded-xl border border-red-200"></p>
 
-                <button type="submit" id="btn-auth-submit" class="w-full min-h-[48px] bg-holiday-berry hover:bg-holiday-berryLight active:scale-[0.99] text-white font-bold py-3 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer text-base sm:text-sm">
+                <button type="submit" id="btn-auth-submit" class="macos-btn w-full min-h-[48px] bg-holiday-berry hover:bg-holiday-berryLight text-white font-bold py-3 rounded-xl shadow-md flex items-center justify-center gap-2 cursor-pointer text-base sm:text-sm">
                     <span id="auth-submit-text">Entrar na Lista</span>
                     <i data-lucide="arrow-right" class="w-4 h-4"></i>
                 </button>
@@ -151,11 +269,11 @@
 
     <!-- ==================== APLICATIVO PRINCIPAL ==================== -->
     <div id="app-container" class="relative z-10 hidden flex-1 flex-col pb-24 md:pb-0">
-        <!-- Header Festivo -->
-        <header class="bg-holiday-pine/95 backdrop-blur-md text-holiday-cream shadow-md sticky top-0 z-30 border-b border-holiday-pineLight pt-safe">
+        <!-- Header Festivo com Transparência Estilo macOS -->
+        <header class="bg-holiday-pine/90 backdrop-blur-xl text-holiday-cream shadow-md sticky top-0 z-30 border-b border-holiday-pineLight/80 pt-safe transition-all duration-300">
             <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-2 sm:gap-3">
                 <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
-                    <div class="bg-holiday-berry p-2 sm:p-2.5 rounded-2xl shadow-inner border border-holiday-gold/30 shrink-0">
+                    <div class="bg-holiday-berry p-2 sm:p-2.5 rounded-2xl shadow-inner border border-holiday-gold/30 shrink-0 transition-transform duration-300 hover:rotate-3">
                         <i data-lucide="gift" class="w-6 h-6 sm:w-7 sm:h-7 text-holiday-goldLight"></i>
                     </div>
                     <div class="min-w-0">
@@ -169,26 +287,26 @@
 
                 <!-- Ações Música, Admin, Sorteio, Perfil, Meus Desejos e Sair -->
                 <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
-                    <!-- Botão Música de Ano Novo (Ligar / Desligar) -->
-                    <button id="btn-toggle-music" onclick="toggleNewYearMusic()" title="Ligar ou desligar música ambiente de Ano Novo"
-                        class="min-h-[42px] px-2.5 sm:px-3.5 py-2 rounded-xl bg-white/15 hover:bg-white/25 text-holiday-goldLight border border-holiday-gold/40 font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer">
-                        <i id="music-icon" data-lucide="volume-2" class="w-4 h-4"></i>
+                    <!-- Botão Música de Ano Novo (Ligar / Desligar - compatível com iOS) -->
+                    <button type="button" id="btn-toggle-music" onclick="toggleNewYearMusic()" title="Ligar ou desligar música ambiente de Ano Novo"
+                        class="macos-btn min-h-[42px] px-2.5 sm:px-3.5 py-2 rounded-xl bg-white/15 hover:bg-white/25 text-holiday-goldLight border border-holiday-gold/40 font-bold text-xs flex items-center gap-1.5 cursor-pointer">
+                        <i data-lucide="volume-2" class="w-4 h-4"></i>
                         <span id="music-label" class="hidden sm:inline">Música: Ligada</span>
                     </button>
 
                     <!-- Botão Exclusivo Admin (Yuri Brian) -->
-                    <button id="btn-admin-panel" onclick="openAdminModal()" title="Painel do Administrador" class="hidden min-h-[42px] px-2.5 sm:px-3.5 py-2 rounded-xl bg-holiday-gold text-stone-900 hover:bg-holiday-goldLight font-bold text-xs sm:text-sm items-center gap-1.5 shadow-sm transition-colors cursor-pointer">
+                    <button type="button" id="btn-admin-panel" onclick="openAdminModal()" title="Painel do Administrador" class="macos-btn hidden min-h-[42px] px-2.5 sm:px-3.5 py-2 rounded-xl bg-holiday-gold text-stone-900 hover:bg-holiday-goldLight font-bold text-xs sm:text-sm items-center gap-1.5 shadow-sm cursor-pointer">
                         <i data-lucide="shield-check" class="w-4 h-4 text-holiday-pine"></i>
                         <span>Admin</span>
                     </button>
 
                     <!-- Botão de Sorteio no Perfil (Desktop) -->
-                    <button id="header-draw-btn" onclick="openDrawModal()" class="hidden md:flex min-h-[42px] px-3.5 py-2 rounded-xl bg-white/10 text-emerald-100 border border-white/15 font-bold text-xs items-center gap-1.5 transition-all cursor-pointer">
+                    <button type="button" id="header-draw-btn" onclick="openDrawModal()" class="macos-btn hidden md:flex min-h-[42px] px-3.5 py-2 rounded-xl bg-white/10 text-emerald-100 border border-white/15 font-bold text-xs items-center gap-1.5 cursor-pointer">
                         <i id="header-draw-icon" data-lucide="lock" class="w-4 h-4 text-holiday-goldLight"></i>
                         <span id="header-draw-label">Sorteio Bloqueado</span>
                     </button>
 
-                    <button onclick="openProfileModal()" title="Seu Perfil e Sorteio" class="min-h-[42px] flex items-center gap-2 bg-holiday-pineLight/70 hover:bg-holiday-pineLight px-2.5 sm:px-3.5 py-1.5 rounded-2xl border border-emerald-700/60 text-xs text-emerald-100 transition-colors cursor-pointer">
+                    <button type="button" onclick="openProfileModal()" title="Seu Perfil e Sorteio" class="macos-btn min-h-[42px] flex items-center gap-2 bg-holiday-pineLight/70 hover:bg-holiday-pineLight px-2.5 sm:px-3.5 py-1.5 rounded-2xl border border-emerald-700/60 text-xs text-emerald-100 cursor-pointer">
                         <div id="header-avatar-container" class="w-7 h-7 rounded-full bg-holiday-berry text-holiday-goldLight font-bold flex items-center justify-center overflow-hidden border border-holiday-gold/50 shrink-0">
                             <span id="header-avatar-initial">?</span>
                             <img id="header-avatar-img" src="" alt="Perfil" class="w-full h-full object-cover hidden">
@@ -197,12 +315,12 @@
                         <i data-lucide="user-cog" class="w-3.5 h-3.5 text-holiday-goldLight"></i>
                     </button>
 
-                    <button onclick="openMyWishesModal()" class="hidden md:flex items-center justify-center gap-2 bg-holiday-berry hover:bg-holiday-berryLight text-white font-semibold px-4 py-2.5 rounded-xl shadow-sm transition-all active:scale-95 text-sm cursor-pointer">
+                    <button type="button" onclick="openMyWishesModal()" class="macos-btn hidden md:flex items-center justify-center gap-2 bg-holiday-berry hover:bg-holiday-berryLight text-white font-semibold px-4 py-2.5 rounded-xl shadow-sm text-sm cursor-pointer">
                         <i data-lucide="sparkles" class="w-4 h-4"></i>
                         <span>Meus Desejos</span>
                     </button>
 
-                    <button onclick="logoutUser()" title="Sair da conta" class="min-h-[42px] px-2.5 sm:px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 active:bg-white/30 text-white text-xs sm:text-sm font-semibold flex items-center gap-1.5 transition-colors cursor-pointer">
+                    <button type="button" onclick="logoutUser()" title="Sair da conta" class="macos-btn min-h-[42px] px-2.5 sm:px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs sm:text-sm font-semibold flex items-center gap-1.5 cursor-pointer">
                         <i data-lucide="log-out" class="w-4 h-4"></i>
                     </button>
                 </div>
@@ -213,14 +331,14 @@
         <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-5 sm:py-8">
 
             <!-- Card de Sorteio Individual no Perfil -->
-            <section id="profile-draw-card" class="mb-6 bg-white/95 backdrop-blur-xs rounded-3xl p-4 sm:p-5 shadow-sm border border-holiday-sand flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+            <section id="profile-draw-card" style="animation-delay: 40ms;" class="macos-stagger-in macos-card mb-6 bg-white/90 backdrop-blur-md rounded-3xl p-4 sm:p-5 shadow-sm border border-holiday-sand flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
                 <div class="flex items-center gap-3.5">
-                    <div id="draw-card-icon-wrap" class="w-12 h-12 rounded-2xl bg-stone-100 text-stone-400 flex items-center justify-center shrink-0">
+                    <div id="draw-card-icon-wrap" class="w-12 h-12 rounded-2xl bg-stone-100 text-stone-400 flex items-center justify-center shrink-0 transition-colors duration-300">
                         <i id="draw-card-icon" data-lucide="lock" class="w-6 h-6"></i>
                     </div>
                     <div>
                         <div class="flex items-center gap-2 flex-wrap">
-                            <span id="draw-card-badge" class="text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-stone-100 text-stone-500">
+                            <span id="draw-card-badge" class="text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-stone-100 text-stone-500 transition-colors duration-300">
                                 Aguardando Liberação
                             </span>
                         </div>
@@ -234,14 +352,14 @@
                 </div>
 
                 <button id="main-draw-btn" onclick="openDrawModal()" disabled
-                    class="min-h-[46px] px-5 py-2.5 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all shrink-0 bg-stone-200 text-stone-400 cursor-not-allowed">
+                    class="macos-btn min-h-[46px] px-5 py-2.5 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 shrink-0 bg-stone-200 text-stone-400 cursor-not-allowed">
                     <i data-lucide="lock" class="w-4 h-4"></i>
                     <span>Sortear Amigo Secreto</span>
                 </button>
             </section>
 
             <!-- Contador Regressivo até 01/01 às 00:00 -->
-            <section id="countdown-card" class="mb-6 bg-white/95 backdrop-blur-xs rounded-3xl p-4 sm:p-6 shadow-sm border border-holiday-gold/50 relative overflow-hidden">
+            <section id="countdown-card" style="animation-delay: 110ms;" class="macos-stagger-in macos-card mb-6 bg-white/90 backdrop-blur-md rounded-3xl p-4 sm:p-6 shadow-sm border border-holiday-gold/50 relative overflow-hidden">
                 <div class="flex flex-col md:flex-row items-center justify-between gap-4">
                     <div class="flex items-center gap-3 text-center sm:text-left">
                         <div class="w-11 h-11 rounded-2xl bg-holiday-berry/10 text-holiday-berry border border-holiday-berry/20 flex items-center justify-center shrink-0">
@@ -256,19 +374,19 @@
                     </div>
 
                     <div id="countdown-boxes" class="grid grid-cols-4 gap-2 sm:gap-3 w-full md:w-auto">
-                        <div class="bg-holiday-cream border border-holiday-sand rounded-2xl px-2.5 py-2 sm:px-4 sm:py-2.5 text-center min-w-[66px] sm:min-w-[78px]">
+                        <div class="bg-holiday-cream border border-holiday-sand rounded-2xl px-2.5 py-2 sm:px-4 sm:py-2.5 text-center min-w-[66px] sm:min-w-[78px] transition-transform duration-300 hover:-translate-y-0.5">
                             <span id="cd-days" class="block font-serif text-xl sm:text-2xl font-bold text-holiday-pine tabular-nums">--</span>
                             <span class="text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider text-stone-500">Dias</span>
                         </div>
-                        <div class="bg-holiday-cream border border-holiday-sand rounded-2xl px-2.5 py-2 sm:px-4 sm:py-2.5 text-center min-w-[66px] sm:min-w-[78px]">
+                        <div class="bg-holiday-cream border border-holiday-sand rounded-2xl px-2.5 py-2 sm:px-4 sm:py-2.5 text-center min-w-[66px] sm:min-w-[78px] transition-transform duration-300 hover:-translate-y-0.5">
                             <span id="cd-hours" class="block font-serif text-xl sm:text-2xl font-bold text-holiday-pine tabular-nums">--</span>
                             <span class="text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider text-stone-500">Horas</span>
                         </div>
-                        <div class="bg-holiday-cream border border-holiday-sand rounded-2xl px-2.5 py-2 sm:px-4 sm:py-2.5 text-center min-w-[66px] sm:min-w-[78px]">
+                        <div class="bg-holiday-cream border border-holiday-sand rounded-2xl px-2.5 py-2 sm:px-4 sm:py-2.5 text-center min-w-[66px] sm:min-w-[78px] transition-transform duration-300 hover:-translate-y-0.5">
                             <span id="cd-minutes" class="block font-serif text-xl sm:text-2xl font-bold text-holiday-pine tabular-nums">--</span>
                             <span class="text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider text-stone-500">Min</span>
                         </div>
-                        <div class="bg-holiday-berry text-white rounded-2xl px-2.5 py-2 sm:px-4 sm:py-2.5 text-center min-w-[66px] sm:min-w-[78px] shadow-xs">
+                        <div class="bg-holiday-berry text-white rounded-2xl px-2.5 py-2 sm:px-4 sm:py-2.5 text-center min-w-[66px] sm:min-w-[78px] shadow-xs transition-transform duration-300 hover:-translate-y-0.5">
                             <span id="cd-seconds" class="block font-serif text-xl sm:text-2xl font-bold text-holiday-goldLight tabular-nums">--</span>
                             <span class="text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider text-white/85">Seg</span>
                         </div>
@@ -277,7 +395,7 @@
             </section>
             
             <!-- Banner de Resumo da Minha Reserva (Múltiplos itens até R$ 100,00) -->
-            <div id="my-reservation-banner" class="hidden mb-6 bg-gradient-to-r from-holiday-pine to-holiday-pineLight text-white p-4 sm:p-5 rounded-3xl shadow-md border border-holiday-gold/40">
+            <div id="my-reservation-banner" class="hidden macos-stagger-in mb-6 bg-gradient-to-r from-holiday-pine to-holiday-pineLight text-white p-4 sm:p-5 rounded-3xl shadow-md border border-holiday-gold/40">
                 <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <div class="flex items-start gap-3 min-w-0 flex-1">
                         <div class="p-2.5 bg-white/15 rounded-2xl shrink-0 mt-0.5">
@@ -295,11 +413,11 @@
                         </div>
                     </div>
                     <div class="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 w-full sm:w-auto shrink-0">
-                        <button onclick="sendEmailBackup()" class="min-h-[42px] px-3.5 py-2 rounded-xl bg-white text-holiday-pine hover:bg-holiday-goldLight font-bold text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer">
+                        <button onclick="sendEmailBackup()" class="macos-btn min-h-[42px] px-3.5 py-2 rounded-xl bg-white text-holiday-pine hover:bg-holiday-goldLight font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer">
                             <i data-lucide="mail" class="w-3.5 h-3.5"></i>
                             <span>Enviar Resumo</span>
                         </button>
-                        <button id="banner-unreserve-all-btn" class="min-h-[42px] px-3.5 py-2 rounded-xl bg-red-500/85 hover:bg-red-600 text-white font-semibold text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer">
+                        <button id="banner-unreserve-all-btn" class="macos-btn min-h-[42px] px-3.5 py-2 rounded-xl bg-red-500/85 hover:bg-red-600 text-white font-semibold text-xs flex items-center justify-center gap-1.5 cursor-pointer">
                             <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
                             <span>Desmarcar Tudo</span>
                         </button>
@@ -311,18 +429,18 @@
             </div>
 
             <!-- Barra de Filtros com Barrinha de Rolagem Horizontal nos Nomes -->
-            <section class="mb-6 sm:mb-8 bg-white/95 backdrop-blur-xs p-4 sm:p-5 rounded-3xl shadow-sm border border-holiday-sand">
+            <section style="animation-delay: 180ms;" class="macos-stagger-in mb-6 sm:mb-8 bg-white/90 backdrop-blur-md p-4 sm:p-5 rounded-3xl shadow-sm border border-holiday-sand">
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-3.5">
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center justify-between mb-2">
                             <label class="block text-[11px] font-bold uppercase tracking-wider text-stone-400">Participantes (role para o lado)</label>
                             <div class="flex items-center gap-1">
                                 <button type="button" onclick="scrollParticipantsBar(-200)" title="Rolar nomes para a esquerda"
-                                    class="w-7 h-7 rounded-lg bg-holiday-cream hover:bg-holiday-sand border border-holiday-sand text-stone-600 flex items-center justify-center cursor-pointer">
+                                    class="macos-btn w-7 h-7 rounded-lg bg-holiday-cream hover:bg-holiday-sand border border-holiday-sand text-stone-600 flex items-center justify-center cursor-pointer">
                                     <i data-lucide="chevron-left" class="w-4 h-4"></i>
                                 </button>
                                 <button type="button" onclick="scrollParticipantsBar(200)" title="Rolar nomes para a direita"
-                                    class="w-7 h-7 rounded-lg bg-holiday-cream hover:bg-holiday-sand border border-holiday-sand text-stone-600 flex items-center justify-center cursor-pointer">
+                                    class="macos-btn w-7 h-7 rounded-lg bg-holiday-cream hover:bg-holiday-sand border border-holiday-sand text-stone-600 flex items-center justify-center cursor-pointer">
                                     <i data-lucide="chevron-right" class="w-4 h-4"></i>
                                 </button>
                             </div>
@@ -331,7 +449,7 @@
                     </div>
 
                     <div class="flex items-center gap-2 self-stretch md:self-end">
-                        <select id="status-filter" onchange="renderWishlists()" class="w-full md:w-auto min-h-[42px] bg-holiday-cream border border-holiday-sand text-stone-700 text-base sm:text-sm rounded-xl px-3.5 py-2 font-medium focus:outline-none focus:ring-2 focus:ring-holiday-pine">
+                        <select id="status-filter" onchange="renderWishlists()" class="w-full md:w-auto min-h-[42px] bg-holiday-cream border border-holiday-sand text-stone-700 text-base sm:text-sm rounded-xl px-3.5 py-2 font-medium focus:outline-none focus:ring-2 focus:ring-holiday-pine transition-all duration-200">
                             <option value="ALL">Todos os status</option>
                             <option value="AVAILABLE">Disponíveis</option>
                             <option value="RESERVED">Já escolhidos</option>
@@ -347,7 +465,7 @@
             </div>
 
             <!-- Estado Vazio -->
-            <div id="empty-state" class="hidden py-14 px-5 text-center bg-white/95 backdrop-blur-xs rounded-3xl border border-dashed border-holiday-gold">
+            <div id="empty-state" class="hidden macos-stagger-in py-14 px-5 text-center bg-white/90 backdrop-blur-md rounded-3xl border border-dashed border-holiday-gold">
                 <div class="w-16 h-16 bg-holiday-goldLight text-holiday-berry rounded-2xl flex items-center justify-center mx-auto mb-4">
                     <i data-lucide="sparkles" class="w-8 h-8"></i>
                 </div>
@@ -355,7 +473,7 @@
                 <p class="text-stone-500 max-w-md mx-auto mb-6 text-sm sm:text-base">
                     Toque no botão abaixo para cadastrar suas opções de presentes com os links das lojas.
                 </p>
-                <button onclick="openMyWishesModal()" class="w-full sm:w-auto min-h-[48px] inline-flex items-center justify-center gap-2 bg-holiday-pine hover:bg-holiday-pineLight text-white font-semibold px-6 py-3 rounded-2xl transition-all cursor-pointer">
+                <button onclick="openMyWishesModal()" class="macos-btn w-full sm:w-auto min-h-[48px] inline-flex items-center justify-center gap-2 bg-holiday-pine hover:bg-holiday-pineLight text-white font-semibold px-6 py-3 rounded-2xl cursor-pointer">
                     <i data-lucide="plus-circle" class="w-5 h-5"></i>
                     Cadastrar Minhas Opções
                 </button>
@@ -366,29 +484,29 @@
         </main>
 
         <!-- Footer Desktop -->
-        <footer class="hidden md:block bg-white/95 backdrop-blur-xs border-t border-holiday-sand py-6 mt-12">
+        <footer class="hidden md:block bg-white/85 backdrop-blur-md border-t border-holiday-sand py-6 mt-12">
             <div class="max-w-6xl mx-auto px-4 text-center text-xs sm:text-sm text-stone-500 flex items-center justify-between gap-2">
                 <p>Amigo Secreto • Escolha um ou mais presentes da mesma lista até R$ 100,00 🥂✨</p>
                 <p id="footer-user-info" class="text-xs text-stone-400"></p>
             </div>
         </footer>
 
-        <!-- ==================== BARRA INFERIOR FIXA MOBILE (iOS / ANDROID) ==================== -->
-        <nav class="md:hidden fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-holiday-sand z-40 px-2.5 pt-2 pb-safe shadow-[0_-4px_20px_rgba(0,0,0,0.06)]">
+        <!-- ==================== BARRA INFERIOR FIXA MOBILE (ESTILO DOCK macOS) ==================== -->
+        <nav class="md:hidden fixed bottom-0 inset-x-0 bg-white/85 backdrop-blur-xl border-t border-holiday-sand/80 z-40 px-2.5 pt-2 pb-safe shadow-[0_-6px_24px_rgba(0,0,0,0.07)]">
             <div class="grid grid-cols-4 gap-1.5 max-w-md mx-auto">
-                <button onclick="scrollToTopList()" class="min-h-[46px] rounded-2xl bg-holiday-cream active:bg-holiday-sand text-holiday-pine font-bold text-[11px] flex flex-col items-center justify-center gap-0.5 transition-colors cursor-pointer">
+                <button onclick="scrollToTopList()" class="macos-btn min-h-[46px] rounded-2xl bg-holiday-cream/90 hover:bg-holiday-sand text-holiday-pine font-bold text-[11px] flex flex-col items-center justify-center gap-0.5 cursor-pointer">
                     <i data-lucide="list-checks" class="w-4 h-4"></i>
                     <span>Listas</span>
                 </button>
-                <button onclick="openMyWishesModal()" class="min-h-[46px] rounded-2xl bg-holiday-berry active:bg-holiday-berryLight text-white font-bold text-[11px] flex flex-col items-center justify-center gap-0.5 shadow-sm transition-colors cursor-pointer">
+                <button onclick="openMyWishesModal()" class="macos-btn min-h-[46px] rounded-2xl bg-holiday-berry hover:bg-holiday-berryLight text-white font-bold text-[11px] flex flex-col items-center justify-center gap-0.5 shadow-sm cursor-pointer">
                     <i data-lucide="sparkles" class="w-4 h-4 text-holiday-goldLight"></i>
                     <span>Desejos</span>
                 </button>
-                <button id="mobile-draw-btn" onclick="openDrawModal()" disabled class="min-h-[46px] rounded-2xl bg-stone-100 text-stone-400 font-bold text-[11px] flex flex-col items-center justify-center gap-0.5 transition-colors cursor-not-allowed">
+                <button id="mobile-draw-btn" onclick="openDrawModal()" disabled class="macos-btn min-h-[46px] rounded-2xl bg-stone-100 text-stone-400 font-bold text-[11px] flex flex-col items-center justify-center gap-0.5 cursor-not-allowed">
                     <i data-lucide="lock" class="w-4 h-4"></i>
                     <span>Sortear</span>
                 </button>
-                <button onclick="openProfileModal()" class="min-h-[46px] rounded-2xl bg-holiday-cream active:bg-holiday-sand text-stone-700 font-bold text-[11px] flex flex-col items-center justify-center gap-0.5 transition-colors cursor-pointer">
+                <button onclick="openProfileModal()" class="macos-btn min-h-[46px] rounded-2xl bg-holiday-cream/90 hover:bg-holiday-sand text-stone-700 font-bold text-[11px] flex flex-col items-center justify-center gap-0.5 cursor-pointer">
                     <i data-lucide="user-circle" class="w-4 h-4 text-holiday-pine"></i>
                     <span>Perfil</span>
                 </button>
@@ -397,9 +515,9 @@
     </div>
 
     <!-- ==================== MODAL: SORTEADOR DO AMIGO SECRETO ==================== -->
-    <div id="draw-modal" class="fixed inset-0 bg-stone-900/70 backdrop-blur-xs z-50 hidden items-end sm:items-center justify-center p-0 sm:p-4">
-        <div class="bg-white rounded-t-3xl sm:rounded-3xl max-w-md w-full p-6 sm:p-8 pb-safe shadow-2xl border-t sm:border border-holiday-gold/40 relative text-center">
-            <button onclick="closeDrawModal()" class="absolute top-5 right-5 text-stone-400 hover:text-stone-700 p-2 rounded-full hover:bg-stone-100 transition-colors cursor-pointer">
+    <div id="draw-modal" onclick="if(event.target===this) closeDrawModal()" class="macos-modal-backdrop fixed inset-0 bg-stone-900/55 backdrop-blur-md z-50 hidden items-end sm:items-center justify-center p-0 sm:p-4">
+        <div class="macos-modal-panel bg-white/95 backdrop-blur-xl rounded-t-3xl sm:rounded-3xl max-w-md w-full p-6 sm:p-8 pb-safe shadow-2xl border-t sm:border border-holiday-gold/40 relative text-center max-h-[90dvh] overflow-y-auto ios-scroll">
+            <button onclick="closeDrawModal()" class="macos-btn absolute top-5 right-5 text-stone-400 hover:text-stone-700 p-2 rounded-full hover:bg-stone-100 cursor-pointer">
                 <i data-lucide="x" class="w-5 h-5"></i>
             </button>
 
@@ -412,7 +530,7 @@
                 <p class="text-sm text-stone-500 mb-6">
                     Aguarde o administrador liberar o sorteio para todos os participantes. Assim que for liberado, o botão ficará ativo automaticamente!
                 </p>
-                <button onclick="closeDrawModal()" class="w-full min-h-[46px] rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold text-sm cursor-pointer">
+                <button onclick="closeDrawModal()" class="macos-btn w-full min-h-[46px] rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold text-sm cursor-pointer">
                     Entendi
                 </button>
             </div>
@@ -435,7 +553,7 @@
                     </div>
                 </div>
 
-                <button id="btn-execute-draw" onclick="executeMyDraw()" class="w-full min-h-[50px] rounded-2xl bg-holiday-berry hover:bg-holiday-berryLight active:scale-[0.99] text-white font-bold text-base shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer">
+                <button id="btn-execute-draw" onclick="executeMyDraw()" class="macos-btn w-full min-h-[50px] rounded-2xl bg-holiday-berry hover:bg-holiday-berryLight text-white font-bold text-base shadow-lg flex items-center justify-center gap-2 cursor-pointer">
                     <i data-lucide="shuffle" class="w-5 h-5 text-holiday-goldLight"></i>
                     <span>Sortear Agora!</span>
                 </button>
@@ -447,7 +565,7 @@
                     Seu Amigo Secreto é:
                 </span>
 
-                <div class="bg-gradient-to-br from-holiday-pine to-holiday-pineLight text-white p-6 rounded-3xl shadow-lg border border-holiday-gold/50 mb-5">
+                <div class="bg-gradient-to-br from-holiday-pine to-holiday-pineLight text-white p-6 rounded-3xl shadow-lg border border-holiday-gold/50 mb-5 macos-stagger-in">
                     <div id="revealed-avatar-wrap" class="w-20 h-20 rounded-full bg-holiday-berry text-holiday-goldLight border-4 border-holiday-goldLight mx-auto mb-3 overflow-hidden flex items-center justify-center text-3xl font-serif font-bold shadow-md">
                         <img id="revealed-avatar-img" src="" alt="Amigo" class="w-full h-full object-cover hidden">
                         <span id="revealed-avatar-initial">?</span>
@@ -459,11 +577,11 @@
                 </div>
 
                 <div class="flex flex-col gap-2">
-                    <button id="btn-view-friend-wishes" onclick="filterByDrawnFriend()" class="w-full min-h-[46px] rounded-xl bg-holiday-berry hover:bg-holiday-berryLight text-white font-bold text-sm flex items-center justify-center gap-2 cursor-pointer shadow-xs">
+                    <button id="btn-view-friend-wishes" onclick="filterByDrawnFriend()" class="macos-btn w-full min-h-[46px] rounded-xl bg-holiday-berry hover:bg-holiday-berryLight text-white font-bold text-sm flex items-center justify-center gap-2 cursor-pointer shadow-xs">
                         <i data-lucide="gift" class="w-4 h-4"></i>
                         <span>Ver Lista de Desejos Dele(a)</span>
                     </button>
-                    <button onclick="closeDrawModal()" class="w-full min-h-[42px] rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-600 font-semibold text-xs cursor-pointer">
+                    <button onclick="closeDrawModal()" class="macos-btn w-full min-h-[42px] rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-600 font-semibold text-xs cursor-pointer">
                         Fechar
                     </button>
                 </div>
@@ -471,86 +589,95 @@
         </div>
     </div>
 
-    <!-- ==================== MODAL: PAINEL ADMINISTRADOR (YURI BRIAN) ==================== -->
-    <div id="admin-modal" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs z-50 hidden items-end sm:items-center justify-center p-0 sm:p-4">
-        <div class="bg-white rounded-t-3xl sm:rounded-3xl max-w-3xl w-full p-5 sm:p-8 shadow-2xl border-t sm:border border-holiday-sand relative h-[92dvh] sm:h-auto sm:max-h-[90vh] flex flex-col">
-            <button onclick="closeAdminModal()" class="absolute top-4 sm:top-5 right-4 sm:right-5 text-stone-400 hover:text-stone-700 p-2 rounded-full hover:bg-stone-100 transition-colors cursor-pointer">
-                <i data-lucide="x" class="w-5 h-5"></i>
-            </button>
-
-            <div class="flex items-center gap-3 mb-4 shrink-0 pr-10">
-                <div class="p-2.5 bg-holiday-goldLight text-holiday-pine rounded-xl border border-holiday-gold/50 shrink-0">
-                    <i data-lucide="shield-check" class="w-6 h-6"></i>
+    <!-- ==================== MODAL: PAINEL ADMINISTRADOR (CORRIGIDO PARA ROLAGEM NO iOS) ==================== -->
+    <div id="admin-modal" onclick="if(event.target===this) closeAdminModal()" class="macos-modal-backdrop fixed inset-0 bg-stone-900/55 backdrop-blur-md z-50 hidden items-end sm:items-center justify-center p-0 sm:p-4">
+        <div class="macos-modal-panel bg-white/95 backdrop-blur-xl rounded-t-3xl sm:rounded-3xl max-w-3xl w-full shadow-2xl border-t sm:border border-holiday-sand relative h-[92dvh] sm:h-auto sm:max-h-[90vh] flex flex-col overflow-hidden">
+            
+            <!-- Cabeçalho fixo compacto no topo do Modal ADM -->
+            <div class="flex items-center justify-between gap-3 px-5 pt-4 pb-3 border-b border-stone-100 bg-white/90 shrink-0">
+                <div class="flex items-center gap-2.5 min-w-0">
+                    <div class="p-2 bg-holiday-goldLight text-holiday-pine rounded-xl border border-holiday-gold/50 shrink-0">
+                        <i data-lucide="shield-check" class="w-5 h-5"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <h2 class="font-serif text-lg sm:text-2xl font-bold text-stone-800 truncate">Painel do Administrador</h2>
+                        <p class="text-[11px] sm:text-xs text-stone-500 truncate">Role para baixo para ver todos os cadastrados</p>
+                    </div>
                 </div>
-                <div>
-                    <h2 class="font-serif text-xl sm:text-2xl font-bold text-stone-800">Painel do Administrador</h2>
-                    <p class="text-xs text-stone-500">Controle o sorteio e visualize os participantes cadastrados (senhas e pares permanecem ocultos).</p>
-                </div>
+                <button onclick="closeAdminModal()" class="macos-btn text-stone-400 hover:text-stone-700 p-2 rounded-full hover:bg-stone-100 cursor-pointer shrink-0">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
             </div>
 
-            <!-- Controle do Sorteio Geral (Exclusivo ADM) -->
-            <div class="bg-gradient-to-r from-holiday-pine to-holiday-pineLight text-white p-4 rounded-2xl mb-4 shrink-0 border border-holiday-gold/40">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                    <div>
-                        <div class="flex items-center gap-2">
-                            <span class="text-[11px] font-bold uppercase tracking-wider text-holiday-goldLight">Controle do Sorteio</span>
-                            <span id="admin-draw-status-pill" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-500/80 text-white">
-                                Bloqueado
-                            </span>
+            <!-- Área Única Rolável (Funciona 100% no iOS Safari) -->
+            <div class="flex-1 min-h-0 overflow-y-auto ios-scroll px-5 py-4 pb-24 sm:pb-6 space-y-4">
+                <!-- Controle do Sorteio Geral (Exclusivo ADM) -->
+                <div class="bg-gradient-to-r from-holiday-pine to-holiday-pineLight text-white p-4 rounded-2xl border border-holiday-gold/40">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-[11px] font-bold uppercase tracking-wider text-holiday-goldLight">Controle do Sorteio</span>
+                                <span id="admin-draw-status-pill" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-500/80 text-white transition-colors duration-300">
+                                    Bloqueado
+                                </span>
+                            </div>
+                            <p id="admin-draw-status-desc" class="text-xs text-emerald-100 mt-1">
+                                Os botões de sortear estão desativados para todos os participantes.
+                            </p>
                         </div>
-                        <p id="admin-draw-status-desc" class="text-xs text-emerald-100 mt-1">
-                            Os botões de sortear estão desativados para todos os participantes.
-                        </p>
+
+                        <div class="flex items-center gap-2 shrink-0">
+                            <button id="btn-admin-release-draw" onclick="adminReleaseDraw()" class="macos-btn min-h-[42px] px-4 py-2 rounded-xl bg-holiday-gold hover:bg-holiday-goldLight text-stone-900 font-bold text-xs flex items-center gap-1.5 shadow-sm cursor-pointer">
+                                <i data-lucide="unlock" class="w-4 h-4"></i>
+                                <span>Liberar Sorteio</span>
+                            </button>
+                            <button id="btn-admin-reset-draw" onclick="adminLockAndResetDraw()" class="macos-btn hidden min-h-[42px] px-3.5 py-2 rounded-xl bg-red-500/85 hover:bg-red-600 text-white font-bold text-xs items-center gap-1.5 cursor-pointer">
+                                <i data-lucide="lock" class="w-4 h-4"></i>
+                                <span>Bloquear / Reiniciar</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Resumo e Busca -->
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-holiday-cream p-3.5 rounded-2xl border border-holiday-sand">
+                    <div class="flex items-center justify-around sm:justify-start gap-4 text-xs">
+                        <div>
+                            <span class="text-stone-400 block font-semibold uppercase tracking-wider text-[10px]">Participantes</span>
+                            <strong id="admin-total-users" class="text-lg font-serif text-holiday-pine">0</strong>
+                        </div>
+                        <div class="h-7 w-px bg-holiday-sand"></div>
+                        <div>
+                            <span class="text-stone-400 block font-semibold uppercase tracking-wider text-[10px]">Com E-mail</span>
+                            <strong id="admin-total-emails" class="text-lg font-serif text-holiday-berry">0</strong>
+                        </div>
+                        <div class="h-7 w-px bg-holiday-sand"></div>
+                        <div>
+                            <span class="text-stone-400 block font-semibold uppercase tracking-wider text-[10px]">Já Sortearam</span>
+                            <strong id="admin-total-revealed" class="text-lg font-serif text-emerald-700">0/0</strong>
+                        </div>
                     </div>
 
-                    <div class="flex items-center gap-2 shrink-0">
-                        <button id="btn-admin-release-draw" onclick="adminReleaseDraw()" class="min-h-[42px] px-4 py-2 rounded-xl bg-holiday-gold hover:bg-holiday-goldLight text-stone-900 font-bold text-xs flex items-center gap-1.5 shadow-sm transition-colors cursor-pointer">
-                            <i data-lucide="unlock" class="w-4 h-4"></i>
-                            <span>Liberar Sorteio</span>
-                        </button>
-                        <button id="btn-admin-reset-draw" onclick="adminLockAndResetDraw()" class="hidden min-h-[42px] px-3.5 py-2 rounded-xl bg-red-500/85 hover:bg-red-600 text-white font-bold text-xs items-center gap-1.5 transition-colors cursor-pointer">
-                            <i data-lucide="lock" class="w-4 h-4"></i>
-                            <span>Bloquear / Reiniciar</span>
-                        </button>
+                    <div class="relative flex-1 sm:max-w-xs">
+                        <i data-lucide="search" class="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+                        <input type="text" id="admin-search-input" oninput="renderAdminUsersList()" placeholder="Buscar nome ou e-mail..."
+                            class="w-full pl-9 pr-3.5 py-2 rounded-xl border border-stone-300 bg-white text-base sm:text-xs outline-none focus:border-holiday-pine transition-all duration-200">
                     </div>
+                </div>
+
+                <!-- Lista de Usuários Cadastrados -->
+                <div>
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-stone-400 mb-2.5">Pessoas Cadastradas</h3>
+                    <div id="admin-users-list" class="space-y-2.5"></div>
                 </div>
             </div>
-
-            <!-- Resumo e Busca -->
-            <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-holiday-cream p-3.5 rounded-2xl border border-holiday-sand mb-4 shrink-0">
-                <div class="flex items-center gap-4 text-xs">
-                    <div>
-                        <span class="text-stone-400 block font-semibold uppercase tracking-wider text-[10px]">Participantes</span>
-                        <strong id="admin-total-users" class="text-lg font-serif text-holiday-pine">0</strong>
-                    </div>
-                    <div class="h-7 w-px bg-holiday-sand"></div>
-                    <div>
-                        <span class="text-stone-400 block font-semibold uppercase tracking-wider text-[10px]">Com E-mail</span>
-                        <strong id="admin-total-emails" class="text-lg font-serif text-holiday-berry">0</strong>
-                    </div>
-                    <div class="h-7 w-px bg-holiday-sand"></div>
-                    <div>
-                        <span class="text-stone-400 block font-semibold uppercase tracking-wider text-[10px]">Já Sortearam</span>
-                        <strong id="admin-total-revealed" class="text-lg font-serif text-emerald-700">0/0</strong>
-                    </div>
-                </div>
-
-                <div class="relative flex-1 sm:max-w-xs">
-                    <i data-lucide="search" class="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
-                    <input type="text" id="admin-search-input" oninput="renderAdminUsersList()" placeholder="Buscar nome ou e-mail..."
-                        class="w-full pl-9 pr-3.5 py-2 rounded-xl border border-stone-300 bg-white text-base sm:text-xs outline-none focus:border-holiday-pine">
-                </div>
-            </div>
-
-            <!-- Lista de Usuários -->
-            <div id="admin-users-list" class="flex-1 overflow-y-auto space-y-2.5 pr-0.5 pb-safe"></div>
         </div>
     </div>
 
     <!-- ==================== MODAL: PERFIL E FOTO ==================== -->
-    <div id="profile-modal" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs z-50 hidden items-start sm:items-center justify-center p-0 sm:p-4 overflow-y-auto">
-        <div id="profile-modal-sheet" class="bg-white rounded-b-3xl sm:rounded-3xl max-w-md w-full p-6 pb-safe shadow-2xl border-b sm:border border-holiday-sand relative my-0 sm:my-auto">
-            <button onclick="closeProfileModal()" class="absolute top-5 right-5 text-stone-400 hover:text-stone-700 p-2 rounded-full hover:bg-stone-100 transition-colors cursor-pointer">
+    <div id="profile-modal" onclick="if(event.target===this) closeProfileModal()" class="macos-modal-backdrop fixed inset-0 bg-stone-900/55 backdrop-blur-md z-50 hidden items-start sm:items-center justify-center p-0 sm:p-4 overflow-y-auto ios-scroll">
+        <div id="profile-modal-sheet" class="macos-modal-top-sheet bg-white/95 backdrop-blur-xl rounded-b-3xl sm:rounded-3xl max-w-md w-full p-6 pb-safe shadow-2xl border-b sm:border border-holiday-sand relative my-0 sm:my-auto">
+            <button onclick="closeProfileModal()" class="macos-btn absolute top-5 right-5 text-stone-400 hover:text-stone-700 p-2 rounded-full hover:bg-stone-100 cursor-pointer">
                 <i data-lucide="x" class="w-5 h-5"></i>
             </button>
 
@@ -563,20 +690,20 @@
                     <span class="text-[10px] font-bold uppercase tracking-wider text-stone-400 block">Sorteio Individual</span>
                     <span id="profile-modal-draw-status" class="text-xs font-bold text-stone-700 truncate block">Aguardando ADM liberar</span>
                 </div>
-                <button type="button" id="profile-modal-draw-btn" onclick="closeProfileModal(); openDrawModal();" disabled
-                    class="min-h-[38px] px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 shrink-0 bg-stone-200 text-stone-400 cursor-not-allowed">
+                <button type="button" id="profile-modal-draw-btn" onclick="closeProfileModal(); setTimeout(openDrawModal, 180);" disabled
+                    class="macos-btn min-h-[38px] px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 shrink-0 bg-stone-200 text-stone-400 cursor-not-allowed">
                     <i data-lucide="lock" class="w-3.5 h-3.5"></i>
                     <span>Sortear</span>
                 </button>
             </div>
 
             <div class="flex flex-col items-center mb-5">
-                <div class="w-24 h-24 rounded-full bg-holiday-pine text-holiday-goldLight border-4 border-holiday-goldLight shadow-md overflow-hidden flex items-center justify-center text-3xl font-serif font-bold mb-3.5">
+                <div class="w-24 h-24 rounded-full bg-holiday-pine text-holiday-goldLight border-4 border-holiday-goldLight shadow-md overflow-hidden flex items-center justify-center text-3xl font-serif font-bold mb-3.5 transition-transform duration-300 hover:scale-105">
                     <img id="profile-modal-img" src="" alt="Sua foto" class="w-full h-full object-cover hidden">
                     <span id="profile-modal-initial">?</span>
                 </div>
 
-                <label class="min-h-[44px] px-5 py-2.5 rounded-xl bg-holiday-pine hover:bg-holiday-pineLight text-white font-semibold text-sm flex items-center gap-2 cursor-pointer transition-colors shadow-xs">
+                <label class="macos-btn min-h-[44px] px-5 py-2.5 rounded-xl bg-holiday-pine hover:bg-holiday-pineLight text-white font-semibold text-sm flex items-center gap-2 cursor-pointer shadow-xs">
                     <i data-lucide="image-plus" class="w-4 h-4"></i>
                     <span>Escolher foto do aparelho</span>
                     <input type="file" id="profile-avatar-file" accept="image/*" class="hidden" onchange="handleAvatarFileSelect(this, 'profile')">
@@ -586,14 +713,14 @@
             <div class="bg-holiday-cream p-3.5 rounded-2xl border border-holiday-sand mb-5">
                 <label class="block text-xs font-semibold text-stone-600 mb-1">Ou cole o link de uma foto (Opcional)</label>
                 <input type="url" id="profile-avatar-url" placeholder="https://..." oninput="previewProfileUrl(this.value)"
-                    class="w-full px-3 py-2 rounded-xl border border-stone-300 bg-white text-base sm:text-xs outline-none focus:border-holiday-pine">
+                    class="w-full px-3 py-2 rounded-xl border border-stone-300 bg-white text-base sm:text-xs outline-none focus:border-holiday-pine transition-all duration-200">
             </div>
 
             <div class="flex items-center gap-2.5 pb-2">
-                <button type="button" id="btn-remove-avatar" onclick="removeProfileAvatar()" class="min-h-[46px] px-3.5 py-2.5 rounded-xl text-xs font-semibold text-red-600 bg-red-50 hover:bg-red-100 transition-colors cursor-pointer">
+                <button type="button" id="btn-remove-avatar" onclick="removeProfileAvatar()" class="macos-btn min-h-[46px] px-3.5 py-2.5 rounded-xl text-xs font-semibold text-red-600 bg-red-50 hover:bg-red-100 cursor-pointer">
                     Remover foto
                 </button>
-                <button type="button" onclick="saveProfileAvatar()" id="btn-save-avatar" class="flex-1 min-h-[46px] px-4 py-2.5 rounded-xl text-sm font-bold text-white bg-holiday-berry hover:bg-holiday-berryLight transition-colors cursor-pointer">
+                <button type="button" onclick="saveProfileAvatar()" id="btn-save-avatar" class="macos-btn flex-1 min-h-[46px] px-4 py-2.5 rounded-xl text-sm font-bold text-white bg-holiday-berry hover:bg-holiday-berryLight cursor-pointer">
                     Salvar Foto
                 </button>
             </div>
@@ -601,9 +728,9 @@
     </div>
 
     <!-- ==================== MODAL: GERENCIAR MINHAS OPÇÕES DE PRESENTE ==================== -->
-    <div id="wishes-modal" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs z-50 hidden items-start sm:items-center justify-center p-0 sm:p-4">
-        <div id="wishes-modal-sheet" class="bg-white rounded-b-3xl sm:rounded-3xl max-w-2xl w-full p-4 sm:p-8 shadow-2xl border-b sm:border border-holiday-sand relative h-[100dvh] sm:h-auto sm:max-h-[90vh] flex flex-col">
-            <button onclick="closeMyWishesModal()" class="absolute top-3.5 sm:top-5 right-3.5 sm:right-5 text-stone-400 hover:text-stone-700 p-2 rounded-full hover:bg-stone-100 transition-colors cursor-pointer z-10">
+    <div id="wishes-modal" onclick="if(event.target===this) closeMyWishesModal()" class="macos-modal-backdrop fixed inset-0 bg-stone-900/55 backdrop-blur-md z-50 hidden items-start sm:items-center justify-center p-0 sm:p-4">
+        <div id="wishes-modal-sheet" class="macos-modal-top-sheet bg-white/95 backdrop-blur-xl rounded-b-3xl sm:rounded-3xl max-w-2xl w-full p-4 sm:p-8 shadow-2xl border-b sm:border border-holiday-sand relative h-[100dvh] sm:h-auto sm:max-h-[90vh] flex flex-col">
+            <button onclick="closeMyWishesModal()" class="macos-btn absolute top-3.5 sm:top-5 right-3.5 sm:right-5 text-stone-400 hover:text-stone-700 p-2 rounded-full hover:bg-stone-100 cursor-pointer z-10">
                 <i data-lucide="x" class="w-6 h-6 sm:w-5 sm:h-5"></i>
             </button>
 
@@ -617,33 +744,33 @@
                 </div>
             </div>
 
-            <form id="wishlist-form" onsubmit="handleSaveWishlist(event)" class="flex-1 overflow-y-auto overscroll-contain pr-0.5 space-y-4 pb-44 sm:pb-4">
+            <form id="wishlist-form" onsubmit="handleSaveWishlist(event)" class="flex-1 min-h-0 overflow-y-auto ios-scroll pr-0.5 space-y-4 pb-44 sm:pb-4">
                 <!-- Observação Geral -->
                 <div class="bg-holiday-cream p-3.5 sm:p-4 rounded-2xl border border-holiday-sand">
                     <label class="block text-xs font-bold uppercase tracking-wider text-stone-500 mb-1.5">Observações Gerais (Tamanhos, Cores, Dicas)</label>
                     <input type="text" id="general-notes" placeholder="Ex: Camiseta M, Calçado 41, gosto de café e livros..."
-                        class="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 bg-white focus:border-holiday-pine outline-none text-base sm:text-sm">
+                        class="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 bg-white focus:border-holiday-pine outline-none text-base sm:text-sm transition-all duration-200">
                 </div>
 
                 <!-- Container Dinâmico das Opções de Presente -->
                 <div id="options-editor-list" class="space-y-4"></div>
 
-                <button type="button" onclick="addOptionBlock()" class="w-full min-h-[48px] py-3 rounded-2xl border-2 border-dashed border-holiday-gold text-holiday-pine hover:bg-holiday-goldLight/40 active:bg-holiday-goldLight/60 font-bold text-sm flex items-center justify-center gap-2 transition-colors cursor-pointer">
+                <button type="button" onclick="addOptionBlock()" class="macos-btn w-full min-h-[48px] py-3 rounded-2xl border-2 border-dashed border-holiday-gold text-holiday-pine hover:bg-holiday-goldLight/40 font-bold text-sm flex items-center justify-center gap-2 cursor-pointer">
                     <i data-lucide="plus-circle" class="w-5 h-5 text-holiday-berry"></i>
                     <span>+ Adicionar outra opção de presente</span>
                 </button>
 
                 <div class="pt-3 pb-2 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-2.5 border-t border-stone-100 bg-white">
-                    <button type="button" id="btn-delete-all-modal" onclick="promptDeleteAllMyGifts()" class="hidden min-h-[44px] px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-red-600 bg-red-50 hover:bg-red-100 transition-colors flex items-center justify-center gap-1.5 cursor-pointer">
+                    <button type="button" id="btn-delete-all-modal" onclick="promptDeleteAllMyGifts()" class="macos-btn hidden min-h-[44px] px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-red-600 bg-red-50 hover:bg-red-100 flex items-center justify-center gap-1.5 cursor-pointer">
                         <i data-lucide="trash-2" class="w-4 h-4"></i>
                         <span>Remover todos os meus presentes</span>
                     </button>
 
                     <div class="flex items-center gap-2.5 sm:ml-auto">
-                        <button type="button" onclick="closeMyWishesModal()" class="flex-1 sm:flex-initial min-h-[46px] px-4 py-2.5 rounded-xl text-sm font-semibold text-stone-600 bg-stone-100 sm:bg-transparent hover:bg-stone-100 transition-colors cursor-pointer">
+                        <button type="button" onclick="closeMyWishesModal()" class="macos-btn flex-1 sm:flex-initial min-h-[46px] px-4 py-2.5 rounded-xl text-sm font-semibold text-stone-600 bg-stone-100 sm:bg-transparent hover:bg-stone-100 cursor-pointer">
                             Cancelar
                         </button>
-                        <button type="submit" id="btn-save-wishlist" class="flex-1 sm:flex-initial min-h-[46px] bg-holiday-berry hover:bg-holiday-berryLight text-white font-semibold px-6 py-2.5 rounded-xl shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer">
+                        <button type="submit" id="btn-save-wishlist" class="macos-btn flex-1 sm:flex-initial min-h-[46px] bg-holiday-berry hover:bg-holiday-berryLight text-white font-semibold px-6 py-2.5 rounded-xl shadow-sm flex items-center justify-center gap-2 cursor-pointer">
                             <i data-lucide="check" class="w-4 h-4"></i>
                             <span>Salvar Lista</span>
                         </button>
@@ -654,8 +781,8 @@
     </div>
 
     <!-- ==================== MODAL: CONFIRMAÇÃO DE RESERVA + E-MAIL (ATÉ R$ 100,00) ==================== -->
-    <div id="reserve-modal" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs z-50 hidden items-start sm:items-center justify-center p-0 sm:p-4 overflow-y-auto">
-        <div id="reserve-modal-sheet" class="bg-white rounded-b-3xl sm:rounded-3xl max-w-md w-full p-6 pb-safe shadow-2xl border-b sm:border border-holiday-sand my-0 sm:my-auto">
+    <div id="reserve-modal" onclick="if(event.target===this) closeReserveModal()" class="macos-modal-backdrop fixed inset-0 bg-stone-900/55 backdrop-blur-md z-50 hidden items-start sm:items-center justify-center p-0 sm:p-4 overflow-y-auto ios-scroll">
+        <div id="reserve-modal-sheet" class="macos-modal-top-sheet bg-white/95 backdrop-blur-xl rounded-b-3xl sm:rounded-3xl max-w-md w-full p-6 pb-safe shadow-2xl border-b sm:border border-holiday-sand my-0 sm:my-auto">
             <div class="w-14 h-14 rounded-2xl bg-holiday-goldLight text-holiday-berry flex items-center justify-center mx-auto mb-3">
                 <i data-lucide="shopping-bag" class="w-7 h-7"></i>
             </div>
@@ -671,15 +798,15 @@
             <div class="bg-holiday-cream p-3.5 rounded-2xl border border-holiday-sand mb-5">
                 <label class="block text-xs font-bold text-stone-700 mb-1.5">Receber detalhes e link por e-mail:</label>
                 <input type="email" id="reserve-email-input" placeholder="seuemail@exemplo.com"
-                    class="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 bg-white text-base sm:text-sm focus:border-holiday-pine outline-none">
+                    class="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 bg-white text-base sm:text-sm focus:border-holiday-pine outline-none transition-all duration-200">
                 <p class="text-[11px] text-stone-500 mt-1.5">O cartão desta pessoa ficará reservado para você, e você poderá escolher mais itens dela até atingir <strong>R$ 100,00</strong>. Só você vê quais itens escolheu.</p>
             </div>
 
             <div class="flex items-center gap-3 pb-2">
-                <button type="button" onclick="closeReserveModal()" class="flex-1 min-h-[46px] px-4 py-2.5 rounded-xl text-sm font-semibold text-stone-600 bg-stone-100 hover:bg-stone-200 transition-colors cursor-pointer">
+                <button type="button" onclick="closeReserveModal()" class="macos-btn flex-1 min-h-[46px] px-4 py-2.5 rounded-xl text-sm font-semibold text-stone-600 bg-stone-100 hover:bg-stone-200 cursor-pointer">
                     Cancelar
                 </button>
-                <button type="button" id="btn-confirm-reserve" class="flex-1 min-h-[46px] px-4 py-2.5 rounded-xl text-sm font-semibold text-white bg-holiday-pine hover:bg-holiday-pineLight transition-colors cursor-pointer">
+                <button type="button" id="btn-confirm-reserve" class="macos-btn flex-1 min-h-[46px] px-4 py-2.5 rounded-xl text-sm font-semibold text-white bg-holiday-pine hover:bg-holiday-pineLight cursor-pointer">
                     Confirmar Escolha
                 </button>
             </div>
@@ -687,8 +814,8 @@
     </div>
 
     <!-- Modal Genérico (Desmarcar reserva / Excluir todos os presentes) -->
-    <div id="confirm-modal" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs z-50 hidden items-end sm:items-center justify-center p-0 sm:p-4">
-        <div class="bg-white rounded-t-3xl sm:rounded-3xl max-w-md w-full p-6 pb-safe shadow-2xl border-t sm:border border-holiday-sand text-center">
+    <div id="confirm-modal" onclick="if(event.target===this) closeConfirmModal()" class="macos-modal-backdrop fixed inset-0 bg-stone-900/55 backdrop-blur-md z-50 hidden items-end sm:items-center justify-center p-0 sm:p-4">
+        <div class="macos-modal-panel bg-white/95 backdrop-blur-xl rounded-t-3xl sm:rounded-3xl max-w-md w-full p-6 pb-safe shadow-2xl border-t sm:border border-holiday-sand text-center">
             <div class="w-12 h-1.5 bg-stone-300 rounded-full mx-auto mb-4 sm:hidden"></div>
             <div class="w-14 h-14 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center mx-auto mb-4">
                 <i id="confirm-modal-icon" data-lucide="rotate-ccw" class="w-7 h-7"></i>
@@ -696,10 +823,10 @@
             <h3 id="confirm-title" class="font-serif text-xl font-bold text-stone-800 mb-2">Confirmar ação</h3>
             <p id="confirm-message" class="text-sm text-stone-600 mb-6"></p>
             <div class="flex items-center justify-center gap-3 pb-2">
-                <button onclick="closeConfirmModal()" class="flex-1 min-h-[46px] px-4 py-2.5 rounded-xl text-sm font-semibold text-stone-600 bg-stone-100 hover:bg-stone-200 transition-colors cursor-pointer">
+                <button onclick="closeConfirmModal()" class="macos-btn flex-1 min-h-[46px] px-4 py-2.5 rounded-xl text-sm font-semibold text-stone-600 bg-stone-100 hover:bg-stone-200 cursor-pointer">
                     Cancelar
                 </button>
-                <button id="confirm-action-btn" class="flex-1 min-h-[46px] px-4 py-2.5 rounded-xl text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition-colors cursor-pointer">
+                <button id="confirm-action-btn" class="macos-btn flex-1 min-h-[46px] px-4 py-2.5 rounded-xl text-sm font-semibold text-white bg-red-600 hover:bg-red-700 cursor-pointer">
                     Confirmar
                 </button>
             </div>
@@ -707,7 +834,7 @@
     </div>
 
     <!-- Toast -->
-    <div id="toast" class="fixed bottom-20 md:bottom-5 left-4 right-4 md:left-auto md:right-5 bg-stone-900 text-white px-4 py-3.5 rounded-2xl shadow-xl text-sm font-medium flex items-center gap-2.5 transform translate-y-32 opacity-0 transition-all duration-300 z-50">
+    <div id="toast" class="fixed bottom-20 md:bottom-5 left-4 right-4 md:left-auto md:right-5 bg-stone-900/90 backdrop-blur-xl text-white px-4 py-3.5 rounded-2xl shadow-2xl border border-white/10 text-sm font-medium flex items-center gap-2.5 transform translate-y-32 opacity-0 pointer-events-none z-50">
         <i data-lucide="info" class="w-4 h-4 text-holiday-gold shrink-0"></i>
         <span id="toast-message">Mensagem</span>
     </div>
@@ -760,7 +887,31 @@
 
         lucide.createIcons();
 
-        // ==================== PAPEL DE PAREDE ANIMADO DE ANO NOVO ====================
+        // ==================== AUXILIAR DE MODAIS SUAVES (FÍSICA MACOS) ====================
+        function openSmoothModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (!modal) return;
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    modal.classList.add('is-open');
+                });
+            });
+        }
+
+        function closeSmoothModal(modalId, onAfterClose = null) {
+            const modal = document.getElementById(modalId);
+            if (!modal) return;
+            modal.classList.remove('is-open');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                if (typeof onAfterClose === 'function') onAfterClose();
+            }, 300);
+        }
+
+        // ==================== PAPEL DE PAREDE ANIMADO DE ANO NOVO (SUAVE 60FPS) ====================
         function initNewYearWallpaper() {
             const canvas = document.getElementById('new-year-wallpaper');
             if (!canvas) return;
@@ -774,14 +925,14 @@
             });
 
             const colors = ['#D4A373', '#E9C46A', '#FAEDCD', '#2D6A4F', '#BC4749'];
-            const particles = Array.from({ length: 48 }, () => ({
+            const particles = Array.from({ length: 42 }, () => ({
                 x: Math.random() * width,
                 y: Math.random() * height,
-                radius: Math.random() * 2.8 + 1.1,
-                speedY: -(Math.random() * 0.38 + 0.14),
-                speedX: (Math.random() - 0.5) * 0.25,
-                alpha: Math.random() * 0.42 + 0.14,
-                twinkleSpeed: Math.random() * 0.02 + 0.008,
+                radius: Math.random() * 2.6 + 1.1,
+                speedY: -(Math.random() * 0.28 + 0.10),
+                speedX: (Math.random() - 0.5) * 0.18,
+                alpha: Math.random() * 0.36 + 0.12,
+                twinkleSpeed: Math.random() * 0.015 + 0.006,
                 phase: Math.random() * Math.PI * 2,
                 color: colors[Math.floor(Math.random() * colors.length)],
                 isStar: Math.random() > 0.68
@@ -817,7 +968,7 @@
 
                 for (const p of particles) {
                     p.y += p.speedY;
-                    p.x += p.speedX + Math.sin(p.phase) * 0.12;
+                    p.x += p.speedX + Math.sin(p.phase) * 0.09;
                     p.phase += p.twinkleSpeed;
 
                     if (p.y < -15) {
@@ -827,7 +978,7 @@
                     if (p.x < -15) p.x = width + 15;
                     if (p.x > width + 15) p.x = -15;
 
-                    const currentAlpha = Math.max(0.08, Math.min(0.55, p.alpha + Math.sin(p.phase) * 0.15));
+                    const currentAlpha = Math.max(0.06, Math.min(0.48, p.alpha + Math.sin(p.phase) * 0.12));
 
                     if (p.isStar) {
                         drawStar(p.x, p.y, p.radius, currentAlpha, p.color);
@@ -849,13 +1000,13 @@
         }
         initNewYearWallpaper();
 
-        // ==================== MÚSICA SUAVE DE ANO NOVO (AULD LANG SYNE) ====================
+        // ==================== MÚSICA SUAVE DE ANO NOVO (OTIMIZADA PARA iOS SAFARI) ====================
         let audioCtx = null;
         let isMusicEnabled = localStorage.getItem('amigo_secreto_music_muted') !== 'true';
         let musicTimerId = null;
         let noteStep = 0;
 
-        // Melodia suave de Ano Novo ("Auld Lang Syne") em timbre de caixinha de música
+        // Melodia suave de Ano Novo ("Auld Lang Syne")
         const AULD_LANG_SYNE_MELODY = [
             { f: 261.63, d: 0.55 }, { f: 349.23, d: 0.85 }, { f: 349.23, d: 0.35 }, { f: 349.23, d: 0.55 },
             { f: 440.00, d: 0.55 }, { f: 392.00, d: 0.85 }, { f: 349.23, d: 0.35 }, { f: 392.00, d: 0.55 },
@@ -867,8 +1018,33 @@
             { f: 261.63, d: 0.55 }, { f: 349.23, d: 1.45 }, { f: 0,      d: 0.65 }
         ];
 
+        function unlockIosAudioContext() {
+            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+            if (!AudioContextClass) return false;
+
+            if (!audioCtx) {
+                audioCtx = new AudioContextClass();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume().catch(() => {});
+            }
+
+            try {
+                const buffer = audioCtx.createBuffer(1, 1, 22050);
+                const source = audioCtx.createBufferSource();
+                source.buffer = buffer;
+                source.connect(audioCtx.destination);
+                source.start(0);
+            } catch {}
+
+            return audioCtx.state === 'running';
+        }
+
         function playMusicBoxNote(freq, duration) {
             if (!audioCtx || !isMusicEnabled || freq <= 0) return;
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume().catch(() => {});
+            }
             try {
                 const now = audioCtx.currentTime;
                 const osc = audioCtx.createOscillator();
@@ -882,11 +1058,10 @@
                 harmonic.frequency.setValueAtTime(freq * 2, now);
 
                 const harmonicGain = audioCtx.createGain();
-                harmonicGain.gain.setValueAtTime(0.012, now);
+                harmonicGain.gain.setValueAtTime(0.02, now);
 
-                // Volume bem baixinho e agradável
                 gain.gain.setValueAtTime(0.0001, now);
-                gain.gain.exponentialRampToValueAtTime(0.035, now + 0.04);
+                gain.gain.exponentialRampToValueAtTime(0.065, now + 0.035);
                 gain.gain.exponentialRampToValueAtTime(0.0001, now + duration + 0.35);
 
                 osc.connect(gain);
@@ -911,14 +1086,7 @@
 
         function ensureAudioStarted() {
             if (!isMusicEnabled) return;
-            if (!audioCtx) {
-                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-                if (!AudioContextClass) return;
-                audioCtx = new AudioContextClass();
-            }
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
+            unlockIosAudioContext();
             if (!musicTimerId) {
                 scheduleNextMusicNote();
             }
@@ -926,14 +1094,13 @@
 
         function updateMusicButtonUI() {
             const btn = document.getElementById('btn-toggle-music');
-            const label = document.getElementById('music-label');
-            if (!btn || !label) return;
+            if (!btn) return;
 
             if (isMusicEnabled) {
-                btn.className = "min-h-[42px] px-2.5 sm:px-3.5 py-2 rounded-xl bg-white/15 hover:bg-white/25 text-holiday-goldLight border border-holiday-gold/40 font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer";
+                btn.className = "macos-btn min-h-[42px] px-2.5 sm:px-3.5 py-2 rounded-xl bg-white/15 hover:bg-white/25 text-holiday-goldLight border border-holiday-gold/40 font-bold text-xs flex items-center gap-1.5 cursor-pointer";
                 btn.innerHTML = `<i data-lucide="volume-2" class="w-4 h-4"></i><span id="music-label" class="hidden sm:inline">Música: Ligada</span>`;
             } else {
-                btn.className = "min-h-[42px] px-2.5 sm:px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/15 text-stone-300 border border-white/15 font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer";
+                btn.className = "macos-btn min-h-[42px] px-2.5 sm:px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/15 text-stone-300 border border-white/15 font-bold text-xs flex items-center gap-1.5 cursor-pointer";
                 btn.innerHTML = `<i data-lucide="volume-x" class="w-4 h-4"></i><span id="music-label" class="hidden sm:inline">Música: Desligada</span>`;
             }
             lucide.createIcons();
@@ -945,8 +1112,13 @@
             updateMusicButtonUI();
 
             if (isMusicEnabled) {
-                ensureAudioStarted();
-                showToast("Música de Ano Novo ligada 🎶");
+                unlockIosAudioContext();
+                if (musicTimerId) {
+                    clearTimeout(musicTimerId);
+                    musicTimerId = null;
+                }
+                scheduleNextMusicNote();
+                showToast("Música ligada 🎶 (No iPhone, verifique se a chave lateral não está no silencioso)");
             } else {
                 if (musicTimerId) {
                     clearTimeout(musicTimerId);
@@ -956,13 +1128,15 @@
             }
         };
 
-        // Inicia automaticamente no primeiro clique/toque na página (respeitando política dos navegadores)
-        ['pointerdown', 'keydown'].forEach(evt => {
+        ['touchend', 'click', 'keydown'].forEach(evt => {
             document.addEventListener(evt, () => {
-                if (isMusicEnabled && !musicTimerId) {
-                    ensureAudioStarted();
+                if (isMusicEnabled) {
+                    unlockIosAudioContext();
+                    if (!musicTimerId) {
+                        scheduleNextMusicNote();
+                    }
                 }
-            }, { once: true });
+            }, { passive: true });
         });
         updateMusicButtonUI();
 
@@ -1094,11 +1268,13 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         };
 
+        let toastTimeoutId = null;
         window.showToast = function(msg) {
             const toast = document.getElementById('toast');
             document.getElementById('toast-message').textContent = msg;
             toast.classList.remove('translate-y-32', 'opacity-0');
-            setTimeout(() => toast.classList.add('translate-y-32', 'opacity-0'), 4200);
+            if (toastTimeoutId) clearTimeout(toastTimeoutId);
+            toastTimeoutId = setTimeout(() => toast.classList.add('translate-y-32', 'opacity-0'), 4200);
         };
 
         window.copyTextToClipboard = function(text) {
@@ -1292,15 +1468,15 @@
             document.getElementById('auth-error').classList.add('hidden');
 
             if (mode === 'login') {
-                tabLogin.className = "min-h-[42px] rounded-xl text-sm font-bold transition-all bg-holiday-pine text-white shadow-xs cursor-pointer";
-                tabRegister.className = "min-h-[42px] rounded-xl text-sm font-bold transition-all text-stone-600 hover:text-stone-900 cursor-pointer";
+                tabLogin.className = "macos-btn min-h-[42px] rounded-xl text-sm font-bold bg-holiday-pine text-white shadow-xs cursor-pointer";
+                tabRegister.className = "macos-btn min-h-[42px] rounded-xl text-sm font-bold text-stone-600 hover:text-stone-900 cursor-pointer";
                 emailGroup.classList.add('hidden');
                 avatarGroup.classList.add('hidden');
                 avatarGroup.classList.remove('flex');
                 submitText.textContent = "Entrar na Lista";
             } else {
-                tabRegister.className = "min-h-[42px] rounded-xl text-sm font-bold transition-all bg-holiday-pine text-white shadow-xs cursor-pointer";
-                tabLogin.className = "min-h-[42px] rounded-xl text-sm font-bold transition-all text-stone-600 hover:text-stone-900 cursor-pointer";
+                tabRegister.className = "macos-btn min-h-[42px] rounded-xl text-sm font-bold bg-holiday-pine text-white shadow-xs cursor-pointer";
+                tabLogin.className = "macos-btn min-h-[42px] rounded-xl text-sm font-bold text-stone-600 hover:text-stone-900 cursor-pointer";
                 emailGroup.classList.remove('hidden');
                 avatarGroup.classList.remove('hidden');
                 avatarGroup.classList.add('flex');
@@ -1544,72 +1720,72 @@
             const profileModalStatus = document.getElementById('profile-modal-draw-status');
 
             if (!isUnlocked || !myAssignedKey) {
-                iconWrap.className = "w-12 h-12 rounded-2xl bg-stone-100 text-stone-400 flex items-center justify-center shrink-0";
+                iconWrap.className = "w-12 h-12 rounded-2xl bg-stone-100 text-stone-400 flex items-center justify-center shrink-0 transition-colors duration-300";
                 iconWrap.innerHTML = `<i data-lucide="lock" class="w-6 h-6"></i>`;
-                badge.className = "text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-stone-100 text-stone-500";
+                badge.className = "text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-stone-100 text-stone-500 transition-colors duration-300";
                 badge.textContent = "Sorteio Bloqueado";
                 title.textContent = "Seu Sorteio do Amigo Secreto";
                 subtitle.textContent = "O botão de sortear ficará desativado até o ADM liberar o sorteio.";
 
                 mainBtn.disabled = true;
-                mainBtn.className = "min-h-[46px] px-5 py-2.5 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all shrink-0 bg-stone-200 text-stone-400 cursor-not-allowed";
+                mainBtn.className = "macos-btn min-h-[46px] px-5 py-2.5 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 shrink-0 bg-stone-200 text-stone-400 cursor-not-allowed";
                 mainBtn.innerHTML = `<i data-lucide="lock" class="w-4 h-4"></i><span>Sortear Amigo Secreto</span>`;
 
-                headerBtn.className = "hidden md:flex min-h-[42px] px-3.5 py-2 rounded-xl bg-white/10 text-emerald-100/70 border border-white/10 font-bold text-xs items-center gap-1.5 cursor-not-allowed";
+                headerBtn.className = "macos-btn hidden md:flex min-h-[42px] px-3.5 py-2 rounded-xl bg-white/10 text-emerald-100/70 border border-white/10 font-bold text-xs items-center gap-1.5 cursor-not-allowed";
                 headerLabel.textContent = "Sorteio Bloqueado";
 
                 mobileBtn.disabled = true;
-                mobileBtn.className = "min-h-[46px] rounded-2xl bg-stone-100 text-stone-400 font-bold text-[11px] flex flex-col items-center justify-center gap-0.5 cursor-not-allowed";
+                mobileBtn.className = "macos-btn min-h-[46px] rounded-2xl bg-stone-100 text-stone-400 font-bold text-[11px] flex flex-col items-center justify-center gap-0.5 cursor-not-allowed";
                 mobileBtn.innerHTML = `<i data-lucide="lock" class="w-4 h-4"></i><span>Sortear</span>`;
 
                 profileModalBtn.disabled = true;
-                profileModalBtn.className = "min-h-[38px] px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 shrink-0 bg-stone-200 text-stone-400 cursor-not-allowed";
+                profileModalBtn.className = "macos-btn min-h-[38px] px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 shrink-0 bg-stone-200 text-stone-400 cursor-not-allowed";
                 profileModalBtn.innerHTML = `<i data-lucide="lock" class="w-3.5 h-3.5"></i><span>Sortear</span>`;
                 profileModalStatus.textContent = "Aguardando ADM liberar";
             } else if (!hasRevealed) {
-                iconWrap.className = "w-12 h-12 rounded-2xl bg-holiday-goldLight text-holiday-berry flex items-center justify-center shrink-0";
+                iconWrap.className = "w-12 h-12 rounded-2xl bg-holiday-goldLight text-holiday-berry flex items-center justify-center shrink-0 transition-colors duration-300";
                 iconWrap.innerHTML = `<i data-lucide="sparkles" class="w-6 h-6"></i>`;
-                badge.className = "text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800";
+                badge.className = "text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 transition-colors duration-300";
                 badge.textContent = "Liberado pelo ADM!";
                 title.textContent = "Seu sorteio está disponível!";
                 subtitle.textContent = "Toque no botão ao lado para sortear e descobrir seu amigo secreto.";
 
                 mainBtn.disabled = false;
-                mainBtn.className = "min-h-[46px] px-5 py-2.5 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all shrink-0 bg-holiday-berry hover:bg-holiday-berryLight active:scale-[0.98] text-white shadow-md cursor-pointer";
+                mainBtn.className = "macos-btn min-h-[46px] px-5 py-2.5 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 shrink-0 bg-holiday-berry hover:bg-holiday-berryLight text-white shadow-md cursor-pointer";
                 mainBtn.innerHTML = `<i data-lucide="shuffle" class="w-4 h-4 text-holiday-goldLight"></i><span>Sortear Meu Amigo</span>`;
 
-                headerBtn.className = "hidden md:flex min-h-[42px] px-3.5 py-2 rounded-xl bg-holiday-gold text-stone-900 hover:bg-holiday-goldLight font-bold text-xs items-center gap-1.5 shadow-xs cursor-pointer";
+                headerBtn.className = "macos-btn hidden md:flex min-h-[42px] px-3.5 py-2 rounded-xl bg-holiday-gold text-stone-900 hover:bg-holiday-goldLight font-bold text-xs items-center gap-1.5 shadow-xs cursor-pointer";
                 headerLabel.textContent = "Sortear Amigo!";
 
                 mobileBtn.disabled = false;
-                mobileBtn.className = "min-h-[46px] rounded-2xl bg-holiday-gold text-stone-900 active:bg-holiday-goldLight font-bold text-[11px] flex flex-col items-center justify-center gap-0.5 shadow-xs cursor-pointer";
+                mobileBtn.className = "macos-btn min-h-[46px] rounded-2xl bg-holiday-gold text-stone-900 hover:bg-holiday-goldLight font-bold text-[11px] flex flex-col items-center justify-center gap-0.5 shadow-xs cursor-pointer";
                 mobileBtn.innerHTML = `<i data-lucide="shuffle" class="w-4 h-4 text-holiday-pine"></i><span>Sortear!</span>`;
 
                 profileModalBtn.disabled = false;
-                profileModalBtn.className = "min-h-[38px] px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 shrink-0 bg-holiday-berry text-white hover:bg-holiday-berryLight cursor-pointer";
+                profileModalBtn.className = "macos-btn min-h-[38px] px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 shrink-0 bg-holiday-berry text-white hover:bg-holiday-berryLight cursor-pointer";
                 profileModalBtn.innerHTML = `<i data-lucide="shuffle" class="w-3.5 h-3.5"></i><span>Sortear</span>`;
                 profileModalStatus.textContent = "Liberado! Pronto para sortear";
             } else {
-                iconWrap.className = "w-12 h-12 rounded-2xl bg-holiday-pine text-holiday-goldLight flex items-center justify-center shrink-0";
+                iconWrap.className = "w-12 h-12 rounded-2xl bg-holiday-pine text-holiday-goldLight flex items-center justify-center shrink-0 transition-colors duration-300";
                 iconWrap.innerHTML = `<i data-lucide="gift" class="w-6 h-6"></i>`;
-                badge.className = "text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-holiday-goldLight text-holiday-pine";
+                badge.className = "text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-holiday-goldLight text-holiday-pine transition-colors duration-300";
                 badge.textContent = "Sorteio Realizado";
                 title.textContent = "Você já sorteou seu Amigo Secreto!";
                 subtitle.textContent = "Toque no botão para ver novamente quem você tirou (só você tem acesso).";
 
                 mainBtn.disabled = false;
-                mainBtn.className = "min-h-[46px] px-5 py-2.5 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all shrink-0 bg-holiday-pine hover:bg-holiday-pineLight text-white shadow-xs cursor-pointer";
+                mainBtn.className = "macos-btn min-h-[46px] px-5 py-2.5 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 shrink-0 bg-holiday-pine hover:bg-holiday-pineLight text-white shadow-xs cursor-pointer";
                 mainBtn.innerHTML = `<i data-lucide="eye" class="w-4 h-4 text-holiday-goldLight"></i><span>Ver Quem Eu Tirei</span>`;
 
-                headerBtn.className = "hidden md:flex min-h-[42px] px-3.5 py-2 rounded-xl bg-white/15 hover:bg-white/25 text-white border border-white/20 font-bold text-xs items-center gap-1.5 cursor-pointer";
+                headerBtn.className = "macos-btn hidden md:flex min-h-[42px] px-3.5 py-2 rounded-xl bg-white/15 hover:bg-white/25 text-white border border-white/20 font-bold text-xs items-center gap-1.5 cursor-pointer";
                 headerLabel.textContent = "Ver Meu Amigo";
 
                 mobileBtn.disabled = false;
-                mobileBtn.className = "min-h-[46px] rounded-2xl bg-holiday-pine text-white font-bold text-[11px] flex flex-col items-center justify-center gap-0.5 cursor-pointer";
+                mobileBtn.className = "macos-btn min-h-[46px] rounded-2xl bg-holiday-pine text-white font-bold text-[11px] flex flex-col items-center justify-center gap-0.5 cursor-pointer";
                 mobileBtn.innerHTML = `<i data-lucide="gift" class="w-4 h-4 text-holiday-goldLight"></i><span>Meu Amigo</span>`;
 
                 profileModalBtn.disabled = false;
-                profileModalBtn.className = "min-h-[38px] px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 shrink-0 bg-holiday-pine text-white hover:bg-holiday-pineLight cursor-pointer";
+                profileModalBtn.className = "macos-btn min-h-[38px] px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 shrink-0 bg-holiday-pine text-white hover:bg-holiday-pineLight cursor-pointer";
                 profileModalBtn.innerHTML = `<i data-lucide="eye" class="w-3.5 h-3.5"></i><span>Ver Amigo</span>`;
                 profileModalStatus.textContent = "Você já realizou seu sorteio";
             }
@@ -1621,14 +1797,14 @@
 
             if (adminPill && adminDesc && releaseBtn && resetBtn) {
                 if (isUnlocked) {
-                    adminPill.className = "text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-400 text-stone-900";
+                    adminPill.className = "text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-400 text-stone-900 transition-colors duration-300";
                     adminPill.textContent = "Liberado";
                     adminDesc.textContent = "Os participantes já podem clicar no botão de sortear em seus perfis.";
                     releaseBtn.classList.add('hidden');
                     resetBtn.classList.remove('hidden');
                     resetBtn.classList.add('flex');
                 } else {
-                    adminPill.className = "text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-500/80 text-white";
+                    adminPill.className = "text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-500/80 text-white transition-colors duration-300";
                     adminPill.textContent = "Bloqueado";
                     adminDesc.textContent = "Os botões de sortear estão desativados até você clicar em Liberar Sorteio.";
                     releaseBtn.classList.remove('hidden');
@@ -1665,16 +1841,12 @@
                 stateRevealed.classList.remove('hidden');
             }
 
-            const modal = document.getElementById('draw-modal');
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
+            openSmoothModal('draw-modal');
             lucide.createIcons();
         };
 
         window.closeDrawModal = function() {
-            const modal = document.getElementById('draw-modal');
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
+            closeSmoothModal('draw-modal');
         };
 
         window.executeMyDraw = async function() {
@@ -1763,15 +1935,11 @@
             document.getElementById('admin-search-input').value = '';
             updateDrawUI();
             renderAdminUsersList();
-            const modal = document.getElementById('admin-modal');
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
+            openSmoothModal('admin-modal');
         };
 
         window.closeAdminModal = function() {
-            const modal = document.getElementById('admin-modal');
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
+            closeSmoothModal('admin-modal');
         };
 
         window.renderAdminUsersList = function() {
@@ -1811,7 +1979,7 @@
                 return;
             }
 
-            listContainer.innerHTML = filtered.map(user => {
+            listContainer.innerHTML = filtered.map((user, idx) => {
                 const initial = escapeHtml((user.displayName || '?').charAt(0).toUpperCase());
                 const hasEmail = user.email && user.email.trim() !== '';
                 const wishlist = allWishlists.find(w => w.id === user.usernameKey);
@@ -1828,7 +1996,7 @@
                     : `<div class="w-11 h-11 rounded-2xl bg-holiday-pine text-holiday-goldLight font-serif font-bold text-base flex items-center justify-center shrink-0">${initial}</div>`;
 
                 return `
-                <div class="p-3.5 sm:p-4 rounded-2xl border border-stone-200 bg-white hover:border-holiday-gold/60 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div style="animation-delay: ${Math.min(idx * 35, 350)}ms;" class="macos-stagger-in p-3.5 sm:p-4 rounded-2xl border border-stone-200 bg-white hover:border-holiday-gold/60 transition-all duration-300 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div class="flex items-center gap-3 min-w-0">
                         ${avatarHtml}
                         <div class="min-w-0">
@@ -1846,9 +2014,9 @@
                                 ${hasEmail ? `
                                     <span class="inline-flex items-center gap-1 text-holiday-pine font-medium bg-emerald-50 px-2.5 py-0.5 rounded-lg border border-emerald-200/70">
                                         <i data-lucide="mail" class="w-3 h-3"></i>
-                                        <span class="truncate max-w-[210px] sm:max-w-[280px]">${escapeHtml(user.email)}</span>
+                                        <span class="truncate max-w-[200px] sm:max-w-[280px]">${escapeHtml(user.email)}</span>
                                     </span>
-                                    <button type="button" onclick="copyTextToClipboard('${escapeHtml(user.email).replace(/'/g, "\\'")}')" title="Copiar e-mail" class="p-1 text-stone-400 hover:text-holiday-pine rounded-lg hover:bg-stone-100 cursor-pointer">
+                                    <button type="button" onclick="copyTextToClipboard('${escapeHtml(user.email).replace(/'/g, "\\'")}')" title="Copiar e-mail" class="macos-btn p-1 text-stone-400 hover:text-holiday-pine rounded-lg hover:bg-stone-100 cursor-pointer">
                                         <i data-lucide="copy" class="w-3.5 h-3.5"></i>
                                     </button>
                                 ` : `
@@ -1885,15 +2053,11 @@
             updateProfileModalPreview(pendingProfileAvatar);
             updateDrawUI();
 
-            const modal = document.getElementById('profile-modal');
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
+            openSmoothModal('profile-modal');
         };
 
         window.closeProfileModal = function() {
-            const modal = document.getElementById('profile-modal');
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
+            closeSmoothModal('profile-modal');
         };
 
         window.previewProfileUrl = function(url) {
@@ -2025,7 +2189,7 @@
             }
 
             let html = `
-                <button onclick="setFilter('ALL')" class="snap-start shrink-0 min-h-[38px] px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer ${activeParticipantFilter === 'ALL' ? 'bg-holiday-pine text-white shadow-sm' : 'bg-holiday-cream text-stone-700 hover:bg-holiday-sand'}">
+                <button onclick="setFilter('ALL')" class="macos-btn snap-start shrink-0 min-h-[38px] px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold cursor-pointer ${activeParticipantFilter === 'ALL' ? 'bg-holiday-pine text-white shadow-sm' : 'bg-holiday-cream text-stone-700 hover:bg-holiday-sand'}">
                     Todos (${allWishlists.length})
                 </button>
             `;
@@ -2039,7 +2203,7 @@
                     : '';
 
                 html += `
-                    <button onclick="setFilter('${w.id}')" class="snap-start shrink-0 min-h-[38px] px-3 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${isActive ? 'bg-holiday-pine text-white shadow-sm' : 'bg-holiday-cream text-stone-700 hover:bg-holiday-sand'}">
+                    <button onclick="setFilter('${w.id}')" class="macos-btn snap-start shrink-0 min-h-[38px] px-3 py-1.5 rounded-xl text-xs sm:text-sm font-semibold cursor-pointer flex items-center gap-1.5 ${isActive ? 'bg-holiday-pine text-white shadow-sm' : 'bg-holiday-cream text-stone-700 hover:bg-holiday-sand'}">
                         ${miniAvatar}
                         <span>${escapeHtml(w.displayName)}</span>
                         <span class="text-xs px-1.5 py-0.5 rounded-md ${isActive ? 'bg-white/20 text-white' : 'bg-stone-200/70 text-stone-600'}">${optCount}</span>
@@ -2093,7 +2257,7 @@
                 if (!opt) return '';
                 const itemPrice = parsePriceBRL(opt.price);
                 return `
-                    <div class="bg-white/10 border border-white/15 rounded-2xl p-3 flex items-center justify-between gap-2.5">
+                    <div class="bg-white/10 backdrop-blur-xs border border-white/15 rounded-2xl p-3 flex items-center justify-between gap-2.5 transition-transform duration-200 hover:bg-white/15">
                         <div class="min-w-0">
                             <span class="text-[10px] font-bold uppercase tracking-wider text-holiday-goldLight block">
                                 Opção ${idx + 1} • ${itemPrice > 0 ? formatBRL(itemPrice) : 'Sem valor'}
@@ -2102,11 +2266,11 @@
                         </div>
                         <div class="flex items-center gap-1.5 shrink-0">
                             <a href="${escapeHtml(opt.url)}" target="_blank" rel="noopener noreferrer" title="Abrir na loja"
-                               class="p-2 rounded-xl bg-white text-holiday-pine hover:bg-holiday-goldLight transition-colors">
+                               class="macos-btn p-2 rounded-xl bg-white text-holiday-pine hover:bg-holiday-goldLight">
                                 <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
                             </a>
                             <button type="button" onclick="promptUnreserveSingleItem('${myReservedList.id}', ${idx})" title="Remover este item"
-                                class="p-2 rounded-xl bg-red-500/80 hover:bg-red-600 text-white transition-colors cursor-pointer">
+                                class="macos-btn p-2 rounded-xl bg-red-500/80 hover:bg-red-600 text-white cursor-pointer">
                                 <i data-lucide="x" class="w-3.5 h-3.5"></i>
                             </button>
                         </div>
@@ -2117,7 +2281,7 @@
             lucide.createIcons();
         }
 
-        // ==================== RENDERIZAÇÃO DOS CARTÕES ====================
+        // ==================== RENDERIZAÇÃO DOS CARTÕES COM ENTRADA EM CASCATA ====================
         window.renderWishlists = function() {
             const container = document.getElementById('wishlists-container');
             const emptyState = document.getElementById('empty-state');
@@ -2140,7 +2304,7 @@
             }
 
             emptyState.classList.add('hidden');
-            container.innerHTML = filtered.map(wishlist => {
+            container.innerHTML = filtered.map((wishlist, cardIndex) => {
                 const isReserved = Boolean(wishlist.reserved);
                 const isMine = wishlist.id === loggedUser.usernameKey;
                 const reservedByMe = isReserved && wishlist.reservedBy === loggedUser.usernameKey;
@@ -2156,8 +2320,10 @@
                     ? `<img src="${escapeHtml(liveAvatar)}" alt="${escapeHtml(wishlist.displayName)}" class="w-12 h-12 rounded-2xl object-cover border-2 border-holiday-gold/60 shrink-0 shadow-xs">`
                     : `<div class="w-12 h-12 rounded-2xl bg-holiday-pine text-holiday-goldLight font-serif font-bold text-lg flex items-center justify-center shrink-0">${initial}</div>`;
 
+                const staggerDelay = Math.min(cardIndex * 65, 380);
+
                 return `
-                <section class="bg-white/95 backdrop-blur-xs rounded-3xl border ${isReserved ? 'border-stone-200' : 'border-holiday-sand'} shadow-sm overflow-hidden">
+                <section style="animation-delay: ${staggerDelay}ms;" class="macos-stagger-in macos-card bg-white/90 backdrop-blur-md rounded-3xl border ${isReserved ? 'border-stone-200' : 'border-holiday-sand'} shadow-sm overflow-hidden">
                     <!-- Cabeçalho da Solicitação do Participante -->
                     <div class="p-4 sm:px-7 sm:py-5 bg-holiday-cream/75 border-b border-holiday-sand flex flex-col sm:flex-row sm:items-center justify-between gap-3.5">
                         <div class="flex items-center gap-3.5">
@@ -2173,11 +2339,11 @@
 
                         <div class="flex items-center gap-2 flex-wrap">
                             ${isMine ? `
-                                <button onclick="openMyWishesModal()" class="flex-1 sm:flex-initial min-h-[40px] px-3.5 py-2 rounded-xl bg-holiday-pine hover:bg-holiday-pineLight text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer">
+                                <button onclick="openMyWishesModal()" class="macos-btn flex-1 sm:flex-initial min-h-[40px] px-3.5 py-2 rounded-xl bg-holiday-pine hover:bg-holiday-pineLight text-white text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer">
                                     <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
                                     <span>Editar Opções</span>
                                 </button>
-                                <button onclick="promptDeleteAllMyGifts()" class="flex-1 sm:flex-initial min-h-[40px] px-3.5 py-2 rounded-xl bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer">
+                                <button onclick="promptDeleteAllMyGifts()" class="macos-btn flex-1 sm:flex-initial min-h-[40px] px-3.5 py-2 rounded-xl bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer">
                                     <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
                                     <span>Remover todos</span>
                                 </button>
@@ -2191,7 +2357,7 @@
                                         : 'Presente já escolhido!'}</span>
                                 </span>
                                 ${reservedByMe ? `
-                                    <button onclick="promptUnreserveAll('${wishlist.id}', '${escapeHtml(wishlist.displayName).replace(/'/g, "\\'")}')" class="w-full sm:w-auto min-h-[40px] px-3 py-2 rounded-xl bg-stone-200 hover:bg-red-100 text-stone-700 hover:text-red-700 text-xs font-bold flex items-center justify-center gap-1 transition-colors cursor-pointer">
+                                    <button onclick="promptUnreserveAll('${wishlist.id}', '${escapeHtml(wishlist.displayName).replace(/'/g, "\\'")}')" class="macos-btn w-full sm:w-auto min-h-[40px] px-3 py-2 rounded-xl bg-stone-200 hover:bg-red-100 text-stone-700 hover:text-red-700 text-xs font-bold flex items-center justify-center gap-1 cursor-pointer">
                                         <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
                                         <span>Desmarcar tudo</span>
                                     </button>
@@ -2216,16 +2382,16 @@
                             const canSelectMore = !isMine && (!isReserved || reservedByMe) && !isThisOptionChosenByMe && canAfford;
 
                             return `
-                            <div class="rounded-2xl border ${isThisOptionChosenByMe ? 'border-holiday-pine ring-2 ring-holiday-pine/30 bg-emerald-50/30' : 'border-stone-200 bg-white'} flex flex-col overflow-hidden transition-all">
-                                <div class="relative h-44 bg-holiday-cream border-b border-stone-100">
+                            <div class="macos-gift-item rounded-2xl border ${isThisOptionChosenByMe ? 'border-holiday-pine ring-2 ring-holiday-pine/30 bg-emerald-50/30' : 'border-stone-200 bg-white'} flex flex-col overflow-hidden">
+                                <div class="relative h-44 bg-holiday-cream border-b border-stone-100 overflow-hidden">
                                     <img src="${escapeHtml(imgUrl)}" alt="${escapeHtml(opt.title)}"
                                          onerror="this.onerror=null; this.src='${smartFallback}';"
                                          class="w-full h-full object-contain p-3 ${isReserved && !isThisOptionChosenByMe ? 'grayscale opacity-60' : ''}">
-                                    <span class="absolute top-2.5 left-2.5 bg-stone-800/85 text-white text-[11px] font-bold px-2.5 py-1 rounded-lg">
+                                    <span class="absolute top-2.5 left-2.5 bg-stone-800/85 backdrop-blur-xs text-white text-[11px] font-bold px-2.5 py-1 rounded-lg">
                                         Opção ${idx + 1}
                                     </span>
                                     ${isThisOptionChosenByMe ? `
-                                        <span class="absolute top-2.5 right-2.5 bg-holiday-pine text-white text-[11px] font-bold px-2.5 py-1 rounded-lg flex items-center gap-1">
+                                        <span class="absolute top-2.5 right-2.5 bg-holiday-pine text-white text-[11px] font-bold px-2.5 py-1 rounded-lg flex items-center gap-1 shadow-xs">
                                             <i data-lucide="check" class="w-3 h-3"></i> Escolhido
                                         </span>
                                     ` : ''}
@@ -2245,20 +2411,20 @@
 
                                     <div class="mt-auto pt-3 border-t border-stone-100 flex items-center gap-2">
                                         <a href="${escapeHtml(opt.url)}" target="_blank" rel="noopener noreferrer"
-                                           class="flex-1 min-h-[42px] bg-holiday-cream hover:bg-holiday-sand active:bg-holiday-sand text-stone-800 font-semibold text-xs py-2.5 px-3 rounded-xl flex items-center justify-center gap-1.5 transition-colors">
+                                           class="macos-btn flex-1 min-h-[42px] bg-holiday-cream hover:bg-holiday-sand text-stone-800 font-semibold text-xs py-2.5 px-3 rounded-xl flex items-center justify-center gap-1.5">
                                             <span>Ver na Loja</span>
                                             <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
                                         </a>
 
                                         ${isThisOptionChosenByMe ? `
                                             <button onclick="promptUnreserveSingleItem('${wishlist.id}', ${idx})"
-                                                class="min-h-[42px] px-3.5 py-2.5 rounded-xl text-xs font-bold bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 transition-all flex items-center gap-1.5 cursor-pointer">
+                                                class="macos-btn min-h-[42px] px-3.5 py-2.5 rounded-xl text-xs font-bold bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 flex items-center gap-1.5 cursor-pointer">
                                                 <i data-lucide="x" class="w-3.5 h-3.5"></i>
                                                 <span>Remover</span>
                                             </button>
                                         ` : canSelectMore ? `
                                             <button onclick="openReserveModal('${wishlist.id}', ${idx})"
-                                                class="min-h-[42px] px-4 py-2.5 rounded-xl text-xs font-bold bg-holiday-pine hover:bg-holiday-pineLight active:scale-[0.98] text-white shadow-xs transition-all flex items-center gap-1.5 cursor-pointer">
+                                                class="macos-btn min-h-[42px] px-4 py-2.5 rounded-xl text-xs font-bold bg-holiday-pine hover:bg-holiday-pineLight text-white shadow-xs flex items-center gap-1.5 cursor-pointer">
                                                 <i data-lucide="shopping-bag" class="w-3.5 h-3.5"></i>
                                                 <span>${reservedByMe ? '+ Adicionar' : 'Vou dar este!'}</span>
                                             </button>
@@ -2300,21 +2466,18 @@
                 addOptionBlock();
             }
 
-            const modal = document.getElementById('wishes-modal');
             const sheet = document.getElementById('wishes-modal-sheet');
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
+            openSmoothModal('wishes-modal');
             if (window.innerWidth < 640 && window.visualViewport) {
                 sheet.style.height = `${window.visualViewport.height}px`;
             }
         };
 
         window.closeMyWishesModal = function() {
-            const modal = document.getElementById('wishes-modal');
             const sheet = document.getElementById('wishes-modal-sheet');
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-            sheet.style.height = '';
+            closeSmoothModal('wishes-modal', () => {
+                sheet.style.height = '';
+            });
         };
 
         window.addOptionBlock = function(data = {}) {
@@ -2325,13 +2488,13 @@
             const initialPreview = data.imageUrl || getSmartGiftIllustration(data.title || '', data.url || '');
 
             const block = document.createElement('div');
-            block.className = "option-block bg-white p-4 rounded-2xl border border-stone-200 shadow-xs space-y-3 relative";
+            block.className = "macos-stagger-in option-block bg-white p-4 rounded-2xl border border-stone-200 shadow-xs space-y-3 relative";
             block.id = `option-block-${idx}`;
 
             block.innerHTML = `
                 <div class="flex items-center justify-between border-b border-stone-100 pb-2">
                     <span class="text-xs font-bold uppercase tracking-wider text-holiday-pine option-label">Opção de Presente</span>
-                    <button type="button" onclick="removeOptionBlock('option-block-${idx}')" class="min-h-[32px] px-2 text-xs text-red-500 hover:text-red-700 font-semibold flex items-center gap-1 cursor-pointer">
+                    <button type="button" onclick="removeOptionBlock('option-block-${idx}')" class="macos-btn min-h-[32px] px-2 text-xs text-red-500 hover:text-red-700 font-semibold flex items-center gap-1 cursor-pointer">
                         <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Remover
                     </button>
                 </div>
@@ -2340,9 +2503,9 @@
                     <label class="block text-xs font-semibold text-stone-700 mb-1">Link de onde comprar *</label>
                     <div class="flex flex-col sm:flex-row gap-2">
                         <input type="url" required placeholder="https://www.loja.com.br/produto..." value="${escapeHtml(data.url || '')}"
-                            class="opt-url flex-1 px-3.5 py-2.5 rounded-xl border border-stone-300 focus:border-holiday-pine outline-none text-base sm:text-sm">
+                            class="opt-url flex-1 px-3.5 py-2.5 rounded-xl border border-stone-300 focus:border-holiday-pine outline-none text-base sm:text-sm transition-all duration-200">
                         <button type="button" onclick="fetchOptionPreview(${idx}, this)"
-                            class="min-h-[42px] bg-holiday-pine hover:bg-holiday-pineLight text-white px-4 py-2 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 shrink-0 cursor-pointer">
+                            class="macos-btn min-h-[42px] bg-holiday-pine hover:bg-holiday-pineLight text-white px-4 py-2 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 shrink-0 cursor-pointer">
                             <i data-lucide="wand-2" class="w-3.5 h-3.5"></i>
                             <span>Puxar Foto</span>
                         </button>
@@ -2354,9 +2517,9 @@
                     <div class="flex items-center gap-3">
                         <img src="${escapeHtml(initialPreview)}"
                              onerror="this.src='${getSmartGiftIllustration()}'"
-                             class="opt-preview w-16 h-16 rounded-xl object-contain bg-white border border-stone-200 shrink-0">
+                             class="opt-preview w-16 h-16 rounded-xl object-contain bg-white border border-stone-200 shrink-0 transition-transform duration-300">
                         <div class="flex-1 min-w-0 sm:hidden">
-                            <label class="min-h-[38px] px-3 py-1.5 rounded-lg bg-white border border-stone-300 text-stone-700 font-semibold text-xs inline-flex items-center gap-1.5 cursor-pointer">
+                            <label class="macos-btn min-h-[38px] px-3 py-1.5 rounded-lg bg-white border border-stone-300 text-stone-700 font-semibold text-xs inline-flex items-center gap-1.5 cursor-pointer">
                                 <i data-lucide="image-plus" class="w-3.5 h-3.5 text-holiday-pine"></i>
                                 <span>Enviar Print / Foto</span>
                                 <input type="file" accept="image/*" class="hidden" onchange="handleGiftFileSelect(this, ${idx})">
@@ -2367,7 +2530,7 @@
                     <div class="flex-1 min-w-0 space-y-1.5">
                         <div class="flex items-center justify-between gap-2">
                             <label class="block text-[11px] font-semibold text-stone-600">Imagem do produto (automática, link ou print)</label>
-                            <label class="hidden sm:inline-flex px-2.5 py-1 rounded-lg bg-white hover:bg-stone-50 border border-stone-300 text-stone-700 font-semibold text-[11px] items-center gap-1 cursor-pointer shrink-0">
+                            <label class="macos-btn hidden sm:inline-flex px-2.5 py-1 rounded-lg bg-white hover:bg-stone-50 border border-stone-300 text-stone-700 font-semibold text-[11px] items-center gap-1 cursor-pointer shrink-0">
                                 <i data-lucide="image-plus" class="w-3 h-3 text-holiday-pine"></i>
                                 <span>Anexar Print</span>
                                 <input type="file" accept="image/*" class="hidden" onchange="handleGiftFileSelect(this, ${idx})">
@@ -2375,7 +2538,7 @@
                         </div>
                         <input type="text" placeholder="Cole o link da imagem ou deixe o ícone automático" value="${escapeHtml(data.imageUrl || '')}"
                             oninput="updateOptionImagePreview(${idx}, this.value)"
-                            class="opt-image w-full px-3 py-1.5 rounded-lg border border-stone-300 bg-white text-base sm:text-xs outline-none">
+                            class="opt-image w-full px-3 py-1.5 rounded-lg border border-stone-300 bg-white text-base sm:text-xs outline-none transition-all duration-200">
                     </div>
                 </div>
 
@@ -2384,19 +2547,19 @@
                         <label class="block text-xs font-semibold text-stone-700 mb-1">Nome do Presente *</label>
                         <input type="text" required placeholder="Ex: Fone Bluetooth JBL" value="${escapeHtml(data.title || '')}"
                             oninput="refreshFallbackIfEmpty(${idx})"
-                            class="opt-title w-full px-3.5 py-2.5 rounded-xl border border-stone-300 focus:border-holiday-pine outline-none text-base sm:text-sm">
+                            class="opt-title w-full px-3.5 py-2.5 rounded-xl border border-stone-300 focus:border-holiday-pine outline-none text-base sm:text-sm transition-all duration-200">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-stone-700 mb-1">Preço (R$) *</label>
                         <input type="text" required placeholder="Ex: R$ 45,00" value="${escapeHtml(data.price || '')}"
-                            class="opt-price w-full px-3.5 py-2.5 rounded-xl border border-stone-300 focus:border-holiday-pine outline-none text-base sm:text-sm">
+                            class="opt-price w-full px-3.5 py-2.5 rounded-xl border border-stone-300 focus:border-holiday-pine outline-none text-base sm:text-sm transition-all duration-200">
                     </div>
                 </div>
 
                 <div>
                     <label class="block text-xs font-semibold text-stone-700 mb-1">Detalhes específicos (Cor, voltagem, modelo)</label>
                     <input type="text" placeholder="Ex: Cor preta, 110v" value="${escapeHtml(data.notes || '')}"
-                        class="opt-notes w-full px-3.5 py-2.5 rounded-xl border border-stone-300 focus:border-holiday-pine outline-none text-base sm:text-sm">
+                        class="opt-notes w-full px-3.5 py-2.5 rounded-xl border border-stone-300 focus:border-holiday-pine outline-none text-base sm:text-sm transition-all duration-200">
                 </div>
             `;
 
@@ -2430,8 +2593,16 @@
                 showToast("Para apagar sua lista inteira, toque em 'Remover todos os meus presentes'.");
                 return;
             }
-            document.getElementById(blockId)?.remove();
-            renumberOptionBlocks();
+            const el = document.getElementById(blockId);
+            if (el) {
+                el.style.transition = 'opacity 0.22s ease, transform 0.22s ease';
+                el.style.opacity = '0';
+                el.style.transform = 'scale(0.96)';
+                setTimeout(() => {
+                    el.remove();
+                    renumberOptionBlocks();
+                }, 220);
+            }
         };
 
         function renumberOptionBlocks() {
@@ -2600,9 +2771,7 @@
                 }
             };
 
-            const modal = document.getElementById('confirm-modal');
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
+            openSmoothModal('confirm-modal');
         };
 
         // ==================== RESERVAR MÚLTIPLOS PRESENTES ATÉ R$ 100,00 ====================
@@ -2649,16 +2818,13 @@
 
             document.getElementById('reserve-email-input').value = loggedUser.email || '';
 
-            const modal = document.getElementById('reserve-modal');
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
+            openSmoothModal('reserve-modal');
         };
 
         window.closeReserveModal = function() {
-            const modal = document.getElementById('reserve-modal');
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-            pendingReserveData = null;
+            closeSmoothModal('reserve-modal', () => {
+                pendingReserveData = null;
+            });
         };
 
         document.getElementById('btn-confirm-reserve').addEventListener('click', async () => {
@@ -2776,9 +2942,7 @@
                 }
             };
 
-            const modal = document.getElementById('confirm-modal');
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
+            openSmoothModal('confirm-modal');
         };
 
         window.promptUnreserveAll = function(wishlistId, displayName) {
@@ -2799,9 +2963,7 @@
                 showToast("Sua escolha foi desmarcada com sucesso.");
             };
 
-            const modal = document.getElementById('confirm-modal');
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
+            openSmoothModal('confirm-modal');
         };
 
         document.getElementById('confirm-action-btn').addEventListener('click', async () => {
@@ -2813,10 +2975,9 @@
         });
 
         window.closeConfirmModal = function() {
-            const modal = document.getElementById('confirm-modal');
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-            pendingConfirmAction = null;
+            closeSmoothModal('confirm-modal', () => {
+                pendingConfirmAction = null;
+            });
         };
 
         function extractDomain(url) {
