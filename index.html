@@ -49,18 +49,43 @@
         }
     </script>
     <style>
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         .pb-safe { padding-bottom: max(0.75rem, env(safe-area-inset-bottom)); }
         .pt-safe { padding-top: max(0.75rem, env(safe-area-inset-top)); }
         input, select, textarea { scroll-margin-top: 100px; scroll-margin-bottom: 180px; }
+
+        /* Barrinha de rolagem horizontal visível para Desktop e Mobile */
+        .names-scrollbar {
+            overflow-x: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #D4A373 #EAE4DC;
+            -webkit-overflow-scrolling: touch;
+        }
+        .names-scrollbar::-webkit-scrollbar {
+            height: 7px;
+            display: block;
+        }
+        .names-scrollbar::-webkit-scrollbar-track {
+            background: #EAE4DC;
+            border-radius: 9999px;
+        }
+        .names-scrollbar::-webkit-scrollbar-thumb {
+            background: linear-gradient(90deg, #1B4332, #D4A373);
+            border-radius: 9999px;
+            border: 1px solid #FAF8F5;
+        }
+        .names-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #9E2A2B;
+        }
     </style>
 </head>
-<body class="bg-holiday-cream text-stone-800 font-sans antialiased min-h-[100dvh] flex flex-col selection:bg-holiday-berry selection:text-white">
+<body class="bg-holiday-cream text-stone-800 font-sans antialiased min-h-[100dvh] flex flex-col selection:bg-holiday-berry selection:text-white relative">
+
+    <!-- ==================== PAPEL DE PAREDE ANIMADO (ANO NOVO) ==================== -->
+    <canvas id="new-year-wallpaper" class="fixed inset-0 w-full h-full pointer-events-none z-0"></canvas>
 
     <!-- ==================== TELA DE LOGIN / CADASTRO ==================== -->
-    <div id="auth-screen" class="min-h-[100dvh] flex items-center justify-center p-4 sm:p-6 bg-gradient-to-br from-holiday-pine via-holiday-pineLight to-stone-900">
-        <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-9 shadow-2xl border border-holiday-gold/30">
+    <div id="auth-screen" class="relative z-10 min-h-[100dvh] flex items-center justify-center p-4 sm:p-6 bg-gradient-to-br from-holiday-pine/95 via-holiday-pineLight/90 to-stone-900/95">
+        <div class="bg-white/95 backdrop-blur-xs rounded-3xl max-w-md w-full p-6 sm:p-9 shadow-2xl border border-holiday-gold/40">
             <div class="text-center mb-6">
                 <div class="w-16 h-16 bg-holiday-berry text-holiday-goldLight rounded-2xl flex items-center justify-center mx-auto mb-3.5 shadow-md">
                     <i data-lucide="gift" class="w-8 h-8"></i>
@@ -125,9 +150,9 @@
     </div>
 
     <!-- ==================== APLICATIVO PRINCIPAL ==================== -->
-    <div id="app-container" class="hidden flex-1 flex-col pb-24 md:pb-0">
+    <div id="app-container" class="relative z-10 hidden flex-1 flex-col pb-24 md:pb-0">
         <!-- Header Festivo -->
-        <header class="bg-holiday-pine text-holiday-cream shadow-md sticky top-0 z-30 border-b border-holiday-pineLight pt-safe">
+        <header class="bg-holiday-pine/95 backdrop-blur-md text-holiday-cream shadow-md sticky top-0 z-30 border-b border-holiday-pineLight pt-safe">
             <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-2 sm:gap-3">
                 <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
                     <div class="bg-holiday-berry p-2 sm:p-2.5 rounded-2xl shadow-inner border border-holiday-gold/30 shrink-0">
@@ -142,8 +167,15 @@
                     </div>
                 </div>
 
-                <!-- Ações Admin, Sorteio, Perfil, Meus Desejos e Sair -->
+                <!-- Ações Música, Admin, Sorteio, Perfil, Meus Desejos e Sair -->
                 <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                    <!-- Botão Música de Ano Novo (Ligar / Desligar) -->
+                    <button id="btn-toggle-music" onclick="toggleNewYearMusic()" title="Ligar ou desligar música ambiente de Ano Novo"
+                        class="min-h-[42px] px-2.5 sm:px-3.5 py-2 rounded-xl bg-white/15 hover:bg-white/25 text-holiday-goldLight border border-holiday-gold/40 font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer">
+                        <i id="music-icon" data-lucide="volume-2" class="w-4 h-4"></i>
+                        <span id="music-label" class="hidden sm:inline">Música: Ligada</span>
+                    </button>
+
                     <!-- Botão Exclusivo Admin (Yuri Brian) -->
                     <button id="btn-admin-panel" onclick="openAdminModal()" title="Painel do Administrador" class="hidden min-h-[42px] px-2.5 sm:px-3.5 py-2 rounded-xl bg-holiday-gold text-stone-900 hover:bg-holiday-goldLight font-bold text-xs sm:text-sm items-center gap-1.5 shadow-sm transition-colors cursor-pointer">
                         <i data-lucide="shield-check" class="w-4 h-4 text-holiday-pine"></i>
@@ -181,7 +213,7 @@
         <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-5 sm:py-8">
 
             <!-- Card de Sorteio Individual no Perfil -->
-            <section id="profile-draw-card" class="mb-6 bg-white rounded-3xl p-4 sm:p-5 shadow-sm border border-holiday-sand flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+            <section id="profile-draw-card" class="mb-6 bg-white/95 backdrop-blur-xs rounded-3xl p-4 sm:p-5 shadow-sm border border-holiday-sand flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
                 <div class="flex items-center gap-3.5">
                     <div id="draw-card-icon-wrap" class="w-12 h-12 rounded-2xl bg-stone-100 text-stone-400 flex items-center justify-center shrink-0">
                         <i id="draw-card-icon" data-lucide="lock" class="w-6 h-6"></i>
@@ -209,7 +241,7 @@
             </section>
 
             <!-- Contador Regressivo até 01/01 às 00:00 -->
-            <section id="countdown-card" class="mb-6 bg-white rounded-3xl p-4 sm:p-6 shadow-sm border border-holiday-gold/50 relative overflow-hidden">
+            <section id="countdown-card" class="mb-6 bg-white/95 backdrop-blur-xs rounded-3xl p-4 sm:p-6 shadow-sm border border-holiday-gold/50 relative overflow-hidden">
                 <div class="flex flex-col md:flex-row items-center justify-between gap-4">
                     <div class="flex items-center gap-3 text-center sm:text-left">
                         <div class="w-11 h-11 rounded-2xl bg-holiday-berry/10 text-holiday-berry border border-holiday-berry/20 flex items-center justify-center shrink-0">
@@ -278,12 +310,24 @@
                 <div id="banner-selected-items-list" class="mt-4 pt-3.5 border-t border-white/15 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5"></div>
             </div>
 
-            <!-- Barra de Filtros -->
-            <section class="mb-6 sm:mb-8 bg-white p-4 sm:p-5 rounded-3xl shadow-sm border border-holiday-sand">
+            <!-- Barra de Filtros com Barrinha de Rolagem Horizontal nos Nomes -->
+            <section class="mb-6 sm:mb-8 bg-white/95 backdrop-blur-xs p-4 sm:p-5 rounded-3xl shadow-sm border border-holiday-sand">
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-3.5">
                     <div class="flex-1 min-w-0">
-                        <label class="block text-[11px] font-bold uppercase tracking-wider text-stone-400 mb-2">Participantes (deslize para ver)</label>
-                        <div id="participants-filter" class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 snap-x"></div>
+                        <div class="flex items-center justify-between mb-2">
+                            <label class="block text-[11px] font-bold uppercase tracking-wider text-stone-400">Participantes (role para o lado)</label>
+                            <div class="flex items-center gap-1">
+                                <button type="button" onclick="scrollParticipantsBar(-200)" title="Rolar nomes para a esquerda"
+                                    class="w-7 h-7 rounded-lg bg-holiday-cream hover:bg-holiday-sand border border-holiday-sand text-stone-600 flex items-center justify-center cursor-pointer">
+                                    <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                                </button>
+                                <button type="button" onclick="scrollParticipantsBar(200)" title="Rolar nomes para a direita"
+                                    class="w-7 h-7 rounded-lg bg-holiday-cream hover:bg-holiday-sand border border-holiday-sand text-stone-600 flex items-center justify-center cursor-pointer">
+                                    <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div id="participants-filter" class="names-scrollbar flex items-center gap-2 pb-2.5 snap-x"></div>
                     </div>
 
                     <div class="flex items-center gap-2 self-stretch md:self-end">
@@ -303,7 +347,7 @@
             </div>
 
             <!-- Estado Vazio -->
-            <div id="empty-state" class="hidden py-14 px-5 text-center bg-white rounded-3xl border border-dashed border-holiday-gold">
+            <div id="empty-state" class="hidden py-14 px-5 text-center bg-white/95 backdrop-blur-xs rounded-3xl border border-dashed border-holiday-gold">
                 <div class="w-16 h-16 bg-holiday-goldLight text-holiday-berry rounded-2xl flex items-center justify-center mx-auto mb-4">
                     <i data-lucide="sparkles" class="w-8 h-8"></i>
                 </div>
@@ -322,9 +366,9 @@
         </main>
 
         <!-- Footer Desktop -->
-        <footer class="hidden md:block bg-white border-t border-holiday-sand py-6 mt-12">
+        <footer class="hidden md:block bg-white/95 backdrop-blur-xs border-t border-holiday-sand py-6 mt-12">
             <div class="max-w-6xl mx-auto px-4 text-center text-xs sm:text-sm text-stone-500 flex items-center justify-between gap-2">
-                <p>Amigo Secreto • Escolha um ou mais presentes da mesma lista até R$ 100,00 🎄✨</p>
+                <p>Amigo Secreto • Escolha um ou mais presentes da mesma lista até R$ 100,00 🥂✨</p>
                 <p id="footer-user-info" class="text-xs text-stone-400"></p>
             </div>
         </footer>
@@ -411,7 +455,7 @@
                     <h3 id="revealed-friend-name" class="font-serif text-2xl sm:text-3xl font-bold text-white">
                         Nome do Amigo
                     </h3>
-                    <p class="text-xs text-emerald-200 mt-1">Guarde segredo! 🤫🎄</p>
+                    <p class="text-xs text-emerald-200 mt-1">Guarde segredo! 🤫🥂</p>
                 </div>
 
                 <div class="flex flex-col gap-2">
@@ -716,6 +760,212 @@
 
         lucide.createIcons();
 
+        // ==================== PAPEL DE PAREDE ANIMADO DE ANO NOVO ====================
+        function initNewYearWallpaper() {
+            const canvas = document.getElementById('new-year-wallpaper');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            let width = canvas.width = window.innerWidth;
+            let height = canvas.height = window.innerHeight;
+
+            window.addEventListener('resize', () => {
+                width = canvas.width = window.innerWidth;
+                height = canvas.height = window.innerHeight;
+            });
+
+            const colors = ['#D4A373', '#E9C46A', '#FAEDCD', '#2D6A4F', '#BC4749'];
+            const particles = Array.from({ length: 48 }, () => ({
+                x: Math.random() * width,
+                y: Math.random() * height,
+                radius: Math.random() * 2.8 + 1.1,
+                speedY: -(Math.random() * 0.38 + 0.14),
+                speedX: (Math.random() - 0.5) * 0.25,
+                alpha: Math.random() * 0.42 + 0.14,
+                twinkleSpeed: Math.random() * 0.02 + 0.008,
+                phase: Math.random() * Math.PI * 2,
+                color: colors[Math.floor(Math.random() * colors.length)],
+                isStar: Math.random() > 0.68
+            }));
+
+            function drawStar(cx, cy, r, alpha, color) {
+                ctx.save();
+                ctx.globalAlpha = alpha;
+                ctx.fillStyle = color;
+                ctx.beginPath();
+                for (let i = 0; i < 4; i++) {
+                    const angle = (i * Math.PI) / 2;
+                    ctx.moveTo(cx, cy);
+                    ctx.quadraticCurveTo(
+                        cx + Math.cos(angle + 0.4) * (r * 0.45),
+                        cy + Math.sin(angle + 0.4) * (r * 0.45),
+                        cx + Math.cos(angle) * (r * 2.3),
+                        cy + Math.sin(angle) * (r * 2.3)
+                    );
+                    ctx.quadraticCurveTo(
+                        cx + Math.cos(angle - 0.4) * (r * 0.45),
+                        cy + Math.sin(angle - 0.4) * (r * 0.45),
+                        cx,
+                        cy
+                    );
+                }
+                ctx.fill();
+                ctx.restore();
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, width, height);
+
+                for (const p of particles) {
+                    p.y += p.speedY;
+                    p.x += p.speedX + Math.sin(p.phase) * 0.12;
+                    p.phase += p.twinkleSpeed;
+
+                    if (p.y < -15) {
+                        p.y = height + 15;
+                        p.x = Math.random() * width;
+                    }
+                    if (p.x < -15) p.x = width + 15;
+                    if (p.x > width + 15) p.x = -15;
+
+                    const currentAlpha = Math.max(0.08, Math.min(0.55, p.alpha + Math.sin(p.phase) * 0.15));
+
+                    if (p.isStar) {
+                        drawStar(p.x, p.y, p.radius, currentAlpha, p.color);
+                    } else {
+                        ctx.save();
+                        ctx.globalAlpha = currentAlpha;
+                        ctx.fillStyle = p.color;
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.restore();
+                    }
+                }
+
+                requestAnimationFrame(animate);
+            }
+
+            animate();
+        }
+        initNewYearWallpaper();
+
+        // ==================== MÚSICA SUAVE DE ANO NOVO (AULD LANG SYNE) ====================
+        let audioCtx = null;
+        let isMusicEnabled = localStorage.getItem('amigo_secreto_music_muted') !== 'true';
+        let musicTimerId = null;
+        let noteStep = 0;
+
+        // Melodia suave de Ano Novo ("Auld Lang Syne") em timbre de caixinha de música
+        const AULD_LANG_SYNE_MELODY = [
+            { f: 261.63, d: 0.55 }, { f: 349.23, d: 0.85 }, { f: 349.23, d: 0.35 }, { f: 349.23, d: 0.55 },
+            { f: 440.00, d: 0.55 }, { f: 392.00, d: 0.85 }, { f: 349.23, d: 0.35 }, { f: 392.00, d: 0.55 },
+            { f: 440.00, d: 0.55 }, { f: 349.23, d: 0.55 }, { f: 349.23, d: 0.55 }, { f: 440.00, d: 0.55 },
+            { f: 523.25, d: 0.55 }, { f: 587.33, d: 1.35 }, { f: 0,      d: 0.35 },
+            { f: 587.33, d: 0.55 }, { f: 523.25, d: 0.85 }, { f: 440.00, d: 0.35 }, { f: 440.00, d: 0.55 },
+            { f: 349.23, d: 0.55 }, { f: 392.00, d: 0.85 }, { f: 349.23, d: 0.35 }, { f: 392.00, d: 0.55 },
+            { f: 440.00, d: 0.55 }, { f: 349.23, d: 0.85 }, { f: 293.66, d: 0.35 }, { f: 293.66, d: 0.55 },
+            { f: 261.63, d: 0.55 }, { f: 349.23, d: 1.45 }, { f: 0,      d: 0.65 }
+        ];
+
+        function playMusicBoxNote(freq, duration) {
+            if (!audioCtx || !isMusicEnabled || freq <= 0) return;
+            try {
+                const now = audioCtx.currentTime;
+                const osc = audioCtx.createOscillator();
+                const harmonic = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, now);
+
+                harmonic.type = 'triangle';
+                harmonic.frequency.setValueAtTime(freq * 2, now);
+
+                const harmonicGain = audioCtx.createGain();
+                harmonicGain.gain.setValueAtTime(0.012, now);
+
+                // Volume bem baixinho e agradável
+                gain.gain.setValueAtTime(0.0001, now);
+                gain.gain.exponentialRampToValueAtTime(0.035, now + 0.04);
+                gain.gain.exponentialRampToValueAtTime(0.0001, now + duration + 0.35);
+
+                osc.connect(gain);
+                harmonic.connect(harmonicGain);
+                harmonicGain.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                osc.start(now);
+                harmonic.start(now);
+                osc.stop(now + duration + 0.4);
+                harmonic.stop(now + duration + 0.4);
+            } catch {}
+        }
+
+        function scheduleNextMusicNote() {
+            if (!isMusicEnabled) return;
+            const note = AULD_LANG_SYNE_MELODY[noteStep % AULD_LANG_SYNE_MELODY.length];
+            noteStep++;
+            playMusicBoxNote(note.f, note.d);
+            musicTimerId = setTimeout(scheduleNextMusicNote, note.d * 1000);
+        }
+
+        function ensureAudioStarted() {
+            if (!isMusicEnabled) return;
+            if (!audioCtx) {
+                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                if (!AudioContextClass) return;
+                audioCtx = new AudioContextClass();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            if (!musicTimerId) {
+                scheduleNextMusicNote();
+            }
+        }
+
+        function updateMusicButtonUI() {
+            const btn = document.getElementById('btn-toggle-music');
+            const label = document.getElementById('music-label');
+            if (!btn || !label) return;
+
+            if (isMusicEnabled) {
+                btn.className = "min-h-[42px] px-2.5 sm:px-3.5 py-2 rounded-xl bg-white/15 hover:bg-white/25 text-holiday-goldLight border border-holiday-gold/40 font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer";
+                btn.innerHTML = `<i data-lucide="volume-2" class="w-4 h-4"></i><span id="music-label" class="hidden sm:inline">Música: Ligada</span>`;
+            } else {
+                btn.className = "min-h-[42px] px-2.5 sm:px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/15 text-stone-300 border border-white/15 font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer";
+                btn.innerHTML = `<i data-lucide="volume-x" class="w-4 h-4"></i><span id="music-label" class="hidden sm:inline">Música: Desligada</span>`;
+            }
+            lucide.createIcons();
+        }
+
+        window.toggleNewYearMusic = function() {
+            isMusicEnabled = !isMusicEnabled;
+            localStorage.setItem('amigo_secreto_music_muted', String(!isMusicEnabled));
+            updateMusicButtonUI();
+
+            if (isMusicEnabled) {
+                ensureAudioStarted();
+                showToast("Música de Ano Novo ligada 🎶");
+            } else {
+                if (musicTimerId) {
+                    clearTimeout(musicTimerId);
+                    musicTimerId = null;
+                }
+                showToast("Música desligada 🔇");
+            }
+        };
+
+        // Inicia automaticamente no primeiro clique/toque na página (respeitando política dos navegadores)
+        ['pointerdown', 'keydown'].forEach(evt => {
+            document.addEventListener(evt, () => {
+                if (isMusicEnabled && !musicTimerId) {
+                    ensureAudioStarted();
+                }
+            }, { once: true });
+        });
+        updateMusicButtonUI();
+
         // ==================== UTILITÁRIOS DE PREÇO E RESERVAS MÚLTIPLAS ====================
         function parsePriceBRL(priceStr) {
             if (priceStr === null || priceStr === undefined) return 0;
@@ -757,6 +1007,11 @@
             const options = wishlist?.options || [];
             return indices.reduce((sum, idx) => sum + parsePriceBRL(options[idx]?.price), 0);
         }
+
+        window.scrollParticipantsBar = function(delta) {
+            const bar = document.getElementById('participants-filter');
+            if (bar) bar.scrollBy({ left: delta, behavior: 'smooth' });
+        };
 
         // ==================== CONTADOR REGRESSIVO (01/01 ÀS 00:00) ====================
         function startSecretSantaCountdown() {
@@ -1059,6 +1314,8 @@
 
         window.handleAuthSubmit = async function(e) {
             e.preventDefault();
+            ensureAudioStarted();
+
             if (!firebaseReady || !db) {
                 showAuthError("Aguarde a conexão com o servidor...");
                 return;
@@ -1900,9 +2157,9 @@
                     : `<div class="w-12 h-12 rounded-2xl bg-holiday-pine text-holiday-goldLight font-serif font-bold text-lg flex items-center justify-center shrink-0">${initial}</div>`;
 
                 return `
-                <section class="bg-white rounded-3xl border ${isReserved ? 'border-stone-200' : 'border-holiday-sand'} shadow-sm overflow-hidden">
+                <section class="bg-white/95 backdrop-blur-xs rounded-3xl border ${isReserved ? 'border-stone-200' : 'border-holiday-sand'} shadow-sm overflow-hidden">
                     <!-- Cabeçalho da Solicitação do Participante -->
-                    <div class="p-4 sm:px-7 sm:py-5 bg-holiday-cream/70 border-b border-holiday-sand flex flex-col sm:flex-row sm:items-center justify-between gap-3.5">
+                    <div class="p-4 sm:px-7 sm:py-5 bg-holiday-cream/75 border-b border-holiday-sand flex flex-col sm:flex-row sm:items-center justify-between gap-3.5">
                         <div class="flex items-center gap-3.5">
                             ${avatarHtml}
                             <div class="min-w-0">
@@ -2353,7 +2610,6 @@
             const wishlist = allWishlists.find(w => w.id === wishlistId);
             if (!wishlist) return;
 
-            // Impede escolher presentes de duas pessoas diferentes
             const alreadyReservedOther = allWishlists.find(
                 w => w.reserved && w.reservedBy === loggedUser.usernameKey && w.id !== wishlistId
             );
