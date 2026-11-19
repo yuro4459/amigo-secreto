@@ -300,7 +300,7 @@
                         <span>Admin</span>
                     </button>
 
-                    <!-- Botão de Sorteio no Perfil (Desktop) -->
+                    <!-- Botão de Sorteio / Visualizar Amigo Secreto no Header (Desktop) -->
                     <button type="button" id="header-draw-btn" onclick="openDrawModal()" class="macos-btn hidden md:flex min-h-[42px] px-3.5 py-2 rounded-xl bg-white/10 text-emerald-100 border border-white/15 font-bold text-xs items-center gap-1.5 cursor-pointer">
                         <i id="header-draw-icon" data-lucide="lock" class="w-4 h-4 text-holiday-goldLight"></i>
                         <span id="header-draw-label">Sorteio Bloqueado</span>
@@ -330,10 +330,10 @@
         <!-- Conteúdo Principal -->
         <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-5 sm:py-8">
 
-            <!-- Card de Sorteio Individual no Perfil -->
+            <!-- Card de Sorteio Individual e Visualização Permanente do Amigo Secreto -->
             <section id="profile-draw-card" style="animation-delay: 40ms;" class="macos-stagger-in macos-card mb-6 bg-white/90 backdrop-blur-md rounded-3xl p-4 sm:p-5 shadow-sm border border-holiday-sand flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
                 <div class="flex items-center gap-3.5">
-                    <div id="draw-card-icon-wrap" class="w-12 h-12 rounded-2xl bg-stone-100 text-stone-400 flex items-center justify-center shrink-0 transition-colors duration-300">
+                    <div id="draw-card-icon-wrap" class="w-12 h-12 rounded-2xl bg-stone-100 text-stone-400 flex items-center justify-center shrink-0 transition-colors duration-300 overflow-hidden">
                         <i id="draw-card-icon" data-lucide="lock" class="w-6 h-6"></i>
                     </div>
                     <div>
@@ -351,11 +351,18 @@
                     </div>
                 </div>
 
-                <button id="main-draw-btn" onclick="openDrawModal()" disabled
-                    class="macos-btn min-h-[46px] px-5 py-2.5 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 shrink-0 bg-stone-200 text-stone-400 cursor-not-allowed">
-                    <i data-lucide="lock" class="w-4 h-4"></i>
-                    <span>Sortear Amigo Secreto</span>
-                </button>
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 shrink-0">
+                    <button id="main-draw-btn" onclick="openDrawModal()" disabled
+                        class="macos-btn min-h-[46px] px-5 py-2.5 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 shrink-0 bg-stone-200 text-stone-400 cursor-not-allowed">
+                        <i data-lucide="lock" class="w-4 h-4"></i>
+                        <span>Sortear Amigo Secreto</span>
+                    </button>
+                    <button id="quick-friend-wishes-btn" onclick="filterByDrawnFriend()"
+                        class="hidden macos-btn min-h-[46px] px-4 py-2.5 rounded-2xl font-bold text-xs flex items-center justify-center gap-1.5 shrink-0 bg-holiday-goldLight hover:bg-holiday-gold/40 text-holiday-pine border border-holiday-gold/50 cursor-pointer">
+                        <i data-lucide="gift" class="w-4 h-4 text-holiday-berry"></i>
+                        <span>Ver Desejos</span>
+                    </button>
+                </div>
             </section>
 
             <!-- Contador Regressivo até 01/01 às 00:00 -->
@@ -559,7 +566,7 @@
                 </button>
             </div>
 
-            <!-- Estado 3: Já Sorteado (Resultado Revelado) -->
+            <!-- Estado 3: Já Sorteado (Resultado Sempre Visível) -->
             <div id="draw-state-revealed" class="hidden py-2">
                 <span class="inline-block text-[11px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full mb-3">
                     Seu Amigo Secreto é:
@@ -573,7 +580,7 @@
                     <h3 id="revealed-friend-name" class="font-serif text-2xl sm:text-3xl font-bold text-white">
                         Nome do Amigo
                     </h3>
-                    <p class="text-xs text-emerald-200 mt-1">Guarde segredo! 🤫🥂</p>
+                    <p class="text-xs text-emerald-200 mt-1">Sempre disponível para consulta • Guarde segredo! 🤫🥂</p>
                 </div>
 
                 <div class="flex flex-col gap-2">
@@ -1747,7 +1754,7 @@
             document.getElementById('auth-password').value = '';
         };
 
-        // ==================== LÓGICA DO SORTEADOR E CONTROLE ADM ====================
+// ==================== LÓGICA DO SORTEADOR, VISUALIZAÇÃO PERMANENTE E CONTROLE ADM ====================
         function generateSecretSantaAssignments(userKeys) {
             const shuffled = [...userKeys];
             for (let i = shuffled.length - 1; i > 0; i--) {
@@ -1823,6 +1830,7 @@
             const title = document.getElementById('draw-card-title');
             const subtitle = document.getElementById('draw-card-subtitle');
             const mainBtn = document.getElementById('main-draw-btn');
+            const quickWishesBtn = document.getElementById('quick-friend-wishes-btn');
 
             const headerBtn = document.getElementById('header-draw-btn');
             const headerLabel = document.getElementById('header-draw-label');
@@ -1831,7 +1839,7 @@
             const profileModalStatus = document.getElementById('profile-modal-draw-status');
 
             if (!isUnlocked || !myAssignedKey) {
-                iconWrap.className = "w-12 h-12 rounded-2xl bg-stone-100 text-stone-400 flex items-center justify-center shrink-0 transition-colors duration-300";
+                iconWrap.className = "w-12 h-12 rounded-2xl bg-stone-100 text-stone-400 flex items-center justify-center shrink-0 transition-colors duration-300 overflow-hidden";
                 iconWrap.innerHTML = `<i data-lucide="lock" class="w-6 h-6"></i>`;
                 badge.className = "text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-stone-100 text-stone-500 transition-colors duration-300";
                 badge.textContent = "Sorteio Bloqueado";
@@ -1841,6 +1849,7 @@
                 mainBtn.disabled = true;
                 mainBtn.className = "macos-btn min-h-[46px] px-5 py-2.5 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 shrink-0 bg-stone-200 text-stone-400 cursor-not-allowed";
                 mainBtn.innerHTML = `<i data-lucide="lock" class="w-4 h-4"></i><span>Sortear Amigo Secreto</span>`;
+                quickWishesBtn?.classList.add('hidden');
 
                 headerBtn.className = "macos-btn hidden md:flex min-h-[42px] px-3.5 py-2 rounded-xl bg-white/10 text-emerald-100/70 border border-white/10 font-bold text-xs items-center gap-1.5 cursor-not-allowed";
                 headerLabel.textContent = "Sorteio Bloqueado";
@@ -1854,7 +1863,7 @@
                 profileModalBtn.innerHTML = `<i data-lucide="lock" class="w-3.5 h-3.5"></i><span>Sortear</span>`;
                 profileModalStatus.textContent = "Aguardando ADM liberar";
             } else if (!hasRevealed) {
-                iconWrap.className = "w-12 h-12 rounded-2xl bg-holiday-goldLight text-holiday-berry flex items-center justify-center shrink-0 transition-colors duration-300";
+                iconWrap.className = "w-12 h-12 rounded-2xl bg-holiday-goldLight text-holiday-berry flex items-center justify-center shrink-0 transition-colors duration-300 overflow-hidden";
                 iconWrap.innerHTML = `<i data-lucide="sparkles" class="w-6 h-6"></i>`;
                 badge.className = "text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 transition-colors duration-300";
                 badge.textContent = "Liberado pelo ADM!";
@@ -1864,6 +1873,7 @@
                 mainBtn.disabled = false;
                 mainBtn.className = "macos-btn min-h-[46px] px-5 py-2.5 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 shrink-0 bg-holiday-berry hover:bg-holiday-berryLight text-white shadow-md cursor-pointer";
                 mainBtn.innerHTML = `<i data-lucide="shuffle" class="w-4 h-4 text-holiday-goldLight"></i><span>Sortear Meu Amigo</span>`;
+                quickWishesBtn?.classList.add('hidden');
 
                 headerBtn.className = "macos-btn hidden md:flex min-h-[42px] px-3.5 py-2 rounded-xl bg-holiday-gold text-stone-900 hover:bg-holiday-goldLight font-bold text-xs items-center gap-1.5 shadow-xs cursor-pointer";
                 headerLabel.textContent = "Sortear Amigo!";
@@ -1877,19 +1887,33 @@
                 profileModalBtn.innerHTML = `<i data-lucide="shuffle" class="w-3.5 h-3.5"></i><span>Sortear</span>`;
                 profileModalStatus.textContent = "Liberado! Pronto para sortear";
             } else {
-                iconWrap.className = "w-12 h-12 rounded-2xl bg-holiday-pine text-holiday-goldLight flex items-center justify-center shrink-0 transition-colors duration-300";
-                iconWrap.innerHTML = `<i data-lucide="gift" class="w-6 h-6"></i>`;
+                // Após o sorteio: mantém o amigo secreto sempre visível e acessível a qualquer momento
+                const friendData = usersDirectory[myAssignedKey] || {};
+                const friendName = friendData.displayName || myAssignedKey;
+                const friendAvatar = friendData.avatarUrl || '';
+                const friendInitial = escapeHtml(friendName.charAt(0).toUpperCase());
+
+                iconWrap.className = "w-12 h-12 rounded-2xl bg-holiday-pine text-holiday-goldLight border-2 border-holiday-gold flex items-center justify-center shrink-0 transition-colors duration-300 overflow-hidden shadow-xs";
+                iconWrap.innerHTML = friendAvatar
+                    ? `<img src="${escapeHtml(friendAvatar)}" alt="${escapeHtml(friendName)}" class="w-full h-full object-cover">`
+                    : `<span class="font-serif font-bold text-lg">${friendInitial}</span>`;
+
                 badge.className = "text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-holiday-goldLight text-holiday-pine transition-colors duration-300";
-                badge.textContent = "Sorteio Realizado";
-                title.textContent = "Você já sorteou seu Amigo Secreto!";
-                subtitle.textContent = "Toque no botão para ver novamente quem você tirou (só você tem acesso).";
+                badge.textContent = "Seu Amigo Secreto • Sempre Visível";
+                title.innerHTML = `Você tirou <span class="text-holiday-berry">${escapeHtml(friendName)}</span>`;
+                subtitle.textContent = "Resultado salvo com sigilo. Toque para abrir o cartão ou ver os desejos.";
 
                 mainBtn.disabled = false;
                 mainBtn.className = "macos-btn min-h-[46px] px-5 py-2.5 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 shrink-0 bg-holiday-pine hover:bg-holiday-pineLight text-white shadow-xs cursor-pointer";
-                mainBtn.innerHTML = `<i data-lucide="eye" class="w-4 h-4 text-holiday-goldLight"></i><span>Ver Quem Eu Tirei</span>`;
+                mainBtn.innerHTML = `<i data-lucide="eye" class="w-4 h-4 text-holiday-goldLight"></i><span>Visualizar Amigo</span>`;
 
-                headerBtn.className = "macos-btn hidden md:flex min-h-[42px] px-3.5 py-2 rounded-xl bg-white/15 hover:bg-white/25 text-white border border-white/20 font-bold text-xs items-center gap-1.5 cursor-pointer";
-                headerLabel.textContent = "Ver Meu Amigo";
+                if (quickWishesBtn) {
+                    quickWishesBtn.classList.remove('hidden');
+                    quickWishesBtn.classList.add('flex');
+                }
+
+                headerBtn.className = "macos-btn hidden md:flex min-h-[42px] px-3.5 py-2 rounded-xl bg-holiday-gold text-stone-900 hover:bg-holiday-goldLight font-bold text-xs items-center gap-1.5 shadow-xs cursor-pointer";
+                headerLabel.textContent = `Amigo: ${friendName}`;
 
                 mobileBtn.disabled = false;
                 mobileBtn.className = "macos-btn min-h-[46px] rounded-2xl bg-holiday-pine text-white font-bold text-[11px] flex flex-col items-center justify-center gap-0.5 cursor-pointer";
@@ -1897,8 +1921,8 @@
 
                 profileModalBtn.disabled = false;
                 profileModalBtn.className = "macos-btn min-h-[38px] px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 shrink-0 bg-holiday-pine text-white hover:bg-holiday-pineLight cursor-pointer";
-                profileModalBtn.innerHTML = `<i data-lucide="eye" class="w-3.5 h-3.5"></i><span>Ver Amigo</span>`;
-                profileModalStatus.textContent = "Você já realizou seu sorteio";
+                profileModalBtn.innerHTML = `<i data-lucide="eye" class="w-3.5 h-3.5"></i><span>Ver ${escapeHtml(friendName)}</span>`;
+                profileModalStatus.textContent = `Amigo secreto: ${friendName}`;
             }
 
             const adminPill = document.getElementById('admin-draw-status-pill');
@@ -1910,7 +1934,7 @@
                 if (isUnlocked) {
                     adminPill.className = "text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-400 text-stone-900 transition-colors duration-300";
                     adminPill.textContent = "Liberado";
-                    adminDesc.textContent = "Os participantes já podem clicar no botão de sortear em seus perfis.";
+                    adminDesc.textContent = "Os participantes já podem sortear e visualizar seus amigos secretos sempre que quiserem.";
                     releaseBtn.classList.add('hidden');
                     resetBtn.classList.remove('hidden');
                     resetBtn.classList.add('flex');
@@ -2001,6 +2025,7 @@
                 document.getElementById('draw-state-ready').classList.add('hidden');
                 populateRevealedFriendUI(myAssignedKey);
                 document.getElementById('draw-state-revealed').classList.remove('hidden');
+                updateDrawUI();
                 lucide.createIcons();
             }, 1800);
         };
@@ -2028,12 +2053,22 @@
         window.filterByDrawnFriend = function() {
             if (!loggedUser) return;
             const friendKey = drawSettings.assignments?.[loggedUser.usernameKey];
-            closeDrawModal();
-            if (friendKey && allWishlists.some(w => w.id === friendKey)) {
-                setFilter(friendKey);
-                document.getElementById('wishlists-container')?.scrollIntoView({ behavior: 'smooth' });
+            const modalOpen = !document.getElementById('draw-modal')?.classList.contains('hidden');
+
+            const applyFriendFilter = () => {
+                if (friendKey && allWishlists.some(w => w.id === friendKey)) {
+                    setFilter(friendKey);
+                    document.getElementById('wishlists-container')?.scrollIntoView({ behavior: 'smooth' });
+                } else {
+                    showToast("Seu amigo secreto ainda não cadastrou a lista de desejos dele!");
+                }
+            };
+
+            if (modalOpen) {
+                closeDrawModal();
+                setTimeout(applyFriendFilter, 220);
             } else {
-                showToast("Seu amigo secreto ainda não cadastrou a lista de desejos dele!");
+                applyFriendFilter();
             }
         };
 
@@ -2085,14 +2120,12 @@
                 confirmBtn.textContent = "Excluindo...";
 
                 try {
-                    // Remove o cadastro e a lista de desejos do participante.
                     const userRef = doc(db, 'artifacts', appId, 'public', 'data', 'secret_santa_users', usernameKey);
                     const wishlistRef = doc(db, 'artifacts', appId, 'public', 'data', 'secret_santa_wishlists', usernameKey);
 
                     await deleteDoc(wishlistRef);
                     await deleteDoc(userRef);
 
-                    // Remove reservas feitas por essa pessoa nas listas dos demais participantes.
                     const relatedWishlists = allWishlists.filter(w => w.reservedBy === usernameKey);
                     await Promise.all(relatedWishlists.map(w => {
                         const ref = doc(db, 'artifacts', appId, 'public', 'data', 'secret_santa_wishlists', w.id);
@@ -2105,13 +2138,11 @@
                         });
                     }));
 
-                    // Remove o participante dos pares e dos registros de revelação do sorteio.
                     const nextAssignments = { ...(drawSettings.assignments || {}) };
                     const nextRevealedBy = { ...(drawSettings.revealedBy || {}) };
                     delete nextAssignments[usernameKey];
                     delete nextRevealedBy[usernameKey];
 
-                    // Ninguém deve continuar apontando para a conta removida.
                     Object.keys(nextAssignments).forEach(key => {
                         if (nextAssignments[key] === usernameKey) delete nextAssignments[key];
                     });
@@ -2357,6 +2388,7 @@
                     updateHeaderAvatarUI();
                 }
 
+                updateDrawUI();
                 updateFiltersUI();
                 renderWishlists();
                 if (!document.getElementById('admin-modal').classList.contains('hidden')) {
