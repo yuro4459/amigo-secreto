@@ -2054,6 +2054,93 @@
             closeSmoothModal('admin-modal');
         };
 
+        // Exclusão administrativa de uma conta e dos dados associados.
+        // A conta do administrador logado nunca pode ser excluída por esta ação.
+        window.adminDeleteAccount = function(usernameKey) {
+            if (!isCurrentUserAdmin() || !db) {
+                showToast("Acesso restrito ao administrador.");
+                return;
+            }
+
+            const target = usersDirectory[usernameKey];
+            if (!target) {
+                showToast("Este participante não foi encontrado.");
+                return;
+            }
+            if (usernameKey === ADMIN_USERNAME_KEY || usernameKey === loggedUser?.usernameKey) {
+                showToast("Por segurança, não é possível excluir a conta do administrador.");
+                return;
+            }
+
+            const targetName = target.displayName || usernameKey;
+            document.getElementById('confirm-modal-icon').setAttribute('data-lucide', 'user-x');
+            document.getElementById('confirm-title').textContent = "Excluir conta permanentemente?";
+            document.getElementById('confirm-message').textContent =
+                `Tem certeza de que deseja excluir a conta de ${targetName}? A lista de desejos e os dados de sorteio/reservas associados também serão removidos. Esta ação não pode ser desfeita.`;
+            document.getElementById('confirm-action-btn').textContent = "Sim, excluir conta";
+
+            pendingConfirmAction = async () => {
+                const confirmBtn = document.getElementById('confirm-action-btn');
+                confirmBtn.disabled = true;
+                confirmBtn.textContent = "Excluindo...";
+
+                try {
+                    // Remove o cadastro e a lista de desejos do participante.
+                    const userRef = doc(db, 'artifacts', appId, 'public', 'data', 'secret_santa_users', usernameKey);
+                    const wishlistRef = doc(db, 'artifacts', appId, 'public', 'data', 'secret_santa_wishlists', usernameKey);
+
+                    await deleteDoc(wishlistRef);
+                    await deleteDoc(userRef);
+
+                    // Remove reservas feitas por essa pessoa nas listas dos demais participantes.
+                    const relatedWishlists = allWishlists.filter(w => w.reservedBy === usernameKey);
+                    await Promise.all(relatedWishlists.map(w => {
+                        const ref = doc(db, 'artifacts', appId, 'public', 'data', 'secret_santa_wishlists', w.id);
+                        return updateDoc(ref, {
+                            reserved: false,
+                            reservedBy: null,
+                            reservedByName: null,
+                            reservedOptionIndex: null,
+                            reservedOptionIndices: []
+                        });
+                    }));
+
+                    // Remove o participante dos pares e dos registros de revelação do sorteio.
+                    const nextAssignments = { ...(drawSettings.assignments || {}) };
+                    const nextRevealedBy = { ...(drawSettings.revealedBy || {}) };
+                    delete nextAssignments[usernameKey];
+                    delete nextRevealedBy[usernameKey];
+
+                    // Ninguém deve continuar apontando para a conta removida.
+                    Object.keys(nextAssignments).forEach(key => {
+                        if (nextAssignments[key] === usernameKey) delete nextAssignments[key];
+                    });
+
+                    const drawRef = doc(db, 'artifacts', appId, 'public', 'data', 'secret_santa_config', 'draw_state');
+                    await setDoc(drawRef, {
+                        ...drawSettings,
+                        assignments: nextAssignments,
+                        revealedBy: nextRevealedBy,
+                        updatedAt: serverTimestamp()
+                    });
+
+                    showToast(`A conta de ${targetName} foi excluída.`);
+                    updateWhatsAppPreviewUI();
+                    renderAdminUsersList();
+                } catch (err) {
+                    console.error("Erro ao excluir conta:", err);
+                    showToast("Não foi possível concluir a exclusão. Verifique as permissões do Firebase e tente novamente.");
+                } finally {
+                    confirmBtn.disabled = false;
+                    confirmBtn.textContent = "Confirmar";
+                    lucide.createIcons();
+                }
+            };
+
+            lucide.createIcons();
+            openSmoothModal('confirm-modal');
+        };
+
         window.renderAdminUsersList = function() {
             if (!isCurrentUserAdmin()) return;
 
@@ -2138,7 +2225,7 @@
                         </div>
                     </div>
 
-                    <div class="flex items-center justify-between sm:justify-end gap-3 pt-2 sm:pt-0 border-t sm:border-t-0 border-stone-100 text-xs shrink-0">
+                    <div class="flex flex-wrap items-center justify-between sm:justify-end gap-2.5 pt-2 sm:pt-0 border-t sm:border-t-0 border-stone-100 text-xs shrink-0">
                         <div class="flex items-center gap-1.5 text-stone-500 bg-holiday-cream px-2.5 py-1 rounded-lg border border-holiday-sand" title="Senha protegida">
                             <i data-lucide="lock" class="w-3 h-3 text-stone-400"></i>
                             <span class="tracking-widest font-mono text-[11px]">••••••••</span>
@@ -2147,6 +2234,15 @@
                             <span class="block font-semibold text-stone-700">${wishesCount} ${wishesCount === 1 ? 'desejo' : 'desejos'}</span>
                             ${createdDateText ? `<span class="text-[10px] text-stone-400">Desde ${createdDateText}</span>` : ''}
                         </div>
+                        ${user.usernameKey !== ADMIN_USERNAME_KEY ? `
+                            <button type="button"
+                                onclick="adminDeleteAccount('${escapeHtml(user.usernameKey)}')"
+                                title="Excluir conta deste participante"
+                                class="macos-btn min-h-[38px] px-3 py-2 rounded-xl bg-red-50 hover:bg-red-100 border border-red-200 text-red-700 font-bold text-[11px] inline-flex items-center justify-center gap-1.5 cursor-pointer">
+                                <i data-lucide="user-x" class="w-3.5 h-3.5"></i>
+                                <span>Excluir conta</span>
+                            </button>
+                        ` : ''}
                     </div>
                 </div>
                 `;
