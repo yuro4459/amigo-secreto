@@ -2661,9 +2661,17 @@
                             <p class="text-xs font-bold text-white truncate">${escapeHtml(opt.title)}</p>
                         </div>
                         <div class="flex items-center gap-1.5 shrink-0">
-                            <a href="${escapeHtml(opt.url)}" target="_blank" rel="noopener noreferrer" title="Abrir na loja"
-                               class="macos-btn p-2 rounded-xl bg-white text-holiday-pine hover:bg-holiday-goldLight">
-                                <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+                            ${opt.url ? `
+                                            <a href="${escapeHtml(opt.url)}" target="_blank" rel="noopener noreferrer"
+                                               class="macos-btn flex-1 min-h-[42px] bg-holiday-cream hover:bg-holiday-sand text-stone-800 font-semibold text-xs py-2.5 px-3 rounded-xl flex items-center justify-center gap-1.5">
+                                                <span>Ver na Loja</span>
+                                                <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+                                            </a>
+                                        ` : `
+                                            <span class="flex-1 min-h-[42px] bg-holiday-cream/70 text-stone-400 font-medium text-xs py-2.5 px-3 rounded-xl flex items-center justify-center">
+                                                Sem link da loja
+                                            </span>
+                                        `}
                             </a>
                             <button type="button" onclick="promptUnreserveSingleItem('${myReservedList.id}', ${idx})" title="Remover este item"
                                 class="macos-btn p-2 rounded-xl bg-red-500/80 hover:bg-red-600 text-white cursor-pointer">
@@ -2896,9 +2904,9 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-stone-700 mb-1">Link de onde comprar *</label>
+                    <label class="block text-xs font-semibold text-stone-700 mb-1">Link de onde comprar (Opcional)</label>
                     <div class="flex flex-col sm:flex-row gap-2">
-                        <input type="url" required placeholder="https://www.loja.com.br/produto..." value="${escapeHtml(data.url || '')}"
+                        <input type="url" placeholder="https://www.loja.com.br/produto... (opcional)" value="${escapeHtml(data.url || '')}"
                             class="opt-url flex-1 px-3.5 py-2.5 rounded-xl border border-stone-300 focus:border-holiday-pine outline-none text-base sm:text-sm transition-all duration-200">
                         <button type="button" onclick="fetchOptionPreview(${idx}, this)"
                             class="macos-btn min-h-[42px] bg-holiday-pine hover:bg-holiday-pineLight text-white px-4 py-2 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 shrink-0 cursor-pointer">
@@ -3086,13 +3094,16 @@
             const blocks = document.querySelectorAll('#options-editor-list .option-block');
             const options = [];
 
-            blocks.forEach(block => {
-                const url = block.querySelector('.opt-url').value.trim();
+           blocks.forEach(block => {
+                let url = block.querySelector('.opt-url').value.trim();
+                if (url && !/^https?:\/\//i.test(url)) {
+                    url = 'https://' + url;
+                }
                 const imageUrl = block.querySelector('.opt-image').value.trim();
                 const title = block.querySelector('.opt-title').value.trim();
                 const price = block.querySelector('.opt-price').value.trim();
                 const notes = block.querySelector('.opt-notes').value.trim();
-                if (url && title) {
+                if (title) {
                     options.push({ url, imageUrl, title, price, notes });
                 }
             });
